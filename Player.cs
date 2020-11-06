@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 using EckTechGames.FloatingCombatText;
 
 public class Player : MonoBehaviour
@@ -9,18 +11,25 @@ public class Player : MonoBehaviour
     public Player attackTarget;
     public Player spellTarget;
 
-    public Vector3 targetPos;
-    public Transform camFollower;
+    public Vector3 targetPos;   
 
     public Vector3 idlePosition;
     public Vector3 strikePosition;
     public GameObject strikePoint;
+    public enum Action {melee, ranged, casting, item, flee }
+    public Action actionType;
 
-    public List<Spell> spells;
+
+    public List<PlayableDirector> playables;
+
+
 
 
 
     // Player Info
+    public bool warriorClass;
+    public bool mageClass;
+    public bool archerClass;
 
     public string playerName;
     public int playerHealth;
@@ -31,13 +40,14 @@ public class Player : MonoBehaviour
     public int playerSTR;
     public int playerDEF;
     public bool dead;
+    public List<Spell> spells;
 
-    // Player Equipment
+    // Player Objects
 
     public GameObject Weapon;
     public List<GameObject> equipedWeapons;
 
-    public void Start()
+    public virtual void Start()
     {
         strikePosition = strikePoint.transform.position;
         anim = GetComponent<Animator>();
@@ -49,19 +59,16 @@ public class Player : MonoBehaviour
         } StartCoroutine(AnimTimer());
     }
 
-    public void Melee()
+    public virtual void Melee()
     {
-        transform.position = attackTarget.strikePosition;
-        GetComponent<Animator>().SetTrigger("AttackR");
+        playables[0].Play();
         IEnumerator HitTimer()
-        {
-            yield return new WaitForSeconds(.75f);
-            attackTarget.anim.SetTrigger("gotHit");
-            yield return new WaitForSeconds(1.75f);
+        {            
+            yield return new WaitForSeconds(2.1f); // slightly longer than timeline animation for movable position.
             transform.position = idlePosition;
 
             int damage = playerSTR - attackTarget.playerDEF;
-            
+
             if (damage > 0)
             {
                 attackTarget.playerHealth = attackTarget.playerHealth - damage;
@@ -72,8 +79,35 @@ public class Player : MonoBehaviour
                 Debug.Log("damage 0 or less");
             }
 
-        } StartCoroutine(HitTimer());     
+        }
+        StartCoroutine(HitTimer());
     }
+
+    public virtual void Ranged()
+    {
+        playables[0].Play();
+        IEnumerator HitTimer()
+        {
+            yield return new WaitForSeconds(2.1f); // slightly longer than timeline animation for movable position.
+            transform.position = idlePosition;
+
+            int damage = playerSTR - attackTarget.playerDEF;
+
+            if (damage > 0)
+            {
+                attackTarget.playerHealth = attackTarget.playerHealth - damage;
+            }
+
+            if (damage <= 0)
+            {
+                Debug.Log("damage 0 or less");
+            }
+
+        }
+        StartCoroutine(HitTimer());
+    }
+
+
 
     public virtual void CastSpell()
     {
@@ -103,6 +137,12 @@ public class Player : MonoBehaviour
     {
 
     }
+
+    public void EnemyHitTrigger()  // for use in anims & timelines to trigger hit anim but not calculate damage;
+    {
+        attackTarget.anim.SetTrigger("gotHit");
+    }
+
 
 
     public virtual void Update()

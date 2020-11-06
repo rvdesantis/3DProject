@@ -26,7 +26,14 @@ public class Mage : Player
 
         base.CastSpell();
 
-        Weapon = equipedWeapons[0];
+        IEnumerator WeaponTimer()
+        {
+            yield return new WaitForSeconds(2);
+            Weapon.gameObject.SetActive(false);
+            Weapon = equipedWeapons[0];
+            Weapon.gameObject.SetActive(true);
+        } StartCoroutine(WeaponTimer());
+
     }
 
 

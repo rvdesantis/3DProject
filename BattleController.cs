@@ -1,12 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
+using Cinemachine;
+
 
 public class BattleController : MonoBehaviour
 {
     public static BattleController Instance { get; set; }
 
-    public CameraMover camMover;   
+    public List<CinemachineVirtualCamera> virtualCams;
+    public CinemachineVirtualCamera meleeCam;
+    public List<PlayableDirector> comboPlayables;
+
     public List<Player> heroes;
     public List<Enemy> enemies;
 
@@ -17,14 +24,18 @@ public class BattleController : MonoBehaviour
     public Vector3 spawnPoint2;
     public Vector3 spawnPoint3;
 
+    public bool endTurn;
+    public bool combo;
+
 
     private void Start()
     {        
         characterTurnIndex = 0;
         battleTurn = 0;
+        virtualCams[0].m_Follow = heroes[0].transform;
     }
 
-    public void NextPlayerAct()
+    public void NextPlayerTurn() // for action selection prior to Action Cycle
     {
         if (characterTurnIndex < 2)
         {
@@ -32,43 +43,137 @@ public class BattleController : MonoBehaviour
             foreach (Enemy character in enemies)
             {
                 character.attackTarget = heroes[characterTurnIndex];
-            }            
-            camMover.desiredPosition = heroes[characterTurnIndex].camFollower.transform.position;
-            camMover.target = heroes[characterTurnIndex].attackTarget.transform;
-            camMover.smoothSpeed = .0075f;
+            }
+            meleeCam.Priority = 0;
+            virtualCams[characterTurnIndex].Priority = 1;
+            virtualCams[characterTurnIndex - 1].Priority = 0;
             return;
         }
-
         if (characterTurnIndex == 2)
         {
-            camMover.desiredPosition = heroes[0].camFollower.transform.position;
+            Debug.Log("Start Hero Action Cycle");
+            characterTurnIndex = 0;
+            PlayerAct();
+        }
+
+    }
+
+    public void NextPlayerAct() // switch to next hero action
+    {
+        if (endTurn == true)
+        {
+            foreach (Player character in heroes)
+            {
+                character.transform.position = character.idlePosition;
+            }
+            virtualCams[0].Priority = 1;
+            virtualCams[2].Priority = 0;
+            Debug.Log("End of Turn.  Start Enemy Turn");
+            return;
+        }
+        if (endTurn == false)
+        {
+            if (characterTurnIndex < 2)
+            {                
+                meleeCam.Priority = 0;
+                characterTurnIndex = characterTurnIndex + 1;
+                virtualCams[characterTurnIndex].Priority = 1;
+                virtualCams[characterTurnIndex - 1].Priority = 0;
+                PlayerAct();
+                return;
+            }
+            if (characterTurnIndex == 2)
+            {
+                meleeCam.Priority = 0;
+                characterTurnIndex = characterTurnIndex + 1;
+                PlayerAct();
+                return;
+            }
+            if (characterTurnIndex == 3)
+            {
+                endTurn = true;
+                Debug.Log("end of player list");
+                NextPlayerAct();
+            }
+        }     
+    }
+
+
+    public void PlayerAct()
+    {
+        if (endTurn)
+        {
+            Debug.Log("Turn over, no Player Act");
+            return;
+        }
+        if (characterTurnIndex <= 2)
+        {
+            ComboChecker();
+
+            if (combo == false)
+            {
+                if (heroes[characterTurnIndex].actionType == Player.Action.melee)
+                {
+                    heroes[characterTurnIndex].Melee();
+                    meleeCam.Priority = 2;
+                    IEnumerator MeleeTimer()
+                    {
+                        yield return new WaitForSeconds(2);
+                        NextPlayerAct();
+                    }
+                    StartCoroutine(MeleeTimer());
+                }
+                if (heroes[characterTurnIndex].actionType == Player.Action.ranged)
+                {
+                    heroes[characterTurnIndex].Melee();
+                    virtualCams[characterTurnIndex].Priority = 2;
+                    IEnumerator MeleeTimer()
+                    {
+                        yield return new WaitForSeconds(2);
+                        NextPlayerAct();
+                    }
+                    StartCoroutine(MeleeTimer());
+                }
+                if (heroes[characterTurnIndex].actionType == Player.Action.casting)
+                {
+                    heroes[characterTurnIndex].CastSpell();
+                    IEnumerator CamTimer()
+                    {
+                        yield return new WaitForSeconds(2);
+                        NextPlayerAct();
+                    }
+                    StartCoroutine(CamTimer());
+                }
+            }
+            
         }
     }
 
-    public void PlayerMeleeAttack()
-    {
-        camMover.desiredPosition = camMover.meleeCamTarget.transform.position;
-        camMover.smoothSpeed = .0075f;
-        heroes[characterTurnIndex].Melee();        
-        IEnumerator MeleeTimer()
+
+    public void ComboChecker()
+    {        
+        if (heroes[0].dead == false && heroes[1].dead == false && heroes[2].dead == false)
         {
-            yield return new WaitForSeconds(3);
-            NextPlayerAct();
-        } StartCoroutine(MeleeTimer());        
+            if (heroes[0].actionType == Player.Action.melee || heroes[0].actionType == Player.Action.ranged)
+            {
+                if (heroes[1].actionType == Player.Action.melee || heroes[1].actionType == Player.Action.ranged)
+                {
+                    if (heroes[2].actionType == Player.Action.melee || heroes[2].actionType == Player.Action.ranged)
+                    {
+                        combo = true;
+                        comboPlayables[0].Play();
+                        IEnumerator CamTimer()
+                        {
+                            yield return new WaitForSeconds(4.5f);
+                            endTurn = true;
+                            NextPlayerAct();
+                        } StartCoroutine(CamTimer());
+                    }
+                }
+            }
+        }
     }
 
-    public void PlayerSpellAttack()
-    {
-        camMover.desiredPosition = heroes[characterTurnIndex].camFollower.transform.position + new Vector3 (0, 1, -2);
-        camMover.smoothSpeed = .0075f;
-        heroes[characterTurnIndex].CastSpell();
-        IEnumerator CamTimer()
-        {
-            yield return new WaitForSeconds(3);
-            NextPlayerAct();
-        }
-        StartCoroutine(CamTimer());
-    }
 
 
     private void Update()
@@ -76,18 +181,32 @@ public class BattleController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            PlayerMeleeAttack();
+            heroes[characterTurnIndex].actionType = Player.Action.melee;
+            if (characterTurnIndex <= 2)
+            {
+                NextPlayerTurn();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            heroes[characterTurnIndex].actionType = Player.Action.ranged;
+            if (characterTurnIndex <= 2)
+            {
+                NextPlayerTurn();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            PlayerSpellAttack();
+            heroes[characterTurnIndex].actionType = Player.Action.casting;
+            if (characterTurnIndex <= 2)
+            {
+                NextPlayerTurn();
+            }
         }
 
-        if (characterTurnIndex == 0)
-        {            
-            camMover.target = heroes[0].attackTarget.transform;
-        }
+
 
         if (characterTurnIndex == 1)
         {        
@@ -99,11 +218,7 @@ public class BattleController : MonoBehaviour
             heroes[2].transform.LookAt(heroes[2].attackTarget.transform);
         }
 
-        if (characterTurnIndex > 2)
-        {
-            camMover.target = heroes[0].camFollower;
-            Debug.Log("character turn index exceeded 2");
-        }
+
 
 
     }
