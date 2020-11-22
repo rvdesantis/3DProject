@@ -9,20 +9,26 @@ using Cinemachine;
 public class BattleController : MonoBehaviour
 {
     public static BattleController Instance { get; set; }
+    public Combo comboController;
 
     public List<CinemachineVirtualCamera> virtualCams;
     public CinemachineVirtualCamera meleeCam;
     public List<PlayableDirector> comboPlayables;
 
+
+    public PlayerBank staticBank;
+    public PlayerBank staticEnemyBank;
     public List<Player> heroes;
-    public List<Enemy> enemies;
+    public List<Player> enemies;
 
     public int characterTurnIndex;
     public int battleTurn; // 0 = Player Turn / 1 = Enemy Turn
 
+    public Vector3 spawnPoint0;
     public Vector3 spawnPoint1;
     public Vector3 spawnPoint2;
-    public Vector3 spawnPoint3;
+
+    public Vector3 enemySpawnPoint0;
 
     public bool endTurn;
     public bool combo;
@@ -32,7 +38,28 @@ public class BattleController : MonoBehaviour
     {        
         characterTurnIndex = 0;
         battleTurn = 0;
-        virtualCams[0].m_Follow = heroes[0].transform;
+
+
+        heroes[0] = Instantiate<Player>(staticBank.bank[HeroSelect.hero0], spawnPoint0, Quaternion.identity);
+
+        heroes[1] = Instantiate<Player>(staticBank.bank[HeroSelect.hero1], spawnPoint1, Quaternion.identity);
+        
+        heroes[2] = Instantiate<Player>(staticBank.bank[HeroSelect.hero2], spawnPoint2, Quaternion.identity);
+
+        enemies[0] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint0, Quaternion.identity);
+
+
+        foreach (Player character in heroes)
+        {
+            character.attackTarget = enemies[0];
+            character.transform.LookAt(character.attackTarget.transform);
+        }
+        foreach (Player character in enemies)
+        {
+            character.attackTarget = heroes[0];
+            character.transform.LookAt(character.attackTarget.transform);
+        }
+
     }
 
     public void NextPlayerTurn() // for action selection prior to Action Cycle
@@ -52,6 +79,8 @@ public class BattleController : MonoBehaviour
         if (characterTurnIndex == 2)
         {
             Debug.Log("Start Hero Action Cycle");
+            virtualCams[0].Priority = 1;
+            virtualCams[2].Priority = 0;
             characterTurnIndex = 0;
             PlayerAct();
         }
@@ -66,10 +95,19 @@ public class BattleController : MonoBehaviour
             {
                 character.transform.position = character.idlePosition;
             }
-            virtualCams[0].Priority = 1;
+            virtualCams[0].Priority = 1;                        
             virtualCams[2].Priority = 0;
             Debug.Log("End of Turn.  Start Enemy Turn");
+            IEnumerator TurnTimer()
+            {
+                yield return new WaitForSeconds(3);
+                characterTurnIndex = 0;
+                endTurn = false;
+                battleTurn = 1;
+                EnemyAct();
+            } StartCoroutine(TurnTimer());
             return;
+
         }
         if (endTurn == false)
         {
@@ -84,15 +122,11 @@ public class BattleController : MonoBehaviour
             }
             if (characterTurnIndex == 2)
             {
-                meleeCam.Priority = 0;
-                characterTurnIndex = characterTurnIndex + 1;
-                PlayerAct();
-                return;
-            }
-            if (characterTurnIndex == 3)
-            {
                 endTurn = true;
                 Debug.Log("end of player list");
+                virtualCams[0].Priority = 1;
+                meleeCam.m_Priority = 0;
+                virtualCams[0].m_LookAt = enemies[0].transform;
                 NextPlayerAct();
             }
         }     
@@ -106,9 +140,9 @@ public class BattleController : MonoBehaviour
             Debug.Log("Turn over, no Player Act");
             return;
         }
-        if (characterTurnIndex <= 2)
+        if (!endTurn)
         {
-            ComboChecker();
+            comboController.ComboChecker();
 
             if (combo == false)
             {
@@ -150,28 +184,68 @@ public class BattleController : MonoBehaviour
     }
 
 
-    public void ComboChecker()
-    {        
-        if (heroes[0].dead == false && heroes[1].dead == false && heroes[2].dead == false)
+    public void EnemyAct()
+    {
+        if (endTurn)
         {
-            if (heroes[0].actionType == Player.Action.melee || heroes[0].actionType == Player.Action.ranged)
-            {
-                if (heroes[1].actionType == Player.Action.melee || heroes[1].actionType == Player.Action.ranged)
-                {
-                    if (heroes[2].actionType == Player.Action.melee || heroes[2].actionType == Player.Action.ranged)
-                    {
-                        combo = true;
-                        comboPlayables[0].Play();
-                        IEnumerator CamTimer()
-                        {
-                            yield return new WaitForSeconds(4.5f);
-                            endTurn = true;
-                            NextPlayerAct();
-                        } StartCoroutine(CamTimer());
-                    }
-                }
-            }
+            Debug.Log("Turn over, no Enemy Act");
+            return;
         }
+        if (enemies[characterTurnIndex].dead == true)
+        {
+            NextEnemyAct();
+            return;
+        }
+        if (characterTurnIndex <= enemies.Count - 1)
+        {
+            enemies[characterTurnIndex].Act();
+            IEnumerator TurnTimer()
+            {
+                yield return new WaitForSeconds(2);
+                NextEnemyAct();
+            } StartCoroutine(TurnTimer());
+               
+        }
+    }
+
+    public void NextEnemyAct() // switch to next enemy action
+    {
+        if (characterTurnIndex <= enemies.Count - 1)
+        {
+            characterTurnIndex = characterTurnIndex + 1;
+            if (characterTurnIndex < enemies.Count)
+            {
+                enemies[characterTurnIndex].Act();
+                return;
+            }
+            if (characterTurnIndex == enemies.Count)
+            {
+                foreach (Player character in enemies)
+                {
+                    character.transform.position = character.idlePosition;
+                }
+                characterTurnIndex = 0;
+                battleTurn = 0;
+
+                Debug.Log("End of Turn.  Start Player Turn");
+
+                foreach(Player character in enemies)
+                {
+                    int deadEnemies = 0;
+                    if (character.dead)
+                    {
+                        deadEnemies++;                        
+                    }
+                    if (deadEnemies == enemies.Count)
+                    {
+                        AreaController.battleReturn = true;
+                        UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
+                    }
+                }                
+                return;
+            }           
+            
+        }        
     }
 
 
@@ -181,11 +255,25 @@ public class BattleController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            heroes[characterTurnIndex].actionType = Player.Action.melee;
-            if (characterTurnIndex <= 2)
+            if (heroes[characterTurnIndex].warriorClass || heroes[characterTurnIndex].berzerkerClass)
             {
-                NextPlayerTurn();
+                heroes[characterTurnIndex].actionType = Player.Action.melee;
+                if (characterTurnIndex <= 2)
+                {
+                    NextPlayerTurn();
+                }
+                return;
             }
+            if (heroes[characterTurnIndex].archerClass || heroes[characterTurnIndex].mageClass)
+            {
+                heroes[characterTurnIndex].actionType = Player.Action.ranged;
+                if (characterTurnIndex <= 2)
+                {
+                    NextPlayerTurn();
+                }
+                return;
+            }
+
         }
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -205,22 +293,6 @@ public class BattleController : MonoBehaviour
                 NextPlayerTurn();
             }
         }
-
-
-
-        if (characterTurnIndex == 1)
-        {        
-            heroes[1].transform.LookAt(heroes[1].attackTarget.transform);
-        }
-
-        if (characterTurnIndex == 2)
-        {
-            heroes[2].transform.LookAt(heroes[2].attackTarget.transform);
-        }
-
-
-
-
     }
 
 

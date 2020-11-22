@@ -9,8 +9,7 @@ public class Archer : Player
 
     public override void Start()
     {        
-        base.Start();
-        Reload();
+        base.Start();        
     }
 
 

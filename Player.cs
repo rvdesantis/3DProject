@@ -10,11 +10,11 @@ public class Player : MonoBehaviour
     public Animator anim;
     public Player attackTarget;
     public Player spellTarget;
+    
 
     public Vector3 targetPos;   
 
     public Vector3 idlePosition;
-    public Vector3 strikePosition;
     public GameObject strikePoint;
     public enum Action {melee, ranged, casting, item, flee }
     public Action actionType;
@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
     public bool warriorClass;
     public bool mageClass;
     public bool archerClass;
+    public bool berzerkerClass;
 
     public string playerName;
     public int playerHealth;
@@ -42,30 +43,39 @@ public class Player : MonoBehaviour
     public bool dead;
     public List<Spell> spells;
 
+    public Sprite playerFace;
+
     // Player Objects
 
     public GameObject Weapon;
     public List<GameObject> equipedWeapons;
 
     public virtual void Start()
-    {
-        strikePosition = strikePoint.transform.position;
+    {        
         anim = GetComponent<Animator>();
-        IEnumerator AnimTimer()
-        {
-            yield return new WaitForSeconds(3);
-            idlePosition = transform.position;
-            Debug.Log(playerName + " idle position set");
-        } StartCoroutine(AnimTimer());
+        Debug.Log(playerName + " idle position set");
+        LookAtTarget();
+        idlePosition = transform.position;
+    }
+
+    public virtual void Act()
+    {
+        // left blank for Enemy use;
     }
 
     public virtual void Melee()
     {
-        playables[0].Play();
         IEnumerator HitTimer()
         {            
-            yield return new WaitForSeconds(2.1f); // slightly longer than timeline animation for movable position.
+            transform.position = attackTarget.strikePoint.transform.position;
+            LookAtTarget();
+            yield return new WaitForSeconds(.25f);
+
+            anim.SetTrigger("AttackR");
+
+            yield return new WaitForSeconds(1.75f);
             transform.position = idlePosition;
+
 
             int damage = playerSTR - attackTarget.playerDEF;
 
@@ -85,11 +95,15 @@ public class Player : MonoBehaviour
 
     public virtual void Ranged()
     {
-        playables[0].Play();
         IEnumerator HitTimer()
         {
-            yield return new WaitForSeconds(2.1f); // slightly longer than timeline animation for movable position.
+            LookAtTarget();
+            yield return new WaitForSeconds(1);
+            anim.SetTrigger("AttackR");
+
+            yield return new WaitForSeconds(1.75f);
             transform.position = idlePosition;
+            
 
             int damage = playerSTR - attackTarget.playerDEF;
 
@@ -111,6 +125,7 @@ public class Player : MonoBehaviour
 
     public virtual void CastSpell()
     {
+        LookAtTarget();        
         GetComponent<Animator>().SetTrigger("castStart");
         IEnumerator SpellTimer()
         {
@@ -143,15 +158,18 @@ public class Player : MonoBehaviour
         attackTarget.anim.SetTrigger("gotHit");
     }
 
-
-
-    public virtual void Update()
+    public void LookAtTarget()
     {
         if (attackTarget != null)
         {
             targetPos = attackTarget.transform.position;
             transform.LookAt(targetPos);
         }
+    }
+
+    public virtual void Update()
+    {
+
     }
 
 

@@ -1,14 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
 
-
-public class WarriorM : Player
+public class SecretWall : MonoBehaviour
 {
-
-    
-
+    public GameObject disolver;
+    public bool open;
 
 
 }

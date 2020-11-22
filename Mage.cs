@@ -7,33 +7,81 @@ public class Mage : Player
 {
 
     public GameObject castingHand;
+    public ParticleSystem meleeStrike;
     public ParticleSystem castingFXShock;
 
 
+    public void TriggerMelee() // triggered in animations
+    {
+        
+        meleeStrike.gameObject.SetActive(true);
+        meleeStrike.Play();
+    }
+
     public void CastShock() // triggered in animations
     {
+        castingFXShock.gameObject.SetActive(true);
         castingFXShock.Play();
+    }
+
+    public override void Melee()
+    {
+        IEnumerator HitTimer()
+        {   
+            yield return new WaitForSeconds(.25f);
+            anim.SetTrigger("AttackR");
+            meleeStrike.transform.position = attackTarget.transform.position;
+            yield return new WaitForSeconds(1.75f);
+            transform.position = idlePosition;
+
+
+            int damage = playerSTR - attackTarget.playerDEF;
+
+            if (damage > 0)
+            {
+                attackTarget.playerHealth = attackTarget.playerHealth - damage;
+            }
+
+            if (damage <= 0)
+            {
+                Debug.Log("damage 0 or less");
+            }
+
+        }
+        StartCoroutine(HitTimer());
     }
 
 
     public override void CastSpell()
     {
-        Weapon.gameObject.SetActive(false);
-        Weapon = equipedWeapons[1];
-        Weapon.gameObject.SetActive(true);
-        Spell spellToCast = Instantiate<Spell>(spells[0], castingHand.transform.position, Quaternion.identity);
-        spellToCast.targetPosition = attackTarget.transform.position;
-
-        base.CastSpell();
-
-        IEnumerator WeaponTimer()
+        if (spells[0].manaCost <= playerMana)
         {
-            yield return new WaitForSeconds(2);
+            playerMana = playerMana - spells[0].manaCost;
             Weapon.gameObject.SetActive(false);
-            Weapon = equipedWeapons[0];
+            Weapon = equipedWeapons[1];
             Weapon.gameObject.SetActive(true);
-        } StartCoroutine(WeaponTimer());
+            Spell spellToCast = Instantiate<Spell>(spells[0], castingHand.transform.position, Quaternion.identity);
+            spellToCast.targetPosition = attackTarget.transform.position;
 
+            base.CastSpell();
+
+            IEnumerator WeaponTimer()
+            {
+                yield return new WaitForSeconds(2);
+                Weapon.gameObject.SetActive(false);
+                Weapon = equipedWeapons[0];
+                Weapon.gameObject.SetActive(true);
+            }
+            StartCoroutine(WeaponTimer());
+            return;
+        }
+
+        if (spells[0].manaCost > playerMana)
+        {
+
+        }
+
+         
     }
 
 
