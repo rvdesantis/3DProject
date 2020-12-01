@@ -23,7 +23,7 @@ public class HeroSelect : MonoBehaviour
     public GameObject backgroundAimer;
     public GameObject backgroundFollower;
     public List<GameObject> lights;
-    public List<ParticleSystem> auras;
+
 
     private void Start()
     {        
@@ -77,7 +77,7 @@ public class HeroSelect : MonoBehaviour
         {            
             if (partyIndex < 2)
             {
-                auras[heroIndex].gameObject.SetActive(true);
+                
                 activeParty.bank[partyIndex] = staticHeroList.bank[heroIndex];
                 if (partyIndex == 0)
                 {
@@ -93,7 +93,7 @@ public class HeroSelect : MonoBehaviour
             }
             if (partyIndex == 2)
             {
-                auras[heroIndex].gameObject.SetActive(true);
+                
                 activeParty.bank[partyIndex] = staticHeroList.bank[heroIndex];
                 hero2 = heroIndex;
 

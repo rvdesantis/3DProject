@@ -57,22 +57,11 @@ public class Mage : Player
         if (spells[0].manaCost <= playerMana)
         {
             playerMana = playerMana - spells[0].manaCost;
-            Weapon.gameObject.SetActive(false);
-            Weapon = equipedWeapons[1];
-            Weapon.gameObject.SetActive(true);
+            
             Spell spellToCast = Instantiate<Spell>(spells[0], castingHand.transform.position, Quaternion.identity);
             spellToCast.targetPosition = attackTarget.transform.position;
 
             base.CastSpell();
-
-            IEnumerator WeaponTimer()
-            {
-                yield return new WaitForSeconds(2);
-                Weapon.gameObject.SetActive(false);
-                Weapon = equipedWeapons[0];
-                Weapon.gameObject.SetActive(true);
-            }
-            StartCoroutine(WeaponTimer());
             return;
         }
 

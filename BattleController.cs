@@ -9,9 +9,11 @@ using Cinemachine;
 public class BattleController : MonoBehaviour
 {
     public static BattleController Instance { get; set; }
+    public BattleUIController uiController;
     public Combo comboController;
 
     public List<CinemachineVirtualCamera> virtualCams;
+    public CinemachineVirtualCamera activeCam;
     public CinemachineVirtualCamera meleeCam;
     public List<PlayableDirector> comboPlayables;
 
@@ -23,12 +25,15 @@ public class BattleController : MonoBehaviour
 
     public int characterTurnIndex;
     public int battleTurn; // 0 = Player Turn / 1 = Enemy Turn
+    public int focusIndex; // used for enemy focus when selecting targets
 
     public Vector3 spawnPoint0;
     public Vector3 spawnPoint1;
     public Vector3 spawnPoint2;
 
     public Vector3 enemySpawnPoint0;
+    public Vector3 enemySpawnPoint1;
+    public Vector3 enemySpawnPoint2;
 
     public bool endTurn;
     public bool combo;
@@ -47,6 +52,8 @@ public class BattleController : MonoBehaviour
         heroes[2] = Instantiate<Player>(staticBank.bank[HeroSelect.hero2], spawnPoint2, Quaternion.identity);
 
         enemies[0] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint0, Quaternion.identity);
+        enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
+        enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
 
 
         foreach (Player character in heroes)
@@ -59,7 +66,10 @@ public class BattleController : MonoBehaviour
             character.attackTarget = heroes[0];
             character.transform.LookAt(character.attackTarget.transform);
         }
-
+        virtualCams[0].LookAt = enemies[0].transform;
+        virtualCams[1].LookAt = enemies[0].transform;
+        virtualCams[2].LookAt = enemies[0].transform;
+        activeCam = virtualCams[0];
     }
 
     public void NextPlayerTurn() // for action selection prior to Action Cycle
@@ -215,7 +225,7 @@ public class BattleController : MonoBehaviour
             characterTurnIndex = characterTurnIndex + 1;
             if (characterTurnIndex < enemies.Count)
             {
-                enemies[characterTurnIndex].Act();
+                EnemyAct();
                 return;
             }
             if (characterTurnIndex == enemies.Count)
@@ -248,49 +258,89 @@ public class BattleController : MonoBehaviour
         }        
     }
 
-
+    public void CamTracker()
+    {        
+        foreach (CinemachineVirtualCamera cam in virtualCams)
+        {
+            if (cam.m_Priority > activeCam.m_Priority)
+            {
+                activeCam = cam;
+            }
+        }
+    }
 
     private void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            if (heroes[characterTurnIndex].warriorClass || heroes[characterTurnIndex].berzerkerClass)
-            {
-                heroes[characterTurnIndex].actionType = Player.Action.melee;
-                if (characterTurnIndex <= 2)
-                {
-                    NextPlayerTurn();
-                }
-                return;
-            }
-            if (heroes[characterTurnIndex].archerClass || heroes[characterTurnIndex].mageClass)
-            {
-                heroes[characterTurnIndex].actionType = Player.Action.ranged;
-                if (characterTurnIndex <= 2)
-                {
-                    NextPlayerTurn();
-                }
-                return;
-            }
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            heroes[characterTurnIndex].actionType = Player.Action.ranged;
-            if (characterTurnIndex <= 2)
-            {
-                NextPlayerTurn();
-            }
-        }
-
+        CamTracker();
         if (Input.GetKeyDown(KeyCode.S))
         {
-            heroes[characterTurnIndex].actionType = Player.Action.casting;
-            if (characterTurnIndex <= 2)
+            uiController.ToggleSpellPanel();
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (battleTurn == 0)
             {
-                NextPlayerTurn();
+                if (focusIndex < enemies.Count - 1)
+                {
+                    focusIndex++;
+                    activeCam.LookAt = enemies[focusIndex].transform;
+                    return;
+                }
+                if (focusIndex == enemies.Count - 1)
+                {
+                    focusIndex = 0;
+                    activeCam.LookAt = enemies[focusIndex].transform;
+                    return;
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (battleTurn == 0)
+            {
+                if (focusIndex > 0)
+                {
+                    focusIndex--;
+                    activeCam.LookAt = enemies[focusIndex].transform;
+                    return;
+                }
+                if (focusIndex == 0)
+                {
+                    focusIndex = enemies.Count - 1;
+                    activeCam.LookAt = enemies[focusIndex].transform;
+                    return;
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (uiController.activeUI == false)
+            {
+                heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
+                focusIndex = 0;
+                if (heroes[characterTurnIndex].warriorClass || heroes[characterTurnIndex].berzerkerClass)
+                {
+                    heroes[characterTurnIndex].actionType = Player.Action.melee;
+                    if (characterTurnIndex <= 2)
+                    {
+                        NextPlayerTurn();
+                    }
+                    return;
+                }
+                if (heroes[characterTurnIndex].archerClass || heroes[characterTurnIndex].mageClass)
+                {
+                    heroes[characterTurnIndex].actionType = Player.Action.ranged;
+                    if (characterTurnIndex <= 2)
+                    {
+                        NextPlayerTurn();
+                    }
+                    return;
+                }
+            }
+            if (uiController.activeUI == true)
+            {
+                heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
+                uiController.activeUI = false;
             }
         }
     }

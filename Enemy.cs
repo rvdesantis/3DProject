@@ -5,7 +5,7 @@ using EckTechGames.FloatingCombatText;
 
 public class Enemy : Player
 {
-    
+    public bool demon;
 
     public override void Act()
     {

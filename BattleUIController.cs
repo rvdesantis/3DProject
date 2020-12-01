@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class BattleUIController : MonoBehaviour
 {
     public BattleController battlecontroller;
@@ -10,7 +11,11 @@ public class BattleUIController : MonoBehaviour
     public List<Slider> healthbars;
     public List<Slider> manabars;
 
+    public List<Button> spellButtons;
+    public GameObject spellPanel;
+    public int spellIndex;
 
+    public bool activeUI;
 
     private void Start()
     {
@@ -72,5 +77,27 @@ public class BattleUIController : MonoBehaviour
     {
         SetHealth();
         SetMana();
+    }
+
+    public void ToggleSpellPanel()
+    {
+        activeUI = true;
+        if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count != 0)
+        {
+            spellIndex = 0;
+            spellButtons[0].image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[0].panelImage;
+            spellButtons[0].Select();
+            spellPanel.gameObject.SetActive(true);
+        }
+    }
+
+    public void SpellBTDown()
+    {
+        battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.casting;
+        spellPanel.gameObject.SetActive(false);
+        if (battlecontroller.characterTurnIndex <= 2)
+        {
+            battlecontroller.NextPlayerTurn();
+        }
     }
 }

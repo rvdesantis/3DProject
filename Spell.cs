@@ -14,6 +14,8 @@ public class Spell : MonoBehaviour
     public bool projectile;
     public float spellSpeed;
 
+    public Sprite panelImage;
+
     // Start is called before the first frame update
     void Start()
     {

@@ -19,6 +19,5 @@ public class FirstPersonPlayer : MonoBehaviour
         {
             GetComponent<Animator>().SetTrigger("turnRight");
         }
-
     }
 }

@@ -23,12 +23,12 @@ public class BattleLauncher : MonoBehaviour
         cornerDistance = FPcontroller.cornerDistance;
         stepCount = FPcontroller.steps;
 
-        if (stepCount > 75 && cornerDistance > 10)
+        if (stepCount > 33 && cornerDistance > 10)
         {            
             int battleChance = Random.Range(0, 100);
             Debug.Log("Battle Chance " + battleChance);
             if (battleChance > 74)
-            {                
+            {           
                 respawnPoint = FPcontroller.playerBody.transform.position;
                 AreaController.respawnPoint = respawnPoint;
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Battle");

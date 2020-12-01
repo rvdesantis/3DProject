@@ -6,12 +6,13 @@ public class AreaController : MonoBehaviour
 {
     public FirstPersonPlayer player;
     public FirstPerson FPcontroller;
-    public Transform playerBody;
+    public GameObject playerBody;
     public List<SecretWall> secretWalls;
-    public List<GameObject> chestLids;
 
-    public Vector3 spawnPoint;
+
+    
     public static Vector3 respawnPoint;
+    public Vector3 respawnPointMirror;
     public static bool battleReturn;
 
     public bool battleReturnmirror;
@@ -21,8 +22,9 @@ public class AreaController : MonoBehaviour
     void Start()
     {
         if (battleReturn)
-        {
-            FPcontroller.playerBody.position = respawnPoint;
+        {            
+            Debug.Log("battle return");
+            playerBody.transform.position = respawnPoint;
             battleReturn = false;
         }
     }
@@ -31,6 +33,7 @@ public class AreaController : MonoBehaviour
     void Update()
     {
         battleReturnmirror = battleReturn;
+        respawnPointMirror = respawnPoint;
         if (Input.GetKeyDown(KeyCode.Space))
         {
             foreach (SecretWall wall in secretWalls)
@@ -49,14 +52,6 @@ public class AreaController : MonoBehaviour
                     StartCoroutine(WallTimer());
                 }
             }
-            foreach (GameObject chest in chestLids)
-            {
-                if (Vector3.Distance(player.transform.position, chest.transform.position) < 3.5f)
-                {
-                    chest.GetComponent<Animator>().SetTrigger("openLid");                   
-                }
-            }
-
         }
     }
 }

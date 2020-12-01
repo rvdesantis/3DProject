@@ -15,12 +15,14 @@ public class Combo : MonoBehaviour
     public Player fWarrior;
     public Player fArcher;
     public Player fMage;
+    public Player target;
 
     // assets set active in timeline
     public Player mWarriorTimelineAsset;
     public Player fWarriorTimelineAsset;
     public Player fArcherTimelineAsset;
     public Player fMageTimelineAsset;
+    public Player demonTimelineAsset;
 
     public int mWarriorCount;
     public int fBerzerkerCount;
@@ -54,6 +56,8 @@ public class Combo : MonoBehaviour
                             fMage.gameObject.SetActive(false);
                             fMageTimelineAsset.attackTarget = fMage.attackTarget;
 
+                            
+                            
                             battleController.comboPlayables[0].Play();
 
 
@@ -85,7 +89,7 @@ public class Combo : MonoBehaviour
                                 battleController.endTurn = true;
                                 battleController.combo = false;
 
-                                yield return new WaitForSeconds(2);
+                                yield return new WaitForSeconds(1);
                                 battleController.NextPlayerAct();
                             }
                             StartCoroutine(CamTimer());
@@ -134,7 +138,7 @@ public class Combo : MonoBehaviour
                                 battleController.endTurn = true;
                                 battleController.combo = false;
 
-                                yield return new WaitForSeconds(2);
+                                yield return new WaitForSeconds(1);
                                 battleController.NextPlayerAct();
                             }
                             StartCoroutine(CamTimer());
@@ -182,7 +186,56 @@ public class Combo : MonoBehaviour
                                 battleController.endTurn = true;
                                 battleController.combo = false;
 
-                                yield return new WaitForSeconds(2);
+                                yield return new WaitForSeconds(1);
+                                battleController.NextPlayerAct();
+                            }
+                            StartCoroutine(CamTimer());
+                        }
+
+
+                        if (fBerzerkerCount == 0)
+                        {
+                            fArcher.gameObject.SetActive(false);
+                            fArcherTimelineAsset.attackTarget = fArcher.attackTarget;
+
+                            fMage.gameObject.SetActive(false);
+                            fMageTimelineAsset.attackTarget = fMage.attackTarget;
+
+                            mWarrior.gameObject.SetActive(false);
+                            mWarriorTimelineAsset.attackTarget = mWarrior.attackTarget;
+
+                            battleController.comboPlayables[3].Play();
+
+
+                            IEnumerator CamTimer()
+                            {
+                                yield return new WaitForSeconds(3);
+                                fArcher.gameObject.SetActive(true);
+                                fArcherTimelineAsset.gameObject.SetActive(false);
+
+                                fMage.gameObject.SetActive(true);
+                                fMageTimelineAsset.gameObject.SetActive(false);
+
+                                mWarrior.gameObject.SetActive(true);
+                                mWarriorTimelineAsset.gameObject.SetActive(false);
+
+                                foreach (Player character in battleController.heroes)
+                                {
+                                    character.transform.position = character.idlePosition;
+                                }
+
+
+                                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[1].playerSTR + battleController.heroes[2].playerSTR + 25;
+                                int damage = groupSTR - battleController.heroes[0].playerDEF;
+                                battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
+                                foreach (Player character in battleController.heroes)
+                                {
+                                    character.transform.position = character.idlePosition;
+                                }
+                                battleController.endTurn = true;
+                                battleController.combo = false;
+
+                                yield return new WaitForSeconds(1);
                                 battleController.NextPlayerAct();
                             }
                             StartCoroutine(CamTimer());
@@ -222,6 +275,8 @@ public class Combo : MonoBehaviour
             }
         }
     }
+
+    
 
 
 }

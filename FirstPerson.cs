@@ -15,7 +15,7 @@ public class FirstPerson : MonoBehaviour
 
 
     public float speed = 12;
-    public float gravity = -9.81f;
+    public float gravity = -3f;
     Vector3 velocity; // for gravity and falling;
 
     public CharacterController controller;
@@ -42,7 +42,7 @@ public class FirstPerson : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
         xRotation -= mouseY; //using -= because rotation is flipped)
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f); // so player can't look down or up more than 90;
+        xRotation = Mathf.Clamp(xRotation, -60f, 60f); // so player can't look down or up more than 90;
 
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         playerBody.Rotate(Vector3.up * mouseX);
@@ -65,7 +65,7 @@ public class FirstPerson : MonoBehaviour
 
         // battle launching; 
         distanceTraveled = Vector3.Distance(transform.position, lastPosition);
-        if (distanceTraveled > 2f)
+        if (distanceTraveled > 3f)
         {
             steps++;
             distanceTraveled = 0;
@@ -74,14 +74,12 @@ public class FirstPerson : MonoBehaviour
 
         foreach(GameObject corner in corners)
         {
-            if (Vector3.Distance(corner.transform.position, playerBody.transform.position) < 20)
+            if (Vector3.Distance(corner.transform.position, playerBody.transform.position) < 11)
             {
                 closestCorner = corner.transform.position;
             }
         }
 
         cornerDistance = Vector3.Distance(transform.position, closestCorner);
-
-
     }
 }
