@@ -13,6 +13,7 @@ public class Spell : MonoBehaviour
 
     public bool projectile;
     public float spellSpeed;
+    public float damageTimer;
 
     public Sprite panelImage;
 
@@ -26,5 +27,10 @@ public class Spell : MonoBehaviour
     void Update()
     {
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, spellSpeed);
+        if (Vector3.Distance(transform.position, targetPosition) < .35f)
+        {
+            gameObject.SetActive(false);
+            Destroy(this); // not destroying spell for some reason.
+        }
     }
 }

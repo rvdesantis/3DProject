@@ -62,7 +62,7 @@ public class Enemy : Player
     public override void Die()
     {
         dead = true;
-        anim.SetTrigger("death");
+        anim.SetTrigger("Dead");
         base.Die();
     }
 

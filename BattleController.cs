@@ -66,10 +66,13 @@ public class BattleController : MonoBehaviour
             character.attackTarget = heroes[0];
             character.transform.LookAt(character.attackTarget.transform);
         }
+        
         virtualCams[0].LookAt = enemies[0].transform;
         virtualCams[1].LookAt = enemies[0].transform;
         virtualCams[2].LookAt = enemies[0].transform;
         activeCam = virtualCams[0];
+
+        enemies[0].ToggleHighlighter();
     }
 
     public void NextPlayerTurn() // for action selection prior to Action Cycle
@@ -84,10 +87,15 @@ public class BattleController : MonoBehaviour
             meleeCam.Priority = 0;
             virtualCams[characterTurnIndex].Priority = 1;
             virtualCams[characterTurnIndex - 1].Priority = 0;
+            focusIndex = 0;
             return;
         }
         if (characterTurnIndex == 2)
         {
+            foreach (Enemy enemy in enemies)
+            {
+                enemy.highlighter.gameObject.SetActive(false);
+            }
             Debug.Log("Start Hero Action Cycle");
             virtualCams[0].Priority = 1;
             virtualCams[2].Priority = 0;
@@ -105,6 +113,15 @@ public class BattleController : MonoBehaviour
             {
                 character.transform.position = character.idlePosition;
             }
+            foreach (Enemy enemy in enemies)
+            {
+                if (enemy.playerHealth <= 0)
+                {
+                    enemy.gameObject.SetActive(false);
+                }
+                enemy.transform.position = enemy.idlePosition;
+            }
+
             virtualCams[0].Priority = 1;                        
             virtualCams[2].Priority = 0;
             Debug.Log("End of Turn.  Start Enemy Turn");
@@ -236,7 +253,7 @@ public class BattleController : MonoBehaviour
                 }
                 characterTurnIndex = 0;
                 battleTurn = 0;
-
+                enemies[0].ToggleHighlighter();
                 Debug.Log("End of Turn.  Start Player Turn");
 
                 foreach(Player character in enemies)
@@ -280,44 +297,109 @@ public class BattleController : MonoBehaviour
         {
             if (battleTurn == 0)
             {
-                if (focusIndex < enemies.Count - 1)
+                if (uiController.activeUI == false)
                 {
-                    focusIndex++;
-                    activeCam.LookAt = enemies[focusIndex].transform;
-                    return;
+                    if (focusIndex < enemies.Count - 1)
+                    {
+                        foreach (Enemy enemy in enemies)
+                        {
+                            enemy.highlighter.gameObject.SetActive(false);
+                        }
+                        focusIndex++;
+                        activeCam.LookAt = enemies[focusIndex].transform;
+                        enemies[focusIndex].ToggleHighlighter();
+                        return;
+                    }
+                    if (focusIndex == enemies.Count - 1)
+                    {
+                        foreach (Enemy enemy in enemies)
+                        {
+                            enemy.highlighter.gameObject.SetActive(false);
+                        }
+                        focusIndex = 0;
+                        activeCam.LookAt = enemies[focusIndex].transform;
+                        enemies[focusIndex].ToggleHighlighter();
+                        return;
+                    }
                 }
-                if (focusIndex == enemies.Count - 1)
+
+                // for Spell Menu
+                if (uiController.activeUI == true)
                 {
-                    focusIndex = 0;
-                    activeCam.LookAt = enemies[focusIndex].transform;
-                    return;
+                    if (uiController.activeUI = uiController.spellPanel)
+                    {
+                        if (uiController.spellIndex == 0)
+                        {
+                            uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
+                            uiController.spellButtons[uiController.spellIndex].Select();
+                        }
+                        if (uiController.spellIndex > 0)
+                        {
+                            uiController.spellIndex--;
+                            uiController.spellButtons[uiController.spellIndex].Select();
+                        }
+                    }
                 }
             }
+            
         }
         if (Input.GetKeyDown(KeyCode.D))
         {
             if (battleTurn == 0)
             {
-                if (focusIndex > 0)
+                if (uiController.activeUI == false)
                 {
-                    focusIndex--;
-                    activeCam.LookAt = enemies[focusIndex].transform;
-                    return;
+                    if (focusIndex > 0)
+                    {
+                        foreach (Enemy enemy in enemies)
+                        {
+                            enemy.highlighter.gameObject.SetActive(false);
+                        }
+                        focusIndex--;
+                        activeCam.LookAt = enemies[focusIndex].transform;
+                        enemies[focusIndex].ToggleHighlighter();
+                        return;
+                    }
+                    if (focusIndex == 0)
+                    {
+                        foreach (Enemy enemy in enemies)
+                        {
+                            enemy.highlighter.gameObject.SetActive(false);
+                        }
+                        focusIndex = enemies.Count - 1;
+                        activeCam.LookAt = enemies[focusIndex].transform;
+                        enemies[focusIndex].ToggleHighlighter();
+                        return;
+                    }
                 }
-                if (focusIndex == 0)
+                
+
+                if (uiController.activeUI == true)
                 {
-                    focusIndex = enemies.Count - 1;
-                    activeCam.LookAt = enemies[focusIndex].transform;
-                    return;
+                    if (uiController.activeUI = uiController.spellPanel)
+                    {
+                        if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
+                        {
+                            uiController.spellIndex = 0;
+                            uiController.spellButtons[uiController.spellIndex].Select();
+                        }
+                        if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
+                        {
+                            uiController.spellIndex++;
+                            uiController.spellButtons[uiController.spellIndex].Select();
+                        }
+
+                    }
                 }
             }
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
+            enemies[focusIndex].ToggleHighlighter();
+            enemies[0].ToggleHighlighter();
             if (uiController.activeUI == false)
-            {
-                heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
-                focusIndex = 0;
+            {                                
                 if (heroes[characterTurnIndex].warriorClass || heroes[characterTurnIndex].berzerkerClass)
                 {
                     heroes[characterTurnIndex].actionType = Player.Action.melee;
@@ -339,8 +421,12 @@ public class BattleController : MonoBehaviour
             }
             if (uiController.activeUI == true)
             {
-                heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
-                uiController.activeUI = false;
+                if (uiController.activeUI = uiController.spellPanel)
+                {
+                    // handled in BattleUIController since Space Key would only select active spell menu button
+                    uiController.activeUI = false;
+                }
+
             }
         }
     }

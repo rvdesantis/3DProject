@@ -33,7 +33,7 @@ public class HeroSelect : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (Input.GetKeyDown(KeyCode.D))
         {
             if (heroIndex < staticHeroList.bank.Count - 1)
             {
@@ -53,7 +53,7 @@ public class HeroSelect : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.A))
         {
             if (heroIndex > 0)
             {

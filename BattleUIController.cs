@@ -88,11 +88,21 @@ public class BattleUIController : MonoBehaviour
             spellButtons[0].image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[0].panelImage;
             spellButtons[0].Select();
             spellPanel.gameObject.SetActive(true);
+            if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count > 1)
+            {
+                spellButtons[1].gameObject.SetActive(true);
+                spellButtons[1].image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[1].panelImage;
+            }
+        }
+        if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count == 0)
+        {
+            activeUI = false;
         }
     }
 
     public void SpellBTDown()
     {
+        battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.enemies[battlecontroller.focusIndex];
         battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.casting;
         spellPanel.gameObject.SetActive(false);
         if (battlecontroller.characterTurnIndex <= 2)

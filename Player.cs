@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Timeline;
-using EckTechGames.FloatingCombatText;
+
 
 public class Player : MonoBehaviour
 {
     public Animator anim;
     public Player attackTarget;
-    public Player spellTarget;
     
 
     public Vector3 targetPos;   
 
     public Vector3 idlePosition;
     public GameObject strikePoint;
+    public GameObject highlighter;
     public enum Action {melee, ranged, casting, item, flee }
     public Action actionType;
 
@@ -125,32 +124,39 @@ public class Player : MonoBehaviour
 
     public virtual void CastSpell()
     {
-        LookAtTarget();        
-        GetComponent<Animator>().SetTrigger("castStart");
-        IEnumerator SpellTimer()
+        if (spells[0].manaCost <= playerMana)
         {
-            yield return new WaitForSeconds(.75f);
-            attackTarget.anim.SetTrigger("gotHit");
+            playerMana = playerMana - spells[0].manaCost;
+            GetComponent<Animator>().SetTrigger("castStart");
+            LookAtTarget();
+            Spell spellToCast = Instantiate<Spell>(spells[0], transform.position, Quaternion.identity);
+            spellToCast.targetPosition = attackTarget.transform.position;           
 
-            int damage = spells[0].power;
-
-            if (damage > 0)
+            IEnumerator SpellTimer()
             {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;
-            }
+                yield return new WaitForSeconds(spellToCast.damageTimer);
+                attackTarget.anim.SetTrigger("gotHit");
 
-            if (damage <= 0)
-            {
-                Debug.Log("damage 0 or less");
+                int damage = spells[0].power;
+
+                if (damage > 0)
+                {
+                    attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                }
+
+                if (damage <= 0)
+                {
+                    Debug.Log("damage 0 or less");
+                }
             }
+            StartCoroutine(SpellTimer());
         }
-        StartCoroutine(SpellTimer());        
     }
 
 
     public virtual void Die()
     {
-
+        
     }
 
     public void EnemyHitTrigger()  // for use in anims & timelines to trigger hit anim but not calculate damage;
@@ -164,6 +170,18 @@ public class Player : MonoBehaviour
         {
             targetPos = attackTarget.transform.position;
             transform.LookAt(targetPos);
+        }
+    }
+
+    public void ToggleHighlighter()
+    {
+        if (highlighter.gameObject.activeSelf)
+        {
+            highlighter.gameObject.SetActive(false);
+        }
+        else
+        {
+            highlighter.gameObject.SetActive(true);
         }
     }
 

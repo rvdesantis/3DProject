@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AreaController : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class AreaController : MonoBehaviour
     public FirstPerson FPcontroller;
     public GameObject playerBody;
     public List<SecretWall> secretWalls;
+    public Compass compass;    
 
 
     
@@ -20,7 +22,7 @@ public class AreaController : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
+    {        
         if (battleReturn)
         {            
             Debug.Log("battle return");
@@ -34,6 +36,7 @@ public class AreaController : MonoBehaviour
     {
         battleReturnmirror = battleReturn;
         respawnPointMirror = respawnPoint;
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             foreach (SecretWall wall in secretWalls)
