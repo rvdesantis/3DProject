@@ -11,8 +11,15 @@ public class Spell : MonoBehaviour
     public int power;
     public int manaCost;
 
+    
+    public enum DamageType {Fire, Ice, Nature, Dark, Normal }
+    public DamageType damage;
+
     public bool projectile;
+    public bool targetALL;
+
     public float spellSpeed;
+    public float castingTime;
     public float damageTimer;
 
     public Sprite panelImage;
@@ -26,11 +33,14 @@ public class Spell : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, spellSpeed);
-        if (Vector3.Distance(transform.position, targetPosition) < .35f)
+        if (projectile)
         {
-            gameObject.SetActive(false);
-            Destroy(this); // not destroying spell for some reason.
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, spellSpeed);
+            if (Vector3.Distance(transform.position, targetPosition) < .25f)
+            {
+                gameObject.SetActive(false);                
+            }
         }
+
     }
 }

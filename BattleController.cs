@@ -13,19 +13,30 @@ public class BattleController : MonoBehaviour
     public Combo comboController;
 
     public List<CinemachineVirtualCamera> virtualCams;
+    // 0-2 Hero Player Back cams, 3-5, Hero Player Front Cams
+    public List<CinemachineVirtualCamera> castingCams;
     public CinemachineVirtualCamera activeCam;
     public CinemachineVirtualCamera meleeCam;
     public List<PlayableDirector> comboPlayables;
+    
+
+    
+    public PlayerBank playerBank;
+    
+    public EnemyBank staticEnemyBank;
+    public EnemyBank SpecialEnemyBank;
+    public int enemyChoice;
+    public int enemyNumber;
 
 
-    public PlayerBank staticBank;
-    public PlayerBank staticEnemyBank;
     public List<Player> heroes;
     public List<Player> enemies;
+    public int deadEnemies;
 
     public int characterTurnIndex;
     public int battleTurn; // 0 = Player Turn / 1 = Enemy Turn
     public int focusIndex; // used for enemy focus when selecting targets
+    public bool keyboard; // used to make sure key strokes to dot register after action selection
 
     public Vector3 spawnPoint0;
     public Vector3 spawnPoint1;
@@ -43,18 +54,60 @@ public class BattleController : MonoBehaviour
     {        
         characterTurnIndex = 0;
         battleTurn = 0;
+        activeCam = virtualCams[0];
+        enemyChoice = BattleLauncher.staticEnemyNumber;
+        enemyNumber = Random.Range(1, 4);  // range does not include end number
 
 
-        heroes[0] = Instantiate<Player>(staticBank.bank[HeroSelect.hero0], spawnPoint0, Quaternion.identity);
+        heroes[0] = Instantiate<Player>(playerBank.bank[HeroSelect.hero0], spawnPoint0, Quaternion.identity);
+        heroes[1] = Instantiate<Player>(playerBank.bank[HeroSelect.hero1], spawnPoint1, Quaternion.identity);        
+        heroes[2] = Instantiate<Player>(playerBank.bank[HeroSelect.hero2], spawnPoint2, Quaternion.identity);
 
-        heroes[1] = Instantiate<Player>(staticBank.bank[HeroSelect.hero1], spawnPoint1, Quaternion.identity);
-        
-        heroes[2] = Instantiate<Player>(staticBank.bank[HeroSelect.hero2], spawnPoint2, Quaternion.identity);
+        // need to define enemies for specific launches, like mimics.
+        if (BattleLauncher.mimic == false && BattleLauncher.dunEnemy == false && BattleLauncher.bossEnemy == false)
+        {            
+            if (enemyNumber == 1)
+            {
+                enemies[0] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint0, Quaternion.identity);
+                enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
+                enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
+                enemies[0].GetComponent<Animator>().SetTrigger("taunt");
+                enemies[0].ToggleHighlighter();
+            }
+            if (enemyNumber == 2)
+            {
+                enemies[0] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint0, Quaternion.identity);
+                enemies[1] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint1, Quaternion.identity);
+                enemies[2] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint2, Quaternion.identity);
+                enemies[1].GetComponent<Animator>().SetTrigger("taunt");
+                enemies[2].GetComponent<Animator>().SetTrigger("taunt");
+                enemies[1].ToggleHighlighter();
+                focusIndex = 1;
+            }
+            if (enemyNumber == 3)
+            {
+                enemies[0] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint0, Quaternion.identity);
+                enemies[1] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint1, Quaternion.identity);
+                enemies[2] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint2, Quaternion.identity);
+                enemies[0].GetComponent<Animator>().SetTrigger("taunt");
+                enemies[0].ToggleHighlighter();
+            }
 
-        enemies[0] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint0, Quaternion.identity);
-        enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
-        enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
-
+        }
+        if (BattleLauncher.mimic == true)
+        {
+            enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[0], enemySpawnPoint0, Quaternion.identity);
+            enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
+            enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
+            BattleLauncher.mimic = false;
+        }
+        if (BattleLauncher.dunEnemy == true || BattleLauncher.bossEnemy == true)
+        {
+            enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[1], enemySpawnPoint0, Quaternion.identity);
+            enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
+            enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
+            BattleLauncher.mimic = false;
+        }
 
         foreach (Player character in heroes)
         {
@@ -65,20 +118,26 @@ public class BattleController : MonoBehaviour
         {
             character.attackTarget = heroes[0];
             character.transform.LookAt(character.attackTarget.transform);
+            if (character.dead)
+            {
+                deadEnemies++;
+            }
         }
         
         virtualCams[0].LookAt = enemies[0].transform;
         virtualCams[1].LookAt = enemies[0].transform;
-        virtualCams[2].LookAt = enemies[0].transform;
-        activeCam = virtualCams[0];
-
-        enemies[0].ToggleHighlighter();
+        virtualCams[2].LookAt = enemies[0].transform;        
+        
+               
+        comboController.AssignPlayers();
+        keyboard = true;
     }
 
     public void NextPlayerTurn() // for action selection prior to Action Cycle
     {
         if (characterTurnIndex < 2)
         {
+            keyboard = true;
             characterTurnIndex = characterTurnIndex + 1;
             foreach (Enemy character in enemies)
             {
@@ -87,16 +146,20 @@ public class BattleController : MonoBehaviour
             meleeCam.Priority = 0;
             virtualCams[characterTurnIndex].Priority = 1;
             virtualCams[characterTurnIndex - 1].Priority = 0;
-            focusIndex = 0;
+            virtualCams[characterTurnIndex].LookAt = enemies[focusIndex].transform;
             return;
         }
         if (characterTurnIndex == 2)
         {
             foreach (Enemy enemy in enemies)
             {
-                enemy.highlighter.gameObject.SetActive(false);
+                if (enemy.dead == false)
+                {
+                    enemy.highlighter.gameObject.SetActive(false);
+                }                
             }
             Debug.Log("Start Hero Action Cycle");
+            keyboard = false;
             virtualCams[0].Priority = 1;
             virtualCams[2].Priority = 0;
             characterTurnIndex = 0;
@@ -115,11 +178,10 @@ public class BattleController : MonoBehaviour
             }
             foreach (Enemy enemy in enemies)
             {
-                if (enemy.playerHealth <= 0)
+                if (enemy.playerHealth > 0)
                 {
-                    enemy.gameObject.SetActive(false);
-                }
-                enemy.transform.position = enemy.idlePosition;
+                    enemy.transform.position = enemy.idlePosition;
+                }                
             }
 
             virtualCams[0].Priority = 1;                        
@@ -139,12 +201,18 @@ public class BattleController : MonoBehaviour
         if (endTurn == false)
         {
             if (characterTurnIndex < 2)
-            {                
-                meleeCam.Priority = 0;
-                characterTurnIndex = characterTurnIndex + 1;
-                virtualCams[characterTurnIndex].Priority = 1;
-                virtualCams[characterTurnIndex - 1].Priority = 0;
-                PlayerAct();
+            {
+                IEnumerator TurnTimer()
+                {
+                    yield return new WaitForSeconds(2); // to allow for previous turn to finish processing prior to updating characterTurnIndex 
+                    meleeCam.Priority = 0;
+                    characterTurnIndex = characterTurnIndex + 1;
+                    virtualCams[characterTurnIndex].Priority = 1;
+                    virtualCams[characterTurnIndex - 1].Priority = 0;
+                    PlayerAct();                                
+                }
+                StartCoroutine(TurnTimer());
+
                 return;
             }
             if (characterTurnIndex == 2)
@@ -154,11 +222,30 @@ public class BattleController : MonoBehaviour
                 virtualCams[0].Priority = 1;
                 meleeCam.m_Priority = 0;
                 virtualCams[0].m_LookAt = enemies[0].transform;
-                NextPlayerAct();
+                IEnumerator TurnTimer()
+                {
+                    yield return new WaitForSeconds(2);
+                    NextPlayerAct();                               
+                }
+                StartCoroutine(TurnTimer());
+                
             }
         }     
     }
 
+    public Player GetHighestEnemy()
+    {
+        Player highestEnemy = enemies[0];
+        foreach (Player enemy in enemies)
+        {
+            if (enemy.playerHealth > highestEnemy.playerHealth)
+            {
+                highestEnemy = enemy;
+            }
+        }
+
+        return highestEnemy;
+    }
 
     public void PlayerAct()
     {
@@ -173,40 +260,93 @@ public class BattleController : MonoBehaviour
 
             if (combo == false)
             {
-                if (heroes[characterTurnIndex].actionType == Player.Action.melee)
+                if (heroes[characterTurnIndex].attackTarget.playerHealth <= 0)
                 {
-                    heroes[characterTurnIndex].Melee();
-                    meleeCam.Priority = 2;
-                    IEnumerator MeleeTimer()
-                    {
-                        yield return new WaitForSeconds(2);
-                        NextPlayerAct();
-                    }
-                    StartCoroutine(MeleeTimer());
+                    heroes[characterTurnIndex].attackTarget = GetHighestEnemy();
+                    heroes[characterTurnIndex].transform.LookAt(GetHighestEnemy().transform);
+                    virtualCams[characterTurnIndex].LookAt = GetHighestEnemy().transform;
                 }
-                if (heroes[characterTurnIndex].actionType == Player.Action.ranged)
+                if (heroes[characterTurnIndex].attackTarget.playerHealth > 0)
                 {
-                    heroes[characterTurnIndex].Melee();
-                    virtualCams[characterTurnIndex].Priority = 2;
-                    IEnumerator MeleeTimer()
+                    if (heroes[characterTurnIndex].actionType == Player.Action.melee)
                     {
-                        yield return new WaitForSeconds(2);
-                        NextPlayerAct();
+                        heroes[characterTurnIndex].Melee();
+                        meleeCam.Priority = 2;
+                        IEnumerator MeleeTimer()
+                        {
+                            yield return new WaitForSeconds(2);
+                            NextPlayerAct();
+                        }
+                        StartCoroutine(MeleeTimer());
                     }
-                    StartCoroutine(MeleeTimer());
+                    if (heroes[characterTurnIndex].actionType == Player.Action.ranged)
+                    {
+                        heroes[characterTurnIndex].Melee();
+                        virtualCams[characterTurnIndex].Priority = 2;
+                        IEnumerator MeleeTimer()
+                        {
+                            yield return new WaitForSeconds(2);
+                            NextPlayerAct();
+                        }
+                        StartCoroutine(MeleeTimer());
+                    }
+                    if (heroes[characterTurnIndex].actionType == Player.Action.casting)
+                    {
+                        if (characterTurnIndex == 0)
+                        {
+                            castingCams[0].Priority = 2;
+                            heroes[characterTurnIndex].CastSpell();
+                            IEnumerator CamTimer()
+                            {
+                                yield return new WaitForSeconds(.25f);
+                                castingCams[1].Priority = 2;
+                                castingCams[0].Priority = 0;
+                                yield return new WaitForSeconds(heroes[0].selectedSpell.castingTime);
+                                castingCams[1].Priority = 0;
+                                yield return new WaitForSeconds(1f);
+                                NextPlayerAct();
+                            }
+                            StartCoroutine(CamTimer());
+                        }
+                        if (characterTurnIndex == 1)
+                        {
+                            castingCams[2].Priority = 2;
+                            heroes[characterTurnIndex].CastSpell();
+                            IEnumerator CamTimer()
+                            {
+                                yield return new WaitForSeconds(.25f);
+                                castingCams[3].Priority = 2;
+                                castingCams[2].Priority = 0;
+                                yield return new WaitForSeconds(heroes[1].selectedSpell.castingTime);
+                                castingCams[3].Priority = 0;
+                                yield return new WaitForSeconds(1f);
+                                NextPlayerAct();
+                            }
+                            StartCoroutine(CamTimer());
+                        }
+                        if (characterTurnIndex == 2)
+                        {
+                            castingCams[4].Priority = 2;
+                            heroes[characterTurnIndex].CastSpell();
+                            IEnumerator CamTimer()
+                            {
+                                yield return new WaitForSeconds(.25f);
+                                castingCams[5].Priority = 2;
+                                castingCams[4].Priority = 0;
+                                yield return new WaitForSeconds(heroes[2].selectedSpell.castingTime);
+                                castingCams[5].Priority = 0;
+                                yield return new WaitForSeconds(1f);
+                                NextPlayerAct();
+                            }
+                            StartCoroutine(CamTimer());
+                        }
+                    }
                 }
-                if (heroes[characterTurnIndex].actionType == Player.Action.casting)
+                else
                 {
-                    heroes[characterTurnIndex].CastSpell();
-                    IEnumerator CamTimer()
-                    {
-                        yield return new WaitForSeconds(2);
-                        NextPlayerAct();
-                    }
-                    StartCoroutine(CamTimer());
+                    NextPlayerAct();
                 }
-            }
-            
+            }            
         }
     }
 
@@ -225,10 +365,11 @@ public class BattleController : MonoBehaviour
         }
         if (characterTurnIndex <= enemies.Count - 1)
         {
+            virtualCams[0].m_LookAt = enemies[characterTurnIndex].transform;
             enemies[characterTurnIndex].Act();
             IEnumerator TurnTimer()
             {
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(3);
                 NextEnemyAct();
             } StartCoroutine(TurnTimer());
                
@@ -247,32 +388,63 @@ public class BattleController : MonoBehaviour
             }
             if (characterTurnIndex == enemies.Count)
             {
-                foreach (Player character in enemies)
+                foreach (Enemy enemy in enemies)
                 {
-                    character.transform.position = character.idlePosition;
+                    if (enemy.playerHealth > 0)
+                    {
+                        enemy.transform.position = enemy.idlePosition;
+                        enemy.highlighter.gameObject.SetActive(false);
+                    }                   
+                    
+                    if (enemy.playerHealth <= 0 && enemy.gameObject.activeSelf && enemy.placeholder == false) // checks for only active gameobjects to avoid double counting
+                    {
+                        deadEnemies++;
+                        enemy.gameObject.SetActive(false);
+                    }
                 }
                 characterTurnIndex = 0;
-                battleTurn = 0;
-                enemies[0].ToggleHighlighter();
+                battleTurn = 0;                
+                heroes[0].attackTarget = enemies[0];
+                focusIndex = 0;
+                TargetChecker();               
+                virtualCams[0].m_LookAt = enemies[focusIndex].transform;                
                 Debug.Log("End of Turn.  Start Player Turn");
+                keyboard = true;
 
-                foreach(Player character in enemies)
-                {
-                    int deadEnemies = 0;
-                    if (character.dead)
-                    {
-                        deadEnemies++;                        
-                    }
+
+
+                foreach (Player character in enemies) // check to see if all enemies are dead to send battle.
+                {                    
                     if (deadEnemies == enemies.Count)
                     {
                         AreaController.battleReturn = true;
                         UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
                     }
+                    return;
                 }                
-                return;
+                
             }           
             
         }        
+    }
+
+    public void TargetChecker()
+    {
+        if (enemies[0].dead == false)
+        {
+            enemies[0].ToggleHighlighter();
+            focusIndex = 0;
+        }
+        if (enemies[0].dead == true && enemies[1].dead == false)
+        {
+            enemies[1].ToggleHighlighter();
+            focusIndex = 1;
+        }
+        if (enemies[0].dead == true && enemies[1].dead == true)
+        {
+            enemies[2].ToggleHighlighter();
+            focusIndex = 2;
+        }
     }
 
     public void CamTracker()
@@ -289,11 +461,302 @@ public class BattleController : MonoBehaviour
     private void Update()
     {
         CamTracker();
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.JoystickButton2))
         {
             uiController.ToggleSpellPanel();
         }
-        if (Input.GetKeyDown(KeyCode.A))
+
+        if (keyboard)
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                if (battleTurn == 0)
+                {
+                    if (uiController.activeUI == false)
+                    {
+                        if (focusIndex < enemies.Count - 1)
+                        {
+                            foreach (Enemy enemy in enemies)
+                            {
+                                if (enemy.dead == false)
+                                {
+                                    enemy.highlighter.gameObject.SetActive(false);
+                                }
+                            }
+                            focusIndex++;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                            if (enemies[focusIndex].dead && focusIndex < enemies.Count - 1)
+                            {
+                                focusIndex++;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            if (enemies[focusIndex].dead && focusIndex == enemies.Count - 1)
+                            {
+                                focusIndex = 0;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            return;
+                        }
+                        if (focusIndex == enemies.Count - 1)
+                        {
+                            foreach (Enemy enemy in enemies)
+                            {
+                                if (enemy.dead == false)
+                                {
+                                    enemy.highlighter.gameObject.SetActive(false);
+                                }
+                            }
+                            focusIndex = 0;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                            if (enemies[focusIndex].dead)
+                            {
+                                focusIndex++;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            if (enemies[focusIndex].dead)
+                            {
+                                focusIndex++;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            return;
+                        }
+                    }
+
+                    // for Spell Menu
+                    if (uiController.activeUI == true)
+                    {
+                        if (uiController.activeUI = uiController.spellPanel)
+                        {
+                            if (uiController.spellIndex == 0)
+                            {
+                                uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
+                                uiController.spellButtons[uiController.spellIndex].Select();
+                            }
+                            if (uiController.spellIndex > 0)
+                            {
+                                uiController.spellIndex--;
+                                uiController.spellButtons[uiController.spellIndex].Select();
+                            }
+                        }
+                    }
+                }
+
+            }
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                if (battleTurn == 0)
+                {
+                    if (uiController.activeUI == false)
+                    {
+                        if (focusIndex > 0)
+                        {
+                            foreach (Enemy enemy in enemies)
+                            {
+                                if (enemy.dead == false)
+                                {
+                                    enemy.highlighter.gameObject.SetActive(false);
+                                }
+                            }
+                            focusIndex--;                            
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                            if (enemies[focusIndex].dead && focusIndex > 0)
+                            {
+                                focusIndex--;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            if (enemies[focusIndex].dead && focusIndex == 0)
+                            {
+                                focusIndex = 2;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            return;
+                        }
+                        if (focusIndex == 0)
+                        {
+                            foreach (Enemy enemy in enemies)
+                            {
+                                if (enemy.dead == false)
+                                {
+                                    enemy.highlighter.gameObject.SetActive(false);
+                                }
+                            }
+                            focusIndex = enemies.Count - 1;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                            if (enemies[focusIndex].dead)
+                            {
+                                focusIndex--;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            if (enemies[focusIndex].dead)
+                            {
+                                focusIndex--;
+                                activeCam.LookAt = enemies[focusIndex].transform;
+                                enemies[focusIndex].ToggleHighlighter();
+                            }
+                            return;
+                        }
+                    }
+
+
+                    if (uiController.activeUI == true)
+                    {
+                        if (uiController.activeUI = uiController.spellPanel)
+                        {
+                            if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
+                            {
+                                uiController.spellIndex = 0;
+                                uiController.spellButtons[uiController.spellIndex].Select();
+                            }
+                            if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
+                            {
+                                uiController.spellIndex++;
+                                uiController.spellButtons[uiController.spellIndex].Select();
+                            }
+
+                        }
+                    }
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+            {
+
+                if (uiController.activeUI == false)
+                {
+                    heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
+                    enemies[focusIndex].ToggleHighlighter();
+                    
+
+                    if (heroes[characterTurnIndex].warriorClass || heroes[characterTurnIndex].berzerkerClass)
+                    {
+                        heroes[characterTurnIndex].actionType = Player.Action.melee;
+                        if (characterTurnIndex <= 2)
+                        {
+                            TargetChecker();
+                            NextPlayerTurn();
+                        }
+                        return;
+                    }
+                    if (heroes[characterTurnIndex].archerClass || heroes[characterTurnIndex].mageClass)
+                    {                        
+                        heroes[characterTurnIndex].actionType = Player.Action.ranged;
+                        if (characterTurnIndex <= 2)
+                        {
+                            TargetChecker();
+                            NextPlayerTurn();
+                        }
+                        return;
+                    }
+                }
+                if (uiController.activeUI == true)
+                {
+                    if (uiController.activeUI = uiController.spellPanel)
+                    {
+                        // handled in BattleUIController since Space Key would only select active spell menu button
+                        uiController.activeUI = false;
+                    }
+
+                }
+            }
+        }
+
+    }
+
+
+    private void FixedUpdate() // Set to .1 in project settings.
+    {
+        if (Input.GetAxis("Horizontal") > .5f)
+        {
+            if (battleTurn == 0)
+            {
+                if (uiController.activeUI == false)
+                {
+                    if (focusIndex > 0)
+                    {
+                        foreach (Enemy enemy in enemies)
+                        {
+                            if (enemy.dead == false)
+                            {
+                                enemy.highlighter.gameObject.SetActive(false);
+                            }
+                        }
+                        focusIndex--;
+                        activeCam.LookAt = enemies[focusIndex].transform;
+                        enemies[focusIndex].ToggleHighlighter();
+                        if (enemies[focusIndex].dead && focusIndex > 0)
+                        {
+                            focusIndex--;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
+                        if (enemies[focusIndex].dead && focusIndex == 0)
+                        {
+                            focusIndex = 2;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
+                        return;
+                    }
+                    if (focusIndex == 0)
+                    {
+                        foreach (Enemy enemy in enemies)
+                        {
+                            if (enemy.dead == false)
+                            {
+                                enemy.highlighter.gameObject.SetActive(false);
+                            }
+                        }
+                        focusIndex = enemies.Count - 1;
+                        activeCam.LookAt = enemies[focusIndex].transform;
+                        enemies[focusIndex].ToggleHighlighter();
+                        if (enemies[focusIndex].dead)
+                        {
+                            focusIndex--;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
+                        if (enemies[focusIndex].dead)
+                        {
+                            focusIndex--;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
+                        return;
+                    }
+                }
+
+
+                if (uiController.activeUI == true)
+                {
+                    if (uiController.activeUI = uiController.spellPanel)
+                    {
+                        if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
+                        {
+                            uiController.spellIndex = 0;
+                            uiController.spellButtons[uiController.spellIndex].Select();
+                        }
+                        if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
+                        {
+                            uiController.spellIndex++;
+                            uiController.spellButtons[uiController.spellIndex].Select();
+                        }
+
+                    }
+                }
+            }
+        }
+
+        if (Input.GetAxis("Horizontal") < -.5f)
         {
             if (battleTurn == 0)
             {
@@ -303,22 +766,52 @@ public class BattleController : MonoBehaviour
                     {
                         foreach (Enemy enemy in enemies)
                         {
-                            enemy.highlighter.gameObject.SetActive(false);
+                            if (enemy.dead == false)
+                            {
+                                enemy.highlighter.gameObject.SetActive(false);
+                            }
                         }
                         focusIndex++;
                         activeCam.LookAt = enemies[focusIndex].transform;
                         enemies[focusIndex].ToggleHighlighter();
+                        if (enemies[focusIndex].dead && focusIndex < enemies.Count - 1)
+                        {
+                            focusIndex++;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
+                        if (enemies[focusIndex].dead && focusIndex == enemies.Count - 1)
+                        {
+                            focusIndex = 0;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
                         return;
                     }
                     if (focusIndex == enemies.Count - 1)
                     {
                         foreach (Enemy enemy in enemies)
                         {
-                            enemy.highlighter.gameObject.SetActive(false);
+                            if (enemy.dead == false)
+                            {
+                                enemy.highlighter.gameObject.SetActive(false);
+                            }
                         }
                         focusIndex = 0;
                         activeCam.LookAt = enemies[focusIndex].transform;
                         enemies[focusIndex].ToggleHighlighter();
+                        if (enemies[focusIndex].dead)
+                        {
+                            focusIndex++;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
+                        if (enemies[focusIndex].dead)
+                        {
+                            focusIndex++;
+                            activeCam.LookAt = enemies[focusIndex].transform;
+                            enemies[focusIndex].ToggleHighlighter();
+                        }
                         return;
                     }
                 }
@@ -341,95 +834,7 @@ public class BattleController : MonoBehaviour
                     }
                 }
             }
-            
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            if (battleTurn == 0)
-            {
-                if (uiController.activeUI == false)
-                {
-                    if (focusIndex > 0)
-                    {
-                        foreach (Enemy enemy in enemies)
-                        {
-                            enemy.highlighter.gameObject.SetActive(false);
-                        }
-                        focusIndex--;
-                        activeCam.LookAt = enemies[focusIndex].transform;
-                        enemies[focusIndex].ToggleHighlighter();
-                        return;
-                    }
-                    if (focusIndex == 0)
-                    {
-                        foreach (Enemy enemy in enemies)
-                        {
-                            enemy.highlighter.gameObject.SetActive(false);
-                        }
-                        focusIndex = enemies.Count - 1;
-                        activeCam.LookAt = enemies[focusIndex].transform;
-                        enemies[focusIndex].ToggleHighlighter();
-                        return;
-                    }
-                }
-                
-
-                if (uiController.activeUI == true)
-                {
-                    if (uiController.activeUI = uiController.spellPanel)
-                    {
-                        if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
-                        {
-                            uiController.spellIndex = 0;
-                            uiController.spellButtons[uiController.spellIndex].Select();
-                        }
-                        if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
-                        {
-                            uiController.spellIndex++;
-                            uiController.spellButtons[uiController.spellIndex].Select();
-                        }
-
-                    }
-                }
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
-            enemies[focusIndex].ToggleHighlighter();
-            enemies[0].ToggleHighlighter();
-            if (uiController.activeUI == false)
-            {                                
-                if (heroes[characterTurnIndex].warriorClass || heroes[characterTurnIndex].berzerkerClass)
-                {
-                    heroes[characterTurnIndex].actionType = Player.Action.melee;
-                    if (characterTurnIndex <= 2)
-                    {
-                        NextPlayerTurn();
-                    }
-                    return;
-                }
-                if (heroes[characterTurnIndex].archerClass || heroes[characterTurnIndex].mageClass)
-                {
-                    heroes[characterTurnIndex].actionType = Player.Action.ranged;
-                    if (characterTurnIndex <= 2)
-                    {
-                        NextPlayerTurn();
-                    }
-                    return;
-                }
-            }
-            if (uiController.activeUI == true)
-            {
-                if (uiController.activeUI = uiController.spellPanel)
-                {
-                    // handled in BattleUIController since Space Key would only select active spell menu button
-                    uiController.activeUI = false;
-                }
-
-            }
         }
     }
-
 
 }

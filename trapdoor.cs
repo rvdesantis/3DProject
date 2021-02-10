@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class trapdoor : MonoBehaviour
 {
-    public FirstPersonPlayer player;
-    public GameObject fallChecker;
+    public GameObject player;
+    
 
     // Start is called before the first frame update
     void Start()

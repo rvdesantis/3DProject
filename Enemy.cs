@@ -1,11 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EckTechGames.FloatingCombatText;
 
 public class Enemy : Player
 {
-    public bool demon;
+    public bool placeholder;
 
     public override void Act()
     {
@@ -35,6 +34,7 @@ public class Enemy : Player
         IEnumerator HitTimer()
         {
             transform.position = attackTarget.strikePoint.transform.position;
+            attackTarget.transform.LookAt(this.transform);
             yield return new WaitForSeconds(1);
             
             anim.SetTrigger("attack1");
@@ -57,6 +57,66 @@ public class Enemy : Player
 
         }
         StartCoroutine(HitTimer());
+    }
+
+    public void TriggerHitBox()
+    {
+        BattleController bController = FindObjectOfType<BattleController>();
+
+        if (bController.heroes[bController.characterTurnIndex].actionType == Action.melee)
+        {
+            hitBox.Impacts[0].gameObject.SetActive(true);
+            hitBox.Impacts[0].Play();
+            IEnumerator ImpactTimer()
+            {
+                yield return new WaitForSeconds(1);
+                hitBox.Impacts[0].Stop();
+                hitBox.Impacts[0].gameObject.SetActive(false);
+            } StartCoroutine(ImpactTimer());
+            return;
+        }
+        if (bController.heroes[bController.characterTurnIndex].actionType == Action.ranged)
+        {
+            hitBox.Impacts[1].gameObject.SetActive(true);
+            hitBox.Impacts[1].Play();
+            IEnumerator ImpactTimer()
+            {
+                yield return new WaitForSeconds(1);
+                hitBox.Impacts[1].Stop();
+                hitBox.Impacts[1].gameObject.SetActive(false);
+            }
+            StartCoroutine(ImpactTimer());
+            return;
+        }
+        if (bController.heroes[bController.characterTurnIndex].actionType == Action.casting)
+        {
+            if (bController.heroes[bController.characterTurnIndex].selectedSpell.damage == Spell.DamageType.Normal)
+            {
+                hitBox.Impacts[0].gameObject.SetActive(true);
+                hitBox.Impacts[0].Play();
+                IEnumerator ImpactTimer()
+                {
+                    yield return new WaitForSeconds(1);
+                    hitBox.Impacts[0].Stop();
+                    hitBox.Impacts[0].gameObject.SetActive(false);
+                }
+                StartCoroutine(ImpactTimer());
+                return;
+            }
+            if (bController.heroes[bController.characterTurnIndex].selectedSpell.damage == Spell.DamageType.Fire)
+            {
+                hitBox.Impacts[2].gameObject.SetActive(true);
+                hitBox.Impacts[2].Play();
+                IEnumerator ImpactTimer()
+                {
+                    yield return new WaitForSeconds(1);
+                    hitBox.Impacts[2].Stop();
+                    hitBox.Impacts[2].gameObject.SetActive(false);
+                }
+                StartCoroutine(ImpactTimer());
+                return;
+            }
+        }
     }
 
     public override void Die()

@@ -48,7 +48,7 @@ public class Archer : Player
 
     public void TriggerBowShoot()
     {
-        quiver[0].targetPosition = attackTarget.transform.position + new Vector3(0, 1.25f, 0);
+        quiver[0].targetPosition = attackTarget.hitBox.transform.position;
         Instantiate<Ammo>(quiver[0], ammoModel.transform.position, Quaternion.identity);
         ammoModel.gameObject.SetActive(false);                
         Weapon.GetComponent<Animator>().SetTrigger("shoot2L");

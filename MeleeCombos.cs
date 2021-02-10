@@ -19,6 +19,7 @@ public class MeleeCombos : MonoBehaviour
         fMage = comboController.fMage;
         fArcher = comboController.fArcher;
         mWarrior = comboController.mWarrior;
+        
 
 
         foreach (Enemy enemy in battleController.enemies)
@@ -54,7 +55,7 @@ public class MeleeCombos : MonoBehaviour
 
             IEnumerator CamTimer()
             {
-                yield return new WaitForSeconds(7.5f);
+                yield return new WaitForSeconds(3.5f);
                 fWarrior.gameObject.SetActive(true);
                 comboController.fWarriorTimelineAsset.gameObject.SetActive(false);
 
@@ -76,14 +77,6 @@ public class MeleeCombos : MonoBehaviour
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
-                    if (enemy == battleController.heroes[0].attackTarget)
-                    {
-                        if (enemy.playerHealth <= 0)
-                        {
-                            enemy.Die();
-                        }
-                    }
-
                     if (enemy != battleController.heroes[0].attackTarget)
                     {
                         if (enemy.playerHealth > 0)
@@ -93,6 +86,7 @@ public class MeleeCombos : MonoBehaviour
                     }
                 }
                 battleController.endTurn = true;
+                battleController.combo = false;
                 battleController.NextPlayerAct(); // will set players back to idle positions, not needed above;
             }
             StartCoroutine(CamTimer());
@@ -137,14 +131,6 @@ public class MeleeCombos : MonoBehaviour
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
-                    if (enemy == battleController.heroes[0].attackTarget)
-                    {
-                        if (enemy.playerHealth <= 0)
-                        {
-                            enemy.Die();
-                        }
-                    }
-
                     if (enemy != battleController.heroes[0].attackTarget)
                     {
                         if (enemy.playerHealth > 0)
@@ -154,6 +140,7 @@ public class MeleeCombos : MonoBehaviour
                     }
                 }
                 battleController.endTurn = true;
+                battleController.combo = false;
                 battleController.NextPlayerAct(); // will set players back to idle positions, not needed above;            
             }
             StartCoroutine(CamTimer());
@@ -197,14 +184,6 @@ public class MeleeCombos : MonoBehaviour
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
-                    if (enemy == battleController.heroes[0].attackTarget)
-                    {
-                        if (enemy.playerHealth <= 0)
-                        {
-                            enemy.Die();
-                        }
-                    }
-
                     if (enemy != battleController.heroes[0].attackTarget)
                     {
                         if (enemy.playerHealth > 0)
@@ -214,6 +193,7 @@ public class MeleeCombos : MonoBehaviour
                     }
                 }
                 battleController.endTurn = true;
+                battleController.combo = false;
                 battleController.NextPlayerAct(); // will set players back to idle positions, not needed above;
             }
             StartCoroutine(CamTimer());
@@ -259,14 +239,6 @@ public class MeleeCombos : MonoBehaviour
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
-                    if (enemy == battleController.heroes[0].attackTarget)
-                    {
-                        if (enemy.playerHealth <= 0)
-                        {
-                            enemy.Die();                            
-                        }
-                    }
-
                     if (enemy != battleController.heroes[0].attackTarget)
                     {
                         if (enemy.playerHealth > 0)
@@ -276,10 +248,11 @@ public class MeleeCombos : MonoBehaviour
                     }
                 }
                 battleController.endTurn = true;
+                battleController.combo = false;
                 battleController.NextPlayerAct(); // will set players back to idle positions, not needed above;
             }
             StartCoroutine(CamTimer());
-        }
+        }       
     }
 
 

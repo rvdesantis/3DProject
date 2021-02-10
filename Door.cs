@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    public FirstPersonPlayer player;
+    public GameObject player;
     public bool locked;
 
     // Start is called before the first frame update
@@ -14,14 +14,22 @@ public class Door : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public virtual void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
-            if (Vector3.Distance(player.transform.position, this.transform.position) < 5 && locked == false)
+            if (Vector3.Distance(player.transform.position, transform.position) < 5)
             {
-                GetComponent<Animator>().SetTrigger("open");
+                if (locked == false)
+                {
+                    GetComponent<Animator>().SetTrigger("open");
+                }       
+                if (locked == true)
+                {
+                    // null
+                }
             }
+
 
         }
     }

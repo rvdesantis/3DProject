@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 
+
 public class Player : MonoBehaviour
 {
     public Animator anim;
@@ -15,6 +16,9 @@ public class Player : MonoBehaviour
     public Vector3 idlePosition;
     public GameObject strikePoint;
     public GameObject highlighter;
+    public GameObject head;
+    public Hitbox hitBox;
+    public GameObject spellSpawnPoint; 
     public enum Action {melee, ranged, casting, item, flee }
     public Action actionType;
 
@@ -41,13 +45,14 @@ public class Player : MonoBehaviour
     public int playerDEF;
     public bool dead;
     public List<Spell> spells;
+    public Spell selectedSpell;
 
     public Sprite playerFace;
 
     // Player Objects
 
-    public GameObject Weapon;
-    public List<GameObject> equipedWeapons;
+    public Weapons Weapon;
+    public List<Weapons> equipedWeapons;
 
     public virtual void Start()
     {        
@@ -68,6 +73,7 @@ public class Player : MonoBehaviour
         {            
             transform.position = attackTarget.strikePoint.transform.position;
             LookAtTarget();
+            attackTarget.transform.LookAt(this.transform);
             yield return new WaitForSeconds(.25f);
 
             anim.SetTrigger("AttackR");
@@ -76,11 +82,12 @@ public class Player : MonoBehaviour
             transform.position = idlePosition;
 
 
-            int damage = playerSTR - attackTarget.playerDEF;
+            int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
             {
                 attackTarget.playerHealth = attackTarget.playerHealth - damage;
+
             }
 
             if (damage <= 0)
@@ -104,11 +111,12 @@ public class Player : MonoBehaviour
             transform.position = idlePosition;
             
 
-            int damage = playerSTR - attackTarget.playerDEF;
+            int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
             {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                attackTarget.playerHealth = attackTarget.playerHealth - damage;                
+
             }
 
             if (damage <= 0)
@@ -124,30 +132,82 @@ public class Player : MonoBehaviour
 
     public virtual void CastSpell()
     {
-        if (spells[0].manaCost <= playerMana)
+        if (selectedSpell.manaCost <= playerMana)
         {
-            playerMana = playerMana - spells[0].manaCost;
+            playerMana = playerMana - selectedSpell.manaCost;
             GetComponent<Animator>().SetTrigger("castStart");
             LookAtTarget();
-            Spell spellToCast = Instantiate<Spell>(spells[0], transform.position, Quaternion.identity);
-            spellToCast.targetPosition = attackTarget.transform.position;           
+            if (selectedSpell.targetALL == false)
+            {
+                IEnumerator CastTimer()
+                {
+                    yield return new WaitForSeconds(1.5f);
+                    Spell spellToCast = Instantiate<Spell>(selectedSpell, spellSpawnPoint.transform.position, Quaternion.identity);
+                    spellToCast.targetPosition = attackTarget.head.transform.position;
+                } StartCoroutine(CastTimer());
+
+            }
+            if (selectedSpell.targetALL)
+            {
+                foreach(Enemy enemy in FindObjectOfType<BattleController>().enemies)
+                {
+                    if (enemy.dead == false)
+                    {
+                        IEnumerator CastTimer()
+                        {
+                            yield return new WaitForSeconds(1.5f);
+                            Spell spellToCast = Instantiate<Spell>(selectedSpell, spellSpawnPoint.transform.position, Quaternion.identity);
+                            spellToCast.targetPosition = enemy.head.transform.position;
+                        }
+                        StartCoroutine(CastTimer());
+
+                    }
+                }
+            }
+        
 
             IEnumerator SpellTimer()
             {
-                yield return new WaitForSeconds(spellToCast.damageTimer);
-                attackTarget.anim.SetTrigger("gotHit");
+                yield return new WaitForSeconds(selectedSpell.damageTimer);
+                if (selectedSpell.targetALL == false)
+                {
+                    attackTarget.anim.SetTrigger("gotHit");
+                }
+                if (selectedSpell.targetALL)
+                {
+                    foreach (Enemy enemy in FindObjectOfType<BattleController>().enemies)
+                    {
+                        if (enemy.dead == false)
+                        {
+                            enemy.anim.SetTrigger("gotHit");
+                        }                        
+                    }
+                    attackTarget.anim.SetTrigger("gotHit");
+                }
 
-                int damage = spells[0].power;
-
+                int damage = selectedSpell.power + Weapon.magPower;
                 if (damage > 0)
                 {
-                    attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                    if (damage <= 0)
+                    {
+                        Debug.Log("damage 0 or less");
+                    }
+                    if (selectedSpell.targetALL == false)
+                    {
+                        attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                    }
+                    if (selectedSpell.targetALL == true)
+                    {                        
+                        foreach (Enemy enemy in FindObjectOfType<BattleController>().enemies)
+                        {
+                            if (enemy.dead == false)
+                            {
+                                enemy.playerHealth = attackTarget.playerHealth - damage;
+                            }
+                        }
+                    }
                 }
-
-                if (damage <= 0)
-                {
-                    Debug.Log("damage 0 or less");
-                }
+                    
             }
             StartCoroutine(SpellTimer());
         }
@@ -161,7 +221,17 @@ public class Player : MonoBehaviour
 
     public void EnemyHitTrigger()  // for use in anims & timelines to trigger hit anim but not calculate damage;
     {
-        attackTarget.anim.SetTrigger("gotHit");
+        if (attackTarget.playerHealth > 0)
+        {
+            attackTarget.anim.SetTrigger("gotHit");
+        }
+        if (attackTarget.playerHealth <= 0)
+        {
+            if (attackTarget.dead == false)
+            {
+                attackTarget.anim.SetTrigger("Dead");
+            }            
+        }        
     }
 
     public void LookAtTarget()
@@ -175,13 +245,16 @@ public class Player : MonoBehaviour
 
     public void ToggleHighlighter()
     {
-        if (highlighter.gameObject.activeSelf)
+        if (dead == false)
         {
-            highlighter.gameObject.SetActive(false);
-        }
-        else
-        {
-            highlighter.gameObject.SetActive(true);
+            if (highlighter.gameObject.activeSelf)
+            {
+                highlighter.gameObject.SetActive(false);
+            }
+            else
+            {
+                highlighter.gameObject.SetActive(true);
+            }
         }
     }
 

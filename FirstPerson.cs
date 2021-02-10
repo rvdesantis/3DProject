@@ -9,8 +9,7 @@ public class FirstPerson : MonoBehaviour
 
     float xRotation = 0;
 
-    public float distanceTraveled;
-    public float cornerDistance;
+    public float distanceTraveled;    
     public float steps;
 
 
@@ -42,14 +41,14 @@ public class FirstPerson : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
         xRotation -= mouseY; //using -= because rotation is flipped)
-        xRotation = Mathf.Clamp(xRotation, -60f, 60f); // so player can't look down or up more than 90;
+        xRotation = Mathf.Clamp(xRotation, 0, 0); // so player can't look down or up;
 
         transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         playerBody.Rotate(Vector3.up * mouseX);
 
 
 
-        // keyboard & controller settings
+        // keyboard & CharacterController settings
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
@@ -61,7 +60,22 @@ public class FirstPerson : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
-        
+        // Joystick
+
+        float jx = Input.GetAxis("JHorizontal");
+        if (jx > .5f)
+        {
+            transform.localRotation = Quaternion.Euler(90, 0f, 0f);
+            playerBody.Rotate(Vector3.up * (jx * .8f));
+
+        }
+        if (jx < .5f)
+        {
+            transform.localRotation = Quaternion.Euler(-90, 0f, 0f);
+            playerBody.Rotate(Vector3.up * (jx * .8f));
+
+        }
+
 
         // battle launching; 
         distanceTraveled = Vector3.Distance(transform.position, lastPosition);
@@ -71,15 +85,5 @@ public class FirstPerson : MonoBehaviour
             distanceTraveled = 0;
             lastPosition = playerBody.transform.position;
         }
-
-        foreach(GameObject corner in corners)
-        {
-            if (Vector3.Distance(corner.transform.position, playerBody.transform.position) < 11)
-            {
-                closestCorner = corner.transform.position;
-            }
-        }
-
-        cornerDistance = Vector3.Distance(transform.position, closestCorner);
     }
 }
