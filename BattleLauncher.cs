@@ -20,8 +20,7 @@ public class BattleLauncher : MonoBehaviour
     public Quaternion rotationPoint;
     public bool launching;
 
-    public int enemyNumber; // refers to MasterEnemyBank position in Battle Scene
-    public static int staticEnemyNumber;
+
 
     public static bool mimic;
     public static bool dunEnemy;
@@ -40,10 +39,8 @@ public class BattleLauncher : MonoBehaviour
             Debug.Log("Battle Chance " + battleChance);
             if (battleChance > 66)
             {                
-                // enemy selection:
-                int enemyRoll = Random.Range(1, areaEnemyBank.bank.Count);  // range starts at 1 as placeholders are always in position 0;
-                staticEnemyNumber = enemyRoll;
-                // Launching Battle
+
+
                 launching = true;
                 respawnPoint = areaController.moveController.transform.position;
                 rotationPoint = areaController.moveController.transform.rotation;                

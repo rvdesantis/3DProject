@@ -6,26 +6,30 @@ using UnityEngine.UI;
 public class AreaUIController : MonoBehaviour
 {
     public AreaController areaController;
+    public bool uiNavigation;
 
     public List<Items> keys;
     public Items activeItem; // for assigning and equiping
 
     public Image itemImage;
     public GameObject itemPanel;
+    public Text itemText;
 
 
     public Image weaponImage;
     public GameObject weaponPanel;
     public Text equipText;
+    public Button yesBT;
+    public Button noBT;
 
     public GameObject inventoryPanel;
     public List<Button> inventoryButtons;
-    public List<Image> inventoryImages;
 
 
     public GameObject playerPanel;
     public List<Image> playerFaces;
     public List<Sprite> faceSprites;
+    public List<Button> playerWeaponButtons;
 
     public List<Text> playerStats;
 
@@ -48,14 +52,23 @@ public class AreaUIController : MonoBehaviour
 
     public void WeaponImage()
     {
-        IEnumerator ToggleItemPanel()
-        {
-            weaponPanel.gameObject.SetActive(true);
-            equipText.text = "Discovered " + activeItem.itemName + "!\n" + areaController.staticBank.bank[activeItem.weaponHero].playerName + " Weapon";
-            yield return new WaitForSeconds(2);
-            weaponPanel.gameObject.SetActive(false);
-        }
-        StartCoroutine(ToggleItemPanel());
+        areaController.moveController.enabled = false;
+        weaponPanel.gameObject.SetActive(true);
+        equipText.text = "Discovered " + activeItem.itemName + "!\n" + areaController.staticBank.bank[activeItem.weaponHero].playerName + " Weapon\nEquip Now?";
+        yesBT.Select();
+    }
+
+    public void EquipWeapon()
+    {
+        Player equipHero = areaController.staticBank.bank[activeItem.weaponHero];
+
+        equipHero.Weapon.gameObject.SetActive(false);
+        equipHero.Weapon = equipHero.equipedWeapons[activeItem.weaponNum];
+        equipHero.equipedWeapons[activeItem.weaponNum].gameObject.SetActive(true);
+
+        weaponPanel.gameObject.SetActive(false);
+        uiNavigation = false;
+        areaController.moveController.enabled = true;
     }
 
     public void ToggleInventory()
@@ -67,29 +80,50 @@ public class AreaUIController : MonoBehaviour
             {
                 button.gameObject.SetActive(false);
             }
+            if (inventoryButtons.IndexOf(button) <= itemCount - 1)
+            {
+                button.gameObject.SetActive(true);     
+                button.image.sprite = areaController.areaInventory[inventoryButtons.IndexOf(button)].itemSprite;
+                itemText.text = areaController.areaInventory[0].itemName;
+            }            
         }
 
-        foreach (Image image in inventoryImages)
-        {            
-            if (inventoryImages.IndexOf(image) <= itemCount - 1)
-            {
-                image.sprite = areaController.areaInventory[inventoryImages.IndexOf(image)].itemSprite;
-            }
+        
+        if (inventoryButtons[0].gameObject.activeSelf)
+        {
+            inventoryButtons[0].Select();
         }
 
         if (inventoryPanel.activeSelf)
         {
             inventoryPanel.gameObject.SetActive(false);
             areaController.moveController.enabled = true;
+            uiNavigation = false;
             return;
         }
         if (inventoryPanel.activeSelf == false)
         {
-            areaController.moveController.enabled = false;
-            inventoryPanel.gameObject.SetActive(true);
-            return;
+            if (playerPanel.activeSelf == false && weaponPanel.activeSelf == false)
+            {
+                areaController.moveController.enabled = false;
+                inventoryPanel.gameObject.SetActive(true);
+                return;
+            }
         }
 
+    }
+
+    public void ToggleUINav() // for UI button use only
+    {
+        if (uiNavigation == false)
+        {
+            uiNavigation = true;
+            return;
+        }
+        if (uiNavigation == true)
+        {
+            uiNavigation = false;
+        }
     }
 
     public void TogglePlayerStats()
@@ -102,29 +136,60 @@ public class AreaUIController : MonoBehaviour
 
         playerStats[0].text = (areaController.activeBank.bank[0].playerName + "\n" + areaController.activeBank.bank[0].playerLevel 
             + "\n" + areaController.activeBank.bank[0].playerMaxHealth + "\n" + areaController.activeBank.bank[0].playerMaxMana
-            + "\n" + areaController.activeBank.bank[0].playerSTR + "\n" + areaController.activeBank.bank[0].playerDEF);
+            + "\n" + (areaController.activeBank.bank[0].playerSTR + areaController.activeBank.bank[0].Weapon.power) + "\n" 
+            + (areaController.activeBank.bank[0].playerDEF + areaController.activeBank.bank[0].Weapon.def));
 
         playerStats[1].text = (areaController.activeBank.bank[1].playerName + "\n" + areaController.activeBank.bank[1].playerLevel
             + "\n" + areaController.activeBank.bank[1].playerMaxHealth + "\n" + areaController.activeBank.bank[1].playerMaxMana
-            + "\n" + areaController.activeBank.bank[1].playerSTR + "\n" + areaController.activeBank.bank[1].playerDEF);
+            + "\n" + (areaController.activeBank.bank[1].playerSTR + areaController.activeBank.bank[1].Weapon.power) + "\n" 
+            + (areaController.activeBank.bank[1].playerDEF + areaController.activeBank.bank[1].Weapon.def));
 
         playerStats[2].text = (areaController.activeBank.bank[2].playerName + "\n" + areaController.activeBank.bank[2].playerLevel
-    + "\n" + areaController.activeBank.bank[2].playerMaxHealth + "\n" + areaController.activeBank.bank[2].playerMaxMana
-    + "\n" + areaController.activeBank.bank[2].playerSTR + "\n" + areaController.activeBank.bank[2].playerDEF);
+            + "\n" + areaController.activeBank.bank[2].playerMaxHealth + "\n" + areaController.activeBank.bank[2].playerMaxMana
+            + "\n" + (areaController.activeBank.bank[2].playerSTR + areaController.activeBank.bank[2].Weapon.power) + "\n" 
+            + (areaController.activeBank.bank[2].playerDEF + areaController.activeBank.bank[2].Weapon.def));
 
         if (playerPanel.activeSelf)
         {
             areaController.moveController.enabled = true;
-            playerPanel.gameObject.SetActive(false);           
+            playerPanel.gameObject.SetActive(false);
+            uiNavigation = false;
             return;
         }
         if (playerPanel.activeSelf == false)
         {
-            areaController.moveController.enabled = false;
-            playerPanel.gameObject.SetActive(true);
-            return;
+            if (weaponPanel.activeSelf == false && inventoryPanel.activeSelf == false)
+            {
+                areaController.moveController.enabled = false;
+                playerPanel.gameObject.SetActive(true);
+                return;
+            }
         }
 
+    }
+
+    public void UpdatePlayerStats()
+    {
+        areaController.SetPlayerBank();
+
+        playerFaces[0].sprite = faceSprites[HeroSelect.hero0];
+        playerFaces[1].sprite = faceSprites[HeroSelect.hero1];
+        playerFaces[2].sprite = faceSprites[HeroSelect.hero2];
+
+        playerStats[0].text = (areaController.activeBank.bank[0].playerName + "\n" + areaController.activeBank.bank[0].playerLevel
+            + "\n" + areaController.activeBank.bank[0].playerMaxHealth + "\n" + areaController.activeBank.bank[0].playerMaxMana
+            + "\n" + (areaController.activeBank.bank[0].playerSTR + areaController.activeBank.bank[0].Weapon.power) + "\n"
+            + (areaController.activeBank.bank[0].playerDEF + areaController.activeBank.bank[0].Weapon.def));
+
+        playerStats[1].text = (areaController.activeBank.bank[1].playerName + "\n" + areaController.activeBank.bank[1].playerLevel
+            + "\n" + areaController.activeBank.bank[1].playerMaxHealth + "\n" + areaController.activeBank.bank[1].playerMaxMana
+            + "\n" + (areaController.activeBank.bank[1].playerSTR + areaController.activeBank.bank[1].Weapon.power) + "\n"
+            + (areaController.activeBank.bank[1].playerDEF + areaController.activeBank.bank[1].Weapon.def));
+
+        playerStats[2].text = (areaController.activeBank.bank[2].playerName + "\n" + areaController.activeBank.bank[2].playerLevel
+            + "\n" + areaController.activeBank.bank[2].playerMaxHealth + "\n" + areaController.activeBank.bank[2].playerMaxMana
+            + "\n" + (areaController.activeBank.bank[2].playerSTR + areaController.activeBank.bank[2].Weapon.power) + "\n"
+            + (areaController.activeBank.bank[2].playerDEF + areaController.activeBank.bank[2].Weapon.def));      
     }
 
     public void ToggleCompass()
@@ -141,6 +206,29 @@ public class AreaUIController : MonoBehaviour
             compassLarge.gameObject.SetActive(false);
             return;
         }
+    }
+
+
+    private void FixedUpdate()
+    {
+        float jx = Input.GetAxis("JHorizontal");
+        if (uiNavigation)
+        {
+            if (inventoryPanel.activeSelf)
+            {
+                if (jx > .5f)
+                {
+
+
+                }
+                if (jx < .5f)
+                {
+
+                }
+            }
+
+        }
+
     }
 
 }

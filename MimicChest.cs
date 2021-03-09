@@ -7,6 +7,7 @@ public class MimicChest : MonoBehaviour
     public BattleLauncher battleLauncher;
     public AreaController areaController;
     public static bool opened;
+    public static bool looted;
     public Items treasure;
 
 
@@ -15,6 +16,10 @@ public class MimicChest : MonoBehaviour
         GetComponent<Animator>().SetTrigger("shut");
         if (opened)
         {
+            if (looted)
+            {
+                gameObject.SetActive(false);
+            }
             if (this.gameObject.activeSelf)
             {
                 gameObject.SetActive(false);
@@ -22,7 +27,8 @@ public class MimicChest : MonoBehaviour
                 {
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
                     areaController.areaUI.activeItem = treasure;
-                    areaController.areaUI.WeaponImage();                    
+                    areaController.areaUI.WeaponImage();
+                    looted = true;
                 }
                 else
                 {
@@ -48,7 +54,7 @@ public class MimicChest : MonoBehaviour
                     yield return new WaitForSeconds(2f);
                     BattleLauncher.mimic = true;
                     battleLauncher.launching = true;
-                    areaController.moveController.gameObject.SetActive(false);
+                    areaController.moveController.enabled = false;
                     areaController.areaUI.fadeOutPanel.gameObject.SetActive(true);
                     battleLauncher.respawnPoint = areaController.moveController.transform.position;
                     battleLauncher.rotationPoint = areaController.moveController.transform.rotation;

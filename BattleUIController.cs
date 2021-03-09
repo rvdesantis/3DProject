@@ -21,8 +21,13 @@ public class BattleUIController : MonoBehaviour
     public int spellIndex;
 
 
+    public GameObject itemPanel;
+    public List<Button> itembuttons;
+    public Sprite itemImage;
+    public int itemIndex;
 
     public bool activeUI;
+    public GameObject currentUI;
 
     private void Start()
     {
@@ -96,30 +101,108 @@ public class BattleUIController : MonoBehaviour
 
     public void ToggleSpellPanel()
     {
+        if (spellPanel.gameObject.activeSelf)
+        {
+            spellPanel.gameObject.SetActive(false);
+            return;
+        }
         activeUI = true;
+        currentUI = spellPanel;
         if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count != 0)
         {
             spellIndex = 0;
-            spellButtons[0].image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[0].panelImage;
+            foreach (Button button in spellButtons)
+            {
+                int spellCount = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count;
+                if (spellButtons.IndexOf(button) > spellCount - 1)
+                {
+                    button.gameObject.SetActive(false);
+                }
+                if (spellButtons.IndexOf(button) <= spellCount - 1)
+                {
+                    button.gameObject.SetActive(true);
+                    button.image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].panelImage;
+                }
+                
+            }
+            
             spellButtons[0].Select();
             spellPanel.gameObject.SetActive(true);
-            if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count > 1)
-            {
-                spellButtons[1].gameObject.SetActive(true);
-                spellButtons[1].image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[1].panelImage;
-            }
+
         }
-        if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count == 0)
+    }
+
+    public void ToggleItemPanel()
+    {
+        if (itemPanel.activeSelf)
         {
-            activeUI = false;
+            itemPanel.gameObject.SetActive(false);
+            return;
         }
-    }    
+        if (itemPanel.activeSelf == false)
+        {
+            itemPanel.gameObject.SetActive(true);
+            activeUI = true;
+            currentUI = itemPanel;
+            itemPanel.gameObject.SetActive(true);
+            foreach (Button button in itembuttons)
+            {
+                int itemIndex = itembuttons.IndexOf(button);
+                if (itemIndex < battlecontroller.battleItems.potions.Count)
+                {
+                    button.GetComponent<Image>().sprite = battlecontroller.battleItems.potions[itemIndex].itemImage;
+                    if (battlecontroller.battleItems.potions[itemIndex].quantity > 0)
+                    {
+                        itembuttons[itemIndex].gameObject.SetActive(true);
+                    }
+                }
+                if (itemIndex >= battlecontroller.battleItems.potions.Count)
+                {
+                    button.gameObject.SetActive(false);
+                }
+
+            }
+            itembuttons[0].Select();
+            itemIndex = 0;
+        }
+    }
+
+    public void ItemButtonDown()
+    {
+        battlecontroller.heroes[battlecontroller.characterTurnIndex].activeItem = battlecontroller.battleItems.potions[itemIndex].gameObject;
+        //
+        battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.heroes[battlecontroller.characterTurnIndex];
+        battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.item;
+        itemPanel.gameObject.SetActive(false);
+
+
+        if (battlecontroller.enemies[0].dead == false)
+        {
+            battlecontroller.focusIndex = 0;
+            battlecontroller.enemies[0].ToggleHighlighter();
+        }
+        if (battlecontroller.enemies[0].dead == true && battlecontroller.enemies[1].dead == false)
+        {
+            battlecontroller.enemies[1].ToggleHighlighter();
+            battlecontroller.focusIndex = 1;
+        }
+        if (battlecontroller.enemies[0].dead == true && battlecontroller.enemies[1].dead == true)
+        {
+            battlecontroller.enemies[2].ToggleHighlighter();
+            battlecontroller.focusIndex = 2;
+        }
+
+
+        if (battlecontroller.characterTurnIndex <= 2)
+        {
+            battlecontroller.NextPlayerTurn();
+        }
+    }
 
 
 
     public void SpellBTDown()
     {
-        battlecontroller.enemies[battlecontroller.focusIndex].ToggleHighlighter();
         battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.enemies[battlecontroller.focusIndex];
         if (battlecontroller.enemies[0].dead == false)
         {

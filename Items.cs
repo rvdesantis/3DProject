@@ -7,10 +7,15 @@ public class Items : MonoBehaviour
     public AreaController areaController;
     public AreaUIController areaUI;
     public FirstPersonPlayer player;
-    public Door targetDoor;
+
     public string itemName;
+    public bool usable;
+    
+    
     public bool key;
-    public bool weapon;
+    public Door targetDoor;    
+
+    public bool weapon;    
     public int weaponNum;
     public int weaponHero;
 
@@ -18,7 +23,6 @@ public class Items : MonoBehaviour
 
     public static bool pickedUp;
     public bool pickedUpMirror;
-
 
 
 

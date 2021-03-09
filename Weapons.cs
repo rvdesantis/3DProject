@@ -4,9 +4,25 @@ using UnityEngine;
 
 public class Weapons : MonoBehaviour
 {
+    public string weaponName;
+    public int weaponIndex;
     public int power;
     public int def;
     public int magPower;
     public int magDEF;
+
+    public int boost;
+
+    public void boostweapon()
+    {
+        power = power + boost;
+    }
+
+    public void ResetBoost()
+    {
+        power = power - boost;
+        boost = 0;
+    }
+
 
 }

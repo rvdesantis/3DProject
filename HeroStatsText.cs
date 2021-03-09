@@ -19,7 +19,7 @@ public class HeroStatsText : MonoBehaviour
             int playerMana = PlayerPrefs.GetInt("BerMaxMana", 0);
             int playerSTR = PlayerPrefs.GetInt("BerStr", 0);
             int playerDEF = PlayerPrefs.GetInt("BerDef", 0);
-            heroStats[0].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + playerSTR.ToString() + "\n" + playerDEF.ToString();
+            heroStats[0].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + (playerSTR + heroSelect.heroBank.bank[heroSelect.heroIndex].Weapon.power).ToString() + "\n" + playerDEF.ToString();
         }
         if (heroSelect.heroIndex == 1)
         {
@@ -28,7 +28,7 @@ public class HeroStatsText : MonoBehaviour
             int playerMana = PlayerPrefs.GetInt("ArMaxMana", 0);
             int playerSTR = PlayerPrefs.GetInt("ArStr", 0);
             int playerDEF = PlayerPrefs.GetInt("ArDef", 0);
-            heroStats[1].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + playerSTR.ToString() + "\n" + playerDEF.ToString();
+            heroStats[1].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + (playerSTR + heroSelect.heroBank.bank[heroSelect.heroIndex].Weapon.power).ToString() + "\n" + playerDEF.ToString();
         }
         if (heroSelect.heroIndex == 2)
         {
@@ -37,7 +37,7 @@ public class HeroStatsText : MonoBehaviour
             int playerMana = PlayerPrefs.GetInt("WarMaxMana", 0);
             int playerSTR = PlayerPrefs.GetInt("WarStr", 0);
             int playerDEF = PlayerPrefs.GetInt("WarDef", 0);
-            heroStats[2].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + playerSTR.ToString() + "\n" + playerDEF.ToString();
+            heroStats[2].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + (playerSTR + heroSelect.heroBank.bank[heroSelect.heroIndex].Weapon.power).ToString() + "\n" + playerDEF.ToString();
         }
         if (heroSelect.heroIndex == 3)
         {
@@ -46,7 +46,7 @@ public class HeroStatsText : MonoBehaviour
             int playerMana = PlayerPrefs.GetInt("MagMaxMana", 0);
             int playerSTR = PlayerPrefs.GetInt("MagStr", 0);
             int playerDEF = PlayerPrefs.GetInt("MagDef", 0);
-            heroStats[3].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + playerSTR.ToString() + "\n" + playerDEF.ToString();
+            heroStats[3].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + (playerSTR + heroSelect.heroBank.bank[heroSelect.heroIndex].Weapon.power).ToString() + "\n" + playerDEF.ToString();
         }
     }
 

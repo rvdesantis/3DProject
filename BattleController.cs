@@ -11,17 +11,18 @@ public class BattleController : MonoBehaviour
     public static BattleController Instance { get; set; }
     public BattleUIController uiController;
     public Combo comboController;
+    public BattleItems battleItems;
 
     public List<CinemachineVirtualCamera> virtualCams;
     // 0-2 Hero Player Back cams, 3-5, Hero Player Front Cams
     public List<CinemachineVirtualCamera> castingCams;
     public CinemachineVirtualCamera activeCam;
     public CinemachineVirtualCamera meleeCam;
-    public List<PlayableDirector> comboPlayables;
+    public List<PlayableDirector> comboPlayables;   
     
-
     
     public PlayerBank playerBank;
+    public List<GameObject> partyInventory;
     
     public EnemyBank staticEnemyBank;
     public EnemyBank SpecialEnemyBank;
@@ -49,13 +50,14 @@ public class BattleController : MonoBehaviour
     public bool endTurn;
     public bool combo;
 
+    
 
     private void Start()
     {        
         characterTurnIndex = 0;
         battleTurn = 0;
         activeCam = virtualCams[0];
-        enemyChoice = BattleLauncher.staticEnemyNumber;
+        
         enemyNumber = Random.Range(1, 4);  // range does not include end number
 
 
@@ -68,6 +70,7 @@ public class BattleController : MonoBehaviour
         {            
             if (enemyNumber == 1)
             {
+                enemyChoice = Random.Range(1, staticEnemyBank.bank.Count);
                 enemies[0] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint0, Quaternion.identity);
                 enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
                 enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
@@ -76,8 +79,10 @@ public class BattleController : MonoBehaviour
             }
             if (enemyNumber == 2)
             {
+                enemyChoice = Random.Range(1, staticEnemyBank.bank.Count);
                 enemies[0] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint0, Quaternion.identity);
                 enemies[1] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint1, Quaternion.identity);
+                enemyChoice = Random.Range(1, staticEnemyBank.bank.Count);
                 enemies[2] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint2, Quaternion.identity);
                 enemies[1].GetComponent<Animator>().SetTrigger("taunt");
                 enemies[2].GetComponent<Animator>().SetTrigger("taunt");
@@ -86,8 +91,11 @@ public class BattleController : MonoBehaviour
             }
             if (enemyNumber == 3)
             {
+                enemyChoice = Random.Range(1, staticEnemyBank.bank.Count);
                 enemies[0] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint0, Quaternion.identity);
+                enemyChoice = Random.Range(1, staticEnemyBank.bank.Count);
                 enemies[1] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint1, Quaternion.identity);
+                enemyChoice = Random.Range(1, staticEnemyBank.bank.Count);
                 enemies[2] = Instantiate<Player>(staticEnemyBank.bank[enemyChoice], enemySpawnPoint2, Quaternion.identity);
                 enemies[0].GetComponent<Animator>().SetTrigger("taunt");
                 enemies[0].ToggleHighlighter();
@@ -106,7 +114,7 @@ public class BattleController : MonoBehaviour
             enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[1], enemySpawnPoint0, Quaternion.identity);
             enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
             enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
-            BattleLauncher.mimic = false;
+            BattleLauncher.dunEnemy = false;            
         }
 
         foreach (Player character in heroes)
@@ -174,7 +182,7 @@ public class BattleController : MonoBehaviour
         {
             foreach (Player character in heroes)
             {
-                character.transform.position = character.idlePosition;
+                character.transform.position = Vector3.MoveTowards(character.transform.position, character.idlePosition, .05f);
             }
             foreach (Enemy enemy in enemies)
             {
@@ -274,7 +282,7 @@ public class BattleController : MonoBehaviour
                         meleeCam.Priority = 2;
                         IEnumerator MeleeTimer()
                         {
-                            yield return new WaitForSeconds(2);
+                            yield return new WaitForSeconds(3);
                             NextPlayerAct();
                         }
                         StartCoroutine(MeleeTimer());
@@ -285,7 +293,7 @@ public class BattleController : MonoBehaviour
                         virtualCams[characterTurnIndex].Priority = 2;
                         IEnumerator MeleeTimer()
                         {
-                            yield return new WaitForSeconds(2);
+                            yield return new WaitForSeconds(3);
                             NextPlayerAct();
                         }
                         StartCoroutine(MeleeTimer());
@@ -339,6 +347,59 @@ public class BattleController : MonoBehaviour
                                 NextPlayerAct();
                             }
                             StartCoroutine(CamTimer());
+                        }
+                    }
+                    if (heroes[characterTurnIndex].actionType == Player.Action.item)
+                    {                       
+                        if (heroes[characterTurnIndex].activeItem == battleItems.potions[0].gameObject)
+                        {
+                            Debug.Log(heroes[characterTurnIndex].playerName + " is using Health Potion");
+                            if (battleItems.potions[0].quantity > 0)
+                            {
+                                Debug.Log(heroes[characterTurnIndex].playerName + " has " + battleItems.potions[0].quantity + " health potions");
+                                IEnumerator ItemTimer()
+                                {
+                                    heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
+                                    battleItems.potions[0].target = heroes[characterTurnIndex].attackTarget;
+                                    battleItems.potions[0].HealthPotion();
+                                    battleItems.potions[0].quantity--;
+                                    yield return new WaitForSeconds(2);
+                                    NextPlayerAct();
+                                }
+                                StartCoroutine(ItemTimer());
+                            }
+                        }
+                        if (heroes[characterTurnIndex].activeItem == battleItems.potions[1].gameObject)
+                        {
+                            if (battleItems.potions[1].quantity > 0)
+                            {
+                                IEnumerator ItemTimer()
+                                {
+                                    heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
+                                    battleItems.potions[1].target = heroes[characterTurnIndex].attackTarget;
+                                    battleItems.potions[1].ManaPotion();
+                                    battleItems.potions[1].quantity--;
+                                    yield return new WaitForSeconds(2);
+                                    NextPlayerAct();
+                                }
+                                StartCoroutine(ItemTimer());
+                            }
+                        }
+                        if (heroes[characterTurnIndex].activeItem == battleItems.potions[2].gameObject)
+                        {
+                            if (battleItems.potions[2].quantity > 0)
+                            {
+                                IEnumerator ItemTimer()
+                                {
+                                    heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
+                                    battleItems.potions[2].target = heroes[characterTurnIndex].attackTarget;
+                                    battleItems.potions[2].ManaPotion();
+                                    battleItems.potions[2].quantity--;
+                                    yield return new WaitForSeconds(2);
+                                    NextPlayerAct();
+                                }
+                                StartCoroutine(ItemTimer());
+                            }
                         }
                     }
                 }
@@ -465,6 +526,10 @@ public class BattleController : MonoBehaviour
         {
             uiController.ToggleSpellPanel();
         }
+        if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.JoystickButton3))
+        {
+            uiController.ToggleItemPanel();
+        }
 
         if (keyboard)
         {
@@ -536,12 +601,29 @@ public class BattleController : MonoBehaviour
                             if (uiController.spellIndex == 0)
                             {
                                 uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
-                                uiController.spellButtons[uiController.spellIndex].Select();
+
                             }
                             if (uiController.spellIndex > 0)
                             {
                                 uiController.spellIndex--;
-                                uiController.spellButtons[uiController.spellIndex].Select();
+
+                            }
+                        }
+                    }
+
+                    if (uiController.activeUI == true)
+                    {
+                        if (uiController.currentUI = uiController.itemPanel)
+                        {
+                            if (uiController.itemIndex == 0)
+                            {
+                                uiController.itemIndex = battleItems.potions.Count;
+
+                            }
+                            if (uiController.itemIndex > 0)
+                            {
+                                uiController.itemIndex--;
+
                             }
                         }
                     }
@@ -611,17 +693,15 @@ public class BattleController : MonoBehaviour
 
                     if (uiController.activeUI == true)
                     {
-                        if (uiController.activeUI = uiController.spellPanel)
+                        if (uiController.currentUI = uiController.spellPanel)
                         {
                             if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
                             {
                                 uiController.spellIndex = 0;
-                                uiController.spellButtons[uiController.spellIndex].Select();
                             }
                             if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
                             {
                                 uiController.spellIndex++;
-                                uiController.spellButtons[uiController.spellIndex].Select();
                             }
 
                         }
@@ -738,17 +818,15 @@ public class BattleController : MonoBehaviour
 
                 if (uiController.activeUI == true)
                 {
-                    if (uiController.activeUI = uiController.spellPanel)
+                    if (uiController.currentUI == uiController.spellPanel)
                     {
                         if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
                         {
-                            uiController.spellIndex = 0;
-                            uiController.spellButtons[uiController.spellIndex].Select();
+                            uiController.spellIndex = 0;                            
                         }
                         if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
                         {
-                            uiController.spellIndex++;
-                            uiController.spellButtons[uiController.spellIndex].Select();
+                            uiController.spellIndex++;                            
                         }
 
                     }
@@ -819,19 +897,47 @@ public class BattleController : MonoBehaviour
                 // for Spell Menu
                 if (uiController.activeUI == true)
                 {
-                    if (uiController.activeUI = uiController.spellPanel)
+                    if (uiController.currentUI == uiController.spellPanel)
                     {
                         if (uiController.spellIndex == 0)
                         {
-                            uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
-                            uiController.spellButtons[uiController.spellIndex].Select();
+                            uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;                            
                         }
                         if (uiController.spellIndex > 0)
                         {
-                            uiController.spellIndex--;
-                            uiController.spellButtons[uiController.spellIndex].Select();
+                            uiController.spellIndex--;                            
                         }
                     }
+                    
+                }
+            }
+        }
+
+        if (Input.GetAxis("Vertical") < -.5f)
+        {
+            if (uiController.currentUI == uiController.itemPanel)
+            {
+                if (uiController.itemIndex < battleItems.potions.Count - 1)
+                {
+                    uiController.itemIndex++;                    
+                }
+                if (uiController.itemIndex == battleItems.potions.Count - 1)
+                {
+                    
+                }
+            }
+        }
+        if (Input.GetAxis("Vertical") > .5f)
+        {
+            if (uiController.currentUI == uiController.itemPanel)
+            {
+                if (uiController.itemIndex == 0)
+                {
+                    
+                }
+                if (uiController.itemIndex > 0)
+                {
+                    uiController.itemIndex--;
                 }
             }
         }

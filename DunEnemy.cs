@@ -60,7 +60,7 @@ public class DunEnemy : MonoBehaviour
                     yield return new WaitForSeconds(2f);
                     BattleLauncher.dunEnemy = true;
                     FindObjectOfType<BattleLauncher>().launching = true;
-                    areaController.moveController.gameObject.SetActive(false);
+                    areaController.moveController.enabled = false;
                     areaController.areaUI.fadeOutPanel.gameObject.SetActive(true);
                     FindObjectOfType<BattleLauncher>().respawnPoint = areaController.moveController.transform.position;
                     FindObjectOfType<BattleLauncher>().rotationPoint = areaController.moveController.transform.rotation;

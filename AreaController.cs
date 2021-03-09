@@ -33,8 +33,7 @@ public class AreaController : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-        moveController.enabled = true;
+    {        
         if (battleReturn)
         {
             Debug.Log("battle return");
@@ -42,9 +41,16 @@ public class AreaController : MonoBehaviour
             moveController.transform.position = respawnPoint;
             Debug.Log("Character respawned at " + respawnPoint);            
             battleReturn = false;
-        }
+        }        
 
-        // SetPlayerBank 
+        if (respawnPoint != Vector3.zero)
+        {
+            if (moveController.transform.position != respawnPoint)
+            {
+                moveController.transform.position = respawnPoint;
+                Debug.Log("Respawn Point Error.  Quick Fix Successful at " + respawnPoint);
+            }
+        }
     }
 
 
@@ -97,50 +103,65 @@ public class AreaController : MonoBehaviour
         battleReturnmirror = battleReturn;
         respawnPointMirror = respawnPoint;
 
+        // for UI Navigation
+        if (areaUI.inventoryPanel.activeSelf || areaUI.playerPanel.activeSelf || areaUI.weaponPanel.activeSelf)
+        {
+            areaUI.uiNavigation = true;
+        }
+
+
+
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
-            foreach (SecretWall wall in secretWalls)
+            if (areaUI.uiNavigation == false)
             {
-                if (Vector3.Distance(moveController.transform.position, wall.transform.position) < 5f && wall.open == false)
-                {                    
-                    IEnumerator WallTimer()
-                    {
-                        if (wall.enemyTrigger)
-                        {
-                            wall.dunEnemy.anim.SetTrigger("turn");
-                            wall.dunEnemy.launchable = true;
-                            wall.enemyTrigger = false;
-                        }
-                        wall.open = true;
-                        wall.gameObject.SetActive(false);
-                        wall.disolver.gameObject.SetActive(true);                        
-                        yield return new WaitForSeconds(2);                        
-                        wall.disolver.gameObject.SetActive(false);
-                    }
-                    StartCoroutine(WallTimer());
-                }
-            }
-
-
-
-            if (Vector3.Distance(moveController.transform.position, bossDoor.transform.position) < 5f)
-            {
-                areaPlayables[0].Play();
-                IEnumerator LaunchTimer()
+                foreach (SecretWall wall in secretWalls)
                 {
-                    yield return new WaitForSeconds(6f);
-                    BattleLauncher.bossEnemy = true;
-                    FindObjectOfType<BattleLauncher>().launching = true;
-                    moveController.gameObject.SetActive(false);
-                    areaUI.fadeOutPanel.gameObject.SetActive(true);
-                    FindObjectOfType<BattleLauncher>().respawnPoint = moveController.transform.position;
-                    FindObjectOfType<BattleLauncher>().rotationPoint = moveController.transform.rotation;
-                    AreaController.respawnPoint = FindObjectOfType<BattleLauncher>().respawnPoint;
-                    AreaController.respawnRotation = FindObjectOfType<BattleLauncher>().rotationPoint;
-                    UnityEngine.SceneManagement.SceneManager.LoadScene("Battle");
+                    if (Vector3.Distance(moveController.transform.position, wall.transform.position) < 5f && wall.open == false)
+                    {
+                        IEnumerator WallTimer()
+                        {
+                            if (wall.enemyTrigger)
+                            {
+                                wall.dunEnemy.anim.SetTrigger("turn");
+                                wall.dunEnemy.launchable = true;
+                                wall.enemyTrigger = false;
+                            }
+                            wall.open = true;
+                            wall.gameObject.SetActive(false);
+                            wall.disolver.gameObject.SetActive(true);
+                            yield return new WaitForSeconds(2);
+                            wall.disolver.gameObject.SetActive(false);
+                        }
+                        StartCoroutine(WallTimer());
+                    }
                 }
-                StartCoroutine(LaunchTimer());
+
+
+
+                if (Vector3.Distance(moveController.transform.position, bossDoor.transform.position) < 5f)
+                {
+                    areaPlayables[0].Play();
+                    IEnumerator LaunchTimer()
+                    {
+                        yield return new WaitForSeconds(6f);
+                        BattleLauncher.bossEnemy = true;
+                        FindObjectOfType<BattleLauncher>().launching = true;
+                        moveController.gameObject.SetActive(false);
+                        areaUI.fadeOutPanel.gameObject.SetActive(true);
+                        FindObjectOfType<BattleLauncher>().respawnPoint = moveController.transform.position;
+                        FindObjectOfType<BattleLauncher>().rotationPoint = moveController.transform.rotation;
+                        AreaController.respawnPoint = FindObjectOfType<BattleLauncher>().respawnPoint;
+                        AreaController.respawnRotation = FindObjectOfType<BattleLauncher>().rotationPoint;
+                        UnityEngine.SceneManagement.SceneManager.LoadScene("Battle");
+                    }
+                    StartCoroutine(LaunchTimer());
+                }
             }
+
+
+
+
         }
 
         

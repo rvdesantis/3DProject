@@ -7,6 +7,7 @@ using UnityEngine.Playables;
 
 public class Player : MonoBehaviour
 {
+    public bool partyLeader;
     public Animator anim;
     public Player attackTarget;
     
@@ -18,7 +19,9 @@ public class Player : MonoBehaviour
     public GameObject highlighter;
     public GameObject head;
     public Hitbox hitBox;
-    public GameObject spellSpawnPoint; 
+    public GameObject spellSpawnPoint;
+    public CombatText combatTextPrefab;    
+
     public enum Action {melee, ranged, casting, item, flee }
     public Action actionType;
 
@@ -46,6 +49,7 @@ public class Player : MonoBehaviour
     public bool dead;
     public List<Spell> spells;
     public Spell selectedSpell;
+    public GameObject activeItem;
 
     public Sprite playerFace;
 
@@ -77,23 +81,24 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(.25f);
 
             anim.SetTrigger("AttackR");
-
-            yield return new WaitForSeconds(1.75f);
-            transform.position = idlePosition;
-
-
             int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
             {
+                attackTarget.combatTextPrefab.damageAmount = damage;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
                 attackTarget.playerHealth = attackTarget.playerHealth - damage;
-
             }
 
             if (damage <= 0)
             {
+                attackTarget.combatTextPrefab.damageAmount = 0;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
                 Debug.Log("damage 0 or less");
             }
+
+            yield return new WaitForSeconds(1.75f);
+            transform.position = idlePosition;
 
         }
         StartCoroutine(HitTimer());
@@ -107,22 +112,24 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(1);
             anim.SetTrigger("AttackR");
 
-            yield return new WaitForSeconds(1.75f);
-            transform.position = idlePosition;
-            
-
             int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
             {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;                
-
+                attackTarget.combatTextPrefab.damageAmount = damage;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
+                attackTarget.playerHealth = attackTarget.playerHealth - damage;
             }
 
             if (damage <= 0)
             {
+                attackTarget.combatTextPrefab.damageAmount = damage;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;     
                 Debug.Log("damage 0 or less");
             }
+
+            yield return new WaitForSeconds(1.75f);
+            transform.position = idlePosition;       
 
         }
         StartCoroutine(HitTimer());
@@ -163,12 +170,16 @@ public class Player : MonoBehaviour
 
                     }
                 }
-            }
-        
+            }        
 
             IEnumerator SpellTimer()
             {
                 yield return new WaitForSeconds(selectedSpell.damageTimer);
+                int damage = selectedSpell.power + Weapon.magPower;
+                attackTarget.combatTextPrefab.damageAmount = damage;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                
+
                 if (selectedSpell.targetALL == false)
                 {
                     attackTarget.anim.SetTrigger("gotHit");
@@ -185,7 +196,8 @@ public class Player : MonoBehaviour
                     attackTarget.anim.SetTrigger("gotHit");
                 }
 
-                int damage = selectedSpell.power + Weapon.magPower;
+
+
                 if (damage > 0)
                 {
                     if (damage <= 0)
@@ -224,12 +236,14 @@ public class Player : MonoBehaviour
         if (attackTarget.playerHealth > 0)
         {
             attackTarget.anim.SetTrigger("gotHit");
+            attackTarget.combatTextPrefab.ToggleCombatText();
         }
         if (attackTarget.playerHealth <= 0)
         {
             if (attackTarget.dead == false)
             {
                 attackTarget.anim.SetTrigger("Dead");
+                attackTarget.combatTextPrefab.ToggleCombatText();
             }            
         }        
     }
@@ -256,6 +270,12 @@ public class Player : MonoBehaviour
                 highlighter.gameObject.SetActive(true);
             }
         }
+    }
+
+    public void ToggleCombatText()
+    {
+
+        combatTextPrefab.gameObject.SetActive(true);
     }
 
     public virtual void Update()

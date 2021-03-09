@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FirstPerson : MonoBehaviour
-{     
+{
+    public AreaController areaController;
+
     public Transform playerBody;
     public float mouseSensitivity = 100f;
 
@@ -63,19 +65,20 @@ public class FirstPerson : MonoBehaviour
         // Joystick
 
         float jx = Input.GetAxis("JHorizontal");
-        if (jx > .5f)
+        if (areaController.areaUI.uiNavigation == false)
         {
-            transform.localRotation = Quaternion.Euler(90, 0f, 0f);
-            playerBody.Rotate(Vector3.up * (jx * .8f));
+            if (jx > .5f)
+            {
+                transform.localRotation = Quaternion.Euler(90, 0f, 0f);
+                playerBody.Rotate(Vector3.up * (jx * .9f));
 
+            }
+            if (jx < .5f)
+            {
+                transform.localRotation = Quaternion.Euler(-90, 0f, 0f);
+                playerBody.Rotate(Vector3.up * (jx * .9f));
+            }
         }
-        if (jx < .5f)
-        {
-            transform.localRotation = Quaternion.Euler(-90, 0f, 0f);
-            playerBody.Rotate(Vector3.up * (jx * .8f));
-
-        }
-
 
         // battle launching; 
         distanceTraveled = Vector3.Distance(transform.position, lastPosition);

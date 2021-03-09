@@ -9,6 +9,7 @@ public class HeroSelect : MonoBehaviour
 
     public PlayerBank staticHeroList;
     public PlayerBank activeParty;
+    public PlayerBank heroBank;
 
     public static int hero0;
     public static int hero1;
@@ -28,6 +29,9 @@ public class HeroSelect : MonoBehaviour
     public List<GameObject> lights;
     public List<GameObject> heroUI;
     public HeroStatsText heroStatsText;
+    public List<WeaponBT> weaponBTs;
+    
+    
     public UIArrow leftArrow;
     public UIArrow rightArrow;
 
@@ -272,13 +276,24 @@ public class HeroSelect : MonoBehaviour
                     }                    
                 }
             }
-            
+
             if (partyIndex > 2)
             {
                 Debug.Log("Only 3 Heroes per party!");
             }
 
         }
-        
+
+
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.JoystickButton3))
+        {
+            if (focused)
+            {
+                Debug.Log("weapon switched");
+                weaponBTs[heroIndex].NextWeapon();
+
+            }
+        }
+
     }
 }
