@@ -7,6 +7,7 @@ public class Enemy : Player
     public bool placeholder;
     public int dieRoll;
 
+
     public override void Act()
     {
         if (spells.Count == 0)

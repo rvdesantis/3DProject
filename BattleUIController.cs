@@ -26,6 +26,10 @@ public class BattleUIController : MonoBehaviour
     public Sprite itemImage;
     public int itemIndex;
 
+    public GameObject levelUpUI;
+    public Image lvlHeroFace;
+    public Text levelText;
+
     public bool activeUI;
     public GameObject currentUI;
 
@@ -227,6 +231,12 @@ public class BattleUIController : MonoBehaviour
         {
             battlecontroller.NextPlayerTurn();
         }
+    }
+
+    public void LevelUpUI()
+    {
+        activeUI = levelUpUI;
+
     }
 
     private void Update()

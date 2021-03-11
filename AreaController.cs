@@ -69,6 +69,7 @@ public class AreaController : MonoBehaviour
                 character.playerMaxMana = PlayerPrefs.GetInt("BerMaxMana");
                 character.playerSTR = PlayerPrefs.GetInt("BerStr");
                 character.playerDEF = PlayerPrefs.GetInt("BerDef");
+                character.XP = PlayerPrefs.GetInt("BerXP");
             }
             if (character.playerName == "Archer")
             {
@@ -77,6 +78,7 @@ public class AreaController : MonoBehaviour
                 character.playerMaxMana = PlayerPrefs.GetInt("ArMaxMana");
                 character.playerSTR = PlayerPrefs.GetInt("ArStr");
                 character.playerDEF = PlayerPrefs.GetInt("ArDef");
+                character.XP = PlayerPrefs.GetInt("ArXP");
             }
             if (character.playerName == "Warrior")
             {
@@ -85,6 +87,7 @@ public class AreaController : MonoBehaviour
                 character.playerMaxMana = PlayerPrefs.GetInt("WarMaxMana");
                 character.playerSTR = PlayerPrefs.GetInt("WarStr");
                 character.playerDEF = PlayerPrefs.GetInt("WarDef");
+                character.XP = PlayerPrefs.GetInt("WarXP");
             }
             if (character.playerName == "Mage")
             {
@@ -93,6 +96,7 @@ public class AreaController : MonoBehaviour
                 character.playerMaxMana = PlayerPrefs.GetInt("MagMaxMana");
                 character.playerSTR = PlayerPrefs.GetInt("MagStr");
                 character.playerDEF = PlayerPrefs.GetInt("MagDef");
+                character.XP = PlayerPrefs.GetInt("MagXP");
             }
         }
     }

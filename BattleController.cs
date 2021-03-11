@@ -478,8 +478,10 @@ public class BattleController : MonoBehaviour
                 {                    
                     if (deadEnemies == enemies.Count)
                     {
+                        // calculate experience.
                         AreaController.battleReturn = true;
-                        UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
+                        AfterBattle();
+                        
                     }
                     return;
                 }                
@@ -488,6 +490,62 @@ public class BattleController : MonoBehaviour
             
         }        
     }
+
+    public void AfterBattle()
+    {
+        int totalXP = enemies[0].XP + enemies[1].XP + enemies[2].XP;
+
+        foreach (Player character in heroes)
+        {
+            if (character.playerName == "Archer")
+            {
+                character.XP = character.XP + totalXP;
+                PlayerPrefs.SetInt("ArXP", character.XP);
+                if (character.playerLevel == 1 && character.XP >= 500)
+                {
+                    character.LevelUp();
+                    uiController.levelUpUI.gameObject.SetActive(true);
+                }
+            }
+            if (character.playerName == "Berserker")
+            {
+                character.XP = character.XP + totalXP;
+                PlayerPrefs.SetInt("BerXP", character.XP);
+                if (character.playerLevel == 1 && character.XP >= 500)
+                {
+                    character.LevelUp();
+                    uiController.levelUpUI.gameObject.SetActive(true);
+                }
+            }
+            if (character.playerName == "Warrior")
+            {
+                character.XP = character.XP + totalXP;
+                PlayerPrefs.SetInt("WarXP", character.XP);
+                if (character.playerLevel == 1 && character.XP >= 500)
+                {
+                    character.LevelUp();
+                    uiController.levelUpUI.gameObject.SetActive(true);
+                }
+            }
+            if (character.playerName == "Mage")
+            {
+                character.XP = character.XP + totalXP;
+                PlayerPrefs.SetInt("MagXP", character.XP);
+                if (character.playerLevel == 1 && character.XP >= 500)
+                {
+                    character.LevelUp();
+                    uiController.levelUpUI.gameObject.SetActive(true);
+                }
+            }
+            PlayerPrefs.Save();
+        }
+
+
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
+    }
+
+    
 
     public void TargetChecker()
     {

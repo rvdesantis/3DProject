@@ -44,6 +44,7 @@ public class Player : MonoBehaviour
     public int playerMaxHealth;
     public int playerMaxMana;
     public int playerLevel;
+    public int XP;
     public int playerSTR;
     public int playerDEF;
     public bool dead;
@@ -274,8 +275,57 @@ public class Player : MonoBehaviour
 
     public void ToggleCombatText()
     {
-
         combatTextPrefab.gameObject.SetActive(true);
+    }
+
+    public void LevelUp()
+    {
+        if (playerLevel == 1 && XP >= 500)
+        {
+            XP = 0;
+            if (berzerkerClass)
+            {
+                PlayerPrefs.SetInt("BerLevel", 2);
+                PlayerPrefs.SetInt("BarXP", 0);
+                PlayerPrefs.SetInt("BerMaxHealth", playerMaxHealth + Random.Range(15, 21));
+                PlayerPrefs.SetInt("BerMaxMana", 20);
+                PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
+                PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
+                PlayerPrefs.Save();
+                return;
+            }
+            if (archerClass)
+            {
+                PlayerPrefs.SetInt("ArLevel", 2);
+                PlayerPrefs.SetInt("ArXP", 0);
+                PlayerPrefs.SetInt("ArMaxHealth", playerMaxHealth + Random.Range(10, 16));
+                PlayerPrefs.SetInt("ArMaxMana", playerMaxMana + Random.Range(15, 21));
+                PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
+                PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));
+                PlayerPrefs.Save();
+                return;
+            }
+            if (warriorClass)
+            {
+                PlayerPrefs.SetInt("WarLevel", 2);
+                PlayerPrefs.SetInt("WarXP", 0);
+                PlayerPrefs.SetInt("WarMaxHealth", playerMaxHealth + Random.Range(20, 26));
+                PlayerPrefs.SetInt("WarMaxMana", 20);
+                PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(15, 21));
+                PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(15, 21));
+                PlayerPrefs.Save();
+            }
+            if (mageClass)
+            {
+                PlayerPrefs.SetInt("MagLevel", 2);
+                PlayerPrefs.SetInt("MagXP", 0);
+                PlayerPrefs.SetInt("MagMaxHealth", playerMaxHealth + Random.Range(15, 21));
+                PlayerPrefs.SetInt("MagMaxMana", playerMaxMana + Random.Range(20, 31));
+                PlayerPrefs.SetInt("MagStr", playerSTR + Random.Range(10, 16));
+                PlayerPrefs.SetInt("MagDef", playerDEF + Random.Range(10, 16));
+                PlayerPrefs.Save();
+            }
+        }
     }
 
     public virtual void Update()

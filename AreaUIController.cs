@@ -137,17 +137,17 @@ public class AreaUIController : MonoBehaviour
         playerStats[0].text = (areaController.activeBank.bank[0].playerName + "\n" + areaController.activeBank.bank[0].playerLevel 
             + "\n" + areaController.activeBank.bank[0].playerMaxHealth + "\n" + areaController.activeBank.bank[0].playerMaxMana
             + "\n" + (areaController.activeBank.bank[0].playerSTR + areaController.activeBank.bank[0].Weapon.power) + "\n" 
-            + (areaController.activeBank.bank[0].playerDEF + areaController.activeBank.bank[0].Weapon.def));
+            + (areaController.activeBank.bank[0].playerDEF + areaController.activeBank.bank[0].Weapon.def) + "\n" + areaController.activeBank.bank[0].XP);
 
         playerStats[1].text = (areaController.activeBank.bank[1].playerName + "\n" + areaController.activeBank.bank[1].playerLevel
             + "\n" + areaController.activeBank.bank[1].playerMaxHealth + "\n" + areaController.activeBank.bank[1].playerMaxMana
             + "\n" + (areaController.activeBank.bank[1].playerSTR + areaController.activeBank.bank[1].Weapon.power) + "\n" 
-            + (areaController.activeBank.bank[1].playerDEF + areaController.activeBank.bank[1].Weapon.def));
+            + (areaController.activeBank.bank[1].playerDEF + areaController.activeBank.bank[1].Weapon.def) + "\n" + areaController.activeBank.bank[1].XP);
 
         playerStats[2].text = (areaController.activeBank.bank[2].playerName + "\n" + areaController.activeBank.bank[2].playerLevel
             + "\n" + areaController.activeBank.bank[2].playerMaxHealth + "\n" + areaController.activeBank.bank[2].playerMaxMana
             + "\n" + (areaController.activeBank.bank[2].playerSTR + areaController.activeBank.bank[2].Weapon.power) + "\n" 
-            + (areaController.activeBank.bank[2].playerDEF + areaController.activeBank.bank[2].Weapon.def));
+            + (areaController.activeBank.bank[2].playerDEF + areaController.activeBank.bank[2].Weapon.def) + "\n" + areaController.activeBank.bank[2].XP);
 
         if (playerPanel.activeSelf)
         {
