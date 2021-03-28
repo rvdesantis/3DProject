@@ -87,14 +87,17 @@ public class Player : MonoBehaviour
             if (damage > 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = damage;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                attackTarget.combatTextPrefab.ToggleCombatText();
                 attackTarget.playerHealth = attackTarget.playerHealth - damage;
+
             }
 
             if (damage <= 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = 0;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                attackTarget.combatTextPrefab.ToggleCombatText();
                 Debug.Log("damage 0 or less");
             }
 
@@ -110,7 +113,7 @@ public class Player : MonoBehaviour
         IEnumerator HitTimer()
         {
             LookAtTarget();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(.25f);
             anim.SetTrigger("AttackR");
 
             int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
@@ -118,14 +121,16 @@ public class Player : MonoBehaviour
             if (damage > 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = damage;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                attackTarget.combatTextPrefab.ToggleCombatText();
                 attackTarget.playerHealth = attackTarget.playerHealth - damage;
             }
 
             if (damage <= 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = damage;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;     
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                attackTarget.combatTextPrefab.ToggleCombatText();
                 Debug.Log("damage 0 or less");
             }
 
@@ -236,16 +241,17 @@ public class Player : MonoBehaviour
     {
         if (attackTarget.playerHealth > 0)
         {
-            attackTarget.anim.SetTrigger("gotHit");
-            attackTarget.combatTextPrefab.ToggleCombatText();
+            attackTarget.anim.SetTrigger("gotHit");            
+            return;
         }
         if (attackTarget.playerHealth <= 0)
         {
             if (attackTarget.dead == false)
             {
-                attackTarget.anim.SetTrigger("Dead");
-                attackTarget.combatTextPrefab.ToggleCombatText();
-            }            
+                attackTarget.dead = true;
+                attackTarget.anim.SetTrigger("Dead");                
+            }
+            return;
         }        
     }
 
@@ -273,10 +279,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ToggleCombatText()
-    {
-        combatTextPrefab.gameObject.SetActive(true);
-    }
 
     public void LevelUp()
     {
@@ -288,7 +290,9 @@ public class Player : MonoBehaviour
                 PlayerPrefs.SetInt("BerLevel", 2);
                 PlayerPrefs.SetInt("BarXP", 0);
                 PlayerPrefs.SetInt("BerMaxHealth", playerMaxHealth + Random.Range(15, 21));
+                PlayerPrefs.SetInt("BerHealth", PlayerPrefs.GetInt("BerMaxHealth"));
                 PlayerPrefs.SetInt("BerMaxMana", 20);
+                PlayerPrefs.SetInt("BerMana", 20);
                 PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
                 PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
                 PlayerPrefs.Save();
@@ -299,7 +303,9 @@ public class Player : MonoBehaviour
                 PlayerPrefs.SetInt("ArLevel", 2);
                 PlayerPrefs.SetInt("ArXP", 0);
                 PlayerPrefs.SetInt("ArMaxHealth", playerMaxHealth + Random.Range(10, 16));
+                PlayerPrefs.SetInt("ArHealth", PlayerPrefs.GetInt("ArMaxHealth"));
                 PlayerPrefs.SetInt("ArMaxMana", playerMaxMana + Random.Range(15, 21));
+                PlayerPrefs.SetInt("ArMana", PlayerPrefs.GetInt("ArMaxMana"));
                 PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
                 PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));
                 PlayerPrefs.Save();
@@ -310,6 +316,8 @@ public class Player : MonoBehaviour
                 PlayerPrefs.SetInt("WarLevel", 2);
                 PlayerPrefs.SetInt("WarXP", 0);
                 PlayerPrefs.SetInt("WarMaxHealth", playerMaxHealth + Random.Range(20, 26));
+                PlayerPrefs.SetInt("WarHealth", PlayerPrefs.GetInt("WarMaxHealth"));
+                PlayerPrefs.SetInt("WarMana", 20);
                 PlayerPrefs.SetInt("WarMaxMana", 20);
                 PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(15, 21));
                 PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(15, 21));
@@ -320,7 +328,9 @@ public class Player : MonoBehaviour
                 PlayerPrefs.SetInt("MagLevel", 2);
                 PlayerPrefs.SetInt("MagXP", 0);
                 PlayerPrefs.SetInt("MagMaxHealth", playerMaxHealth + Random.Range(15, 21));
+                PlayerPrefs.SetInt("MagHealth", PlayerPrefs.GetInt("MagMaxHealth"));
                 PlayerPrefs.SetInt("MagMaxMana", playerMaxMana + Random.Range(20, 31));
+                PlayerPrefs.SetInt("MagMana", PlayerPrefs.GetInt("MagMaxMana"));
                 PlayerPrefs.SetInt("MagStr", playerSTR + Random.Range(10, 16));
                 PlayerPrefs.SetInt("MagDef", playerDEF + Random.Range(10, 16));
                 PlayerPrefs.Save();

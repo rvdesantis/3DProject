@@ -9,6 +9,7 @@ public class MimicChest : MonoBehaviour
     public static bool opened;
     public static bool looted;
     public Items treasure;
+    public bool inArea;
 
 
     private void Start()
@@ -43,10 +44,32 @@ public class MimicChest : MonoBehaviour
 
     void Update()
     {
+        if (Vector3.Distance(areaController.moveController.transform.position, this.transform.position) < 7)
+        {
+            if (opened == false)
+            {
+                inArea = true;
+            }
+            if (inArea && opened == false)
+            {
+                areaController.areaUI.messageText.text = "Open Chest?";
+                areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", true);
+            }
+        }
+        if (Vector3.Distance(areaController.moveController.transform.position, this.transform.position) > 8)
+        {
+            if (inArea == true)
+            {
+                areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                inArea = false;
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
             if (Vector3.Distance(areaController.moveController.transform.position, this.transform.position) < 7)
             {
+                areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 GetComponent<Animator>().SetTrigger("open");
                 opened = true;
                 IEnumerator LaunchTimer()

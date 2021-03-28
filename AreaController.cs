@@ -15,6 +15,7 @@ public class AreaController : MonoBehaviour
     public List<SecretWall> secretWalls;
     public GameObject bossDoor;
     public List<Items> areaInventory;
+    public List<Items> potions;
     public List<PlayableDirector> areaPlayables;
 
     public PlayerBank activeBank;
@@ -27,6 +28,7 @@ public class AreaController : MonoBehaviour
 
 
     public static bool battleReturn;
+    public int respawnAttempt;
 
     public bool battleReturnmirror;
     
@@ -37,20 +39,29 @@ public class AreaController : MonoBehaviour
         if (battleReturn)
         {
             Debug.Log("battle return");
-            moveController.transform.rotation = respawnRotation;
-            moveController.transform.position = respawnPoint;
-            Debug.Log("Character respawned at " + respawnPoint);            
-            battleReturn = false;
-        }        
 
-        if (respawnPoint != Vector3.zero)
+            Respawn();
+        } 
+
+        SetPlayerBank();
+        SetStartingItems();
+    }
+
+    public void Respawn()
+    {
+        moveController.enabled = false;
+        moveController.transform.rotation = respawnRotation;
+        moveController.transform.position = respawnPoint;
+        Debug.Log("Character respawned at " + respawnPoint);
+        moveController.enabled = true;
+
+        if (moveController.transform.position != respawnPoint)
         {
-            if (moveController.transform.position != respawnPoint)
-            {
-                moveController.transform.position = respawnPoint;
-                Debug.Log("Respawn Point Error.  Quick Fix Successful at " + respawnPoint);
-            }
+            respawnAttempt++;
+            Respawn();
+            Debug.Log("Respawn Point Error.  Quick Fix Successful attempt " + respawnAttempt);
         }
+        
     }
 
 
@@ -101,6 +112,11 @@ public class AreaController : MonoBehaviour
         }
     }
 
+    public void SetStartingItems()
+    {
+        areaInventory.Add(potions[0]);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -108,7 +124,7 @@ public class AreaController : MonoBehaviour
         respawnPointMirror = respawnPoint;
 
         // for UI Navigation
-        if (areaUI.inventoryPanel.activeSelf || areaUI.playerPanel.activeSelf || areaUI.weaponPanel.activeSelf)
+        if (areaUI.inventoryPanel.activeSelf || areaUI.playerPanel.activeSelf || areaUI.weaponPanel.activeSelf || areaUI.menuUI.activeSelf)
         {
             areaUI.uiNavigation = true;
         }
@@ -168,7 +184,14 @@ public class AreaController : MonoBehaviour
 
         }
 
-        
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton4))
+        {
+            if (areaUI.inventoryPanel.activeSelf == false && areaUI.playerPanel.activeSelf == false && areaUI.weaponPanel.activeSelf == false && areaUI.menuUI.activeSelf == false)
+            {
+                areaUI.ToggleMenu();
+            }                
+        }
+
 
         if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.JoystickButton1))
         {

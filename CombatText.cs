@@ -25,11 +25,12 @@ public class CombatText : MonoBehaviour
         CombatText damageText = Instantiate<CombatText>(this, startingPosition, Quaternion.identity);
         damageText.battleController = FindObjectOfType<BattleController>();
         damageText.anim = damageText.floatingText.GetComponent<Animator>();
+
         
         damageText.floatingText.gameObject.SetActive(true);
         damageText.floatingText.text = damageAmount.ToString();
+        damageText.floatingText.transform.position = startingPosition;
         damageText.anim.SetTrigger("float");
-
     }
 
     

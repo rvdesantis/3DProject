@@ -24,19 +24,28 @@ public class FirstPerson : MonoBehaviour
     // for battle start
 
     public Vector3 lastPosition;
-    public List<GameObject> corners;
-    public Vector3 closestCorner;
 
-    
+
+    public GameObject rotator;
+    public GameObject rotator0;
+    public GameObject rotator90;
+    public GameObject rotator180;
+    public GameObject rotator270;
+
+    public Quaternion rotationMirror;
+  
+
     void Start()
     {
         lastPosition = transform.position;
         Cursor.lockState = CursorLockMode.Locked;
+        rotator = rotator0;
     }
 
     // Update is called once per frame
     void Update()
     {
+        rotationMirror = playerBody.rotation;
         // must use Time.deltaTime since this is in Update()
         // mouse settings
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
@@ -70,13 +79,13 @@ public class FirstPerson : MonoBehaviour
             if (jx > .5f)
             {
                 transform.localRotation = Quaternion.Euler(90, 0f, 0f);
-                playerBody.Rotate(Vector3.up * (jx * .9f));
+                playerBody.Rotate(Vector3.up * (jx * 1.5f));
 
             }
             if (jx < .5f)
             {
                 transform.localRotation = Quaternion.Euler(-90, 0f, 0f);
-                playerBody.Rotate(Vector3.up * (jx * .9f));
+                playerBody.Rotate(Vector3.up * (jx * 1.5f));
             }
         }
 
@@ -87,6 +96,26 @@ public class FirstPerson : MonoBehaviour
             steps++;
             distanceTraveled = 0;
             lastPosition = playerBody.transform.position;
+        }
+
+
+        playerBody.rotation = Quaternion.Slerp(playerBody.rotation, rotator.transform.rotation, .0075f);
+        float yRotation = playerBody.transform.eulerAngles.y;
+        if (yRotation >= 325 || yRotation < 45)
+        {
+            rotator = rotator0;
+        }
+        if (yRotation >= 46 && yRotation < 134)
+        {
+            rotator = rotator90;
+        }
+        if (yRotation >= 135 && yRotation < 224)
+        {
+            rotator = rotator180;
+        }
+        if (yRotation >= 225 && yRotation < 324)
+        {
+            rotator = rotator270;
         }
     }
 }

@@ -35,6 +35,20 @@ public class HeroSelect : MonoBehaviour
     public UIArrow leftArrow;
     public UIArrow rightArrow;
 
+    public bool joystick;
+    public GameObject directionUI;
+    public Text directionText;
+    public Image spaceBar;
+    public Image greenButton;
+    
+
+    public Text backText;
+    public Image redButton;
+    public Image escButton;
+    public Image blueButton;
+
+    public Animator directionUIanim;
+
     public GameObject iconPanel;
     public Text partyCounter;
 
@@ -42,7 +56,8 @@ public class HeroSelect : MonoBehaviour
     private void Start()
     {        
         cam1.m_LookAt = camAimers[0].transform;
-        lights[0].gameObject.SetActive(true);        
+        lights[0].gameObject.SetActive(true);
+        directionUIanim = directionUI.GetComponent<Animator>();
     }
 
     public void SaveToPrefs()
@@ -51,6 +66,7 @@ public class HeroSelect : MonoBehaviour
         {
             PlayerPrefs.SetString("BerName", "Berserker");
             PlayerPrefs.SetInt("BerLevel", staticHeroList.bank[0].playerLevel);
+            PlayerPrefs.SetInt("BerHealth", staticHeroList.bank[0].playerMaxHealth); // sets player health to max when starting dungeon
             PlayerPrefs.SetInt("BerMaxHealth", staticHeroList.bank[0].playerMaxHealth);
             PlayerPrefs.SetInt("BerMaxMana", staticHeroList.bank[0].playerMaxMana);
             PlayerPrefs.SetInt("BerStr", staticHeroList.bank[0].playerSTR);
@@ -60,6 +76,7 @@ public class HeroSelect : MonoBehaviour
         {
             PlayerPrefs.SetString("ArName", "Archer");
             PlayerPrefs.SetInt("ArLevel", staticHeroList.bank[1].playerLevel);
+            PlayerPrefs.SetInt("ArHealth", staticHeroList.bank[1].playerMaxHealth);
             PlayerPrefs.SetInt("ArMaxHealth", staticHeroList.bank[1].playerMaxHealth);
             PlayerPrefs.SetInt("ArMaxMana", staticHeroList.bank[1].playerMaxMana);
             PlayerPrefs.SetInt("ArStr", staticHeroList.bank[1].playerSTR);
@@ -69,6 +86,7 @@ public class HeroSelect : MonoBehaviour
         {
             PlayerPrefs.SetString("WarName", "Warrior");
             PlayerPrefs.SetInt("WarLevel", staticHeroList.bank[2].playerLevel);
+            PlayerPrefs.SetInt("WarHealth", staticHeroList.bank[2].playerMaxHealth);
             PlayerPrefs.SetInt("WarMaxHealth", staticHeroList.bank[2].playerMaxHealth);
             PlayerPrefs.SetInt("WarMaxMana", staticHeroList.bank[2].playerMaxMana);
             PlayerPrefs.SetInt("WarStr", staticHeroList.bank[2].playerSTR);
@@ -78,6 +96,7 @@ public class HeroSelect : MonoBehaviour
         {
             PlayerPrefs.SetString("MagName", "Mage");
             PlayerPrefs.SetInt("MagLevel", staticHeroList.bank[3].playerLevel);
+            PlayerPrefs.SetInt("MagHealth", staticHeroList.bank[3].playerMaxHealth);
             PlayerPrefs.SetInt("MagMaxHealth", staticHeroList.bank[3].playerMaxHealth);
             PlayerPrefs.SetInt("MagMaxMana", staticHeroList.bank[3].playerMaxMana);
             PlayerPrefs.SetInt("MagStr", staticHeroList.bank[3].playerSTR);
@@ -86,10 +105,88 @@ public class HeroSelect : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    public void UpdateDirections()
+    {
+        if (!focused)
+        {
+            directionText.text = "Select " + staticHeroList.bank[heroIndex].playerName;
+            directionUIanim.SetBool("left", false);
+            directionUIanim.SetBool("right", false);
+
+            redButton.gameObject.SetActive(false); backText.gameObject.SetActive(false); escButton.gameObject.SetActive(false); blueButton.gameObject.SetActive(false);
+        }
+        if (focused)
+        {
+            backText.text = "Return";
+            if (heroIndex != hero0 || heroIndex != hero1 || heroIndex != hero2)
+            {                
+                directionText.text = "Add " + staticHeroList.bank[heroIndex].playerName;                
+            }
+            if (heroIndex == hero0 || heroIndex == hero1 || heroIndex == hero2)
+            {
+                if (partyIndex > 0)
+                {
+                    directionText.text = "Remove " + staticHeroList.bank[heroIndex].playerName;
+                    greenButton.gameObject.SetActive(false);
+                    blueButton.gameObject.SetActive(true);
+                }                               
+            }
+
+            if (joystick)
+            {
+                escButton.gameObject.SetActive(false);
+                redButton.gameObject.SetActive(true); backText.gameObject.SetActive(true);
+            }
+            if (!joystick)
+            {
+                redButton.gameObject.SetActive(false);
+                escButton.gameObject.SetActive(true); backText.gameObject.SetActive(true);
+            }
+
+
+            if (heroIndex == 1 || heroIndex == 2)
+            {
+                directionUIanim.SetBool("right", false);
+                directionUIanim.SetBool("left", true);
+                
+            }
+            if (heroIndex == 0 || heroIndex == 3)
+            {
+                directionUIanim.SetBool("left", false);
+                directionUIanim.SetBool("right", true);
+            }
+
+        }
+        if (joystick)
+        {
+            spaceBar.gameObject.SetActive(false);
+            if (!focused)
+            {
+                greenButton.gameObject.SetActive(true);
+            }            
+        }
+        if (joystick == false)
+        {
+            if (greenButton.gameObject.activeSelf)
+            {
+                spaceBar.gameObject.SetActive(true);
+                greenButton.gameObject.SetActive(false);
+                blueButton.gameObject.SetActive(false);
+            }
+
+        }
+    }
+
     private void FixedUpdate() // for joystick.  Set to .1 in project settings.
     {
+        
+
         if (Input.GetAxis("Horizontal") > .5f)
         {
+            if (joystick == false)
+            {
+                joystick = true;
+            }
             if (!focused)
             {
                 rightArrow.ArrowTrigger();
@@ -114,6 +211,10 @@ public class HeroSelect : MonoBehaviour
 
         if (Input.GetAxis("Horizontal") < -.5f)
         {
+            if (joystick == false)
+            {
+                joystick = true;
+            }
             if (!focused)
             {
                 leftArrow.ArrowTrigger();
@@ -138,10 +239,17 @@ public class HeroSelect : MonoBehaviour
         }
     }
 
+
+
     private void Update()
     {
+        UpdateDirections();
         if (Input.GetKeyUp(KeyCode.D))
         {
+            if (joystick == true)
+            {
+                joystick = false;
+            }
             if (!focused)
             {
                 rightArrow.ArrowTrigger();
@@ -166,6 +274,10 @@ public class HeroSelect : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
+            if (joystick == true)
+            {
+                joystick = false;
+            }
             if (!focused)
             {
                 leftArrow.ArrowTrigger();
@@ -193,14 +305,51 @@ public class HeroSelect : MonoBehaviour
         {
             if (focused)
             {
-                
+                focused = false;
                 cam1.m_Priority = 1;
                 focusCams[heroIndex].m_Priority = 0;
                 heroUI[heroIndex].gameObject.SetActive(false);
-                staticHeroList.bank[heroIndex].GetComponent<Animator>().SetTrigger("sit");
-                focused = false;
+                staticHeroList.bank[heroIndex].GetComponent<Animator>().SetTrigger("sit");                
                 iconPanel.gameObject.SetActive(true);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton2))
+        {
+            if (focused)
+            {
+                if (staticHeroList.bank[heroIndex].anim.GetBool("select") == true)
+                {
+                    staticHeroList.bank[heroIndex].anim.SetBool("select", false);
+                    if (staticHeroList.bank[heroIndex] == activeParty.bank[partyIndex])
+                    {
+                        activeParty.bank[partyIndex] = null;
+
+                    }
+                    if (staticHeroList.bank[heroIndex] != activeParty.bank[partyIndex])
+                    {
+                        if (partyIndex == 2)
+                        {
+                            activeParty.bank[0] = activeParty.bank[1];
+                            activeParty.bank[1] = null;
+                        }
+
+                    }
+                    partyIndex--;
+                }               
+
+                focused = false;
+                cam1.m_Priority = 1;
+                focusCams[heroIndex].m_Priority = 0;
+                heroUI[heroIndex].gameObject.SetActive(false);
+                
+                
+                partyCounter.text = "CHOOSE PARTY (" + partyIndex + " out of 3)";
+                iconPanel.gameObject.SetActive(true);
+
+
+            }
+            return;
         }
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.JoystickButton0))
@@ -213,7 +362,10 @@ public class HeroSelect : MonoBehaviour
                 iconPanel.gameObject.SetActive(false);
                 heroStatsText.LoadHeroSelectStats();
                 heroUI[heroIndex].gameObject.SetActive(true);
-                staticHeroList.bank[heroIndex].GetComponent<Animator>().SetTrigger("stand");
+                if (staticHeroList.bank[heroIndex].GetComponent<Animator>().GetBool("select") == false)
+                {
+                    staticHeroList.bank[heroIndex].GetComponent<Animator>().SetTrigger("stand");
+                }                
                 return;
             }
             if (focused)
@@ -231,6 +383,7 @@ public class HeroSelect : MonoBehaviour
                     {
                         if (hero0 != heroIndex)
                         {
+                            activeParty.bank[partyIndex] = staticHeroList.bank[heroIndex];
                             hero1 = heroIndex;   
                             partyIndex++;                            
                             partyCounter.text = "CHOOSE PARTY (" + partyIndex + " out of 3)";
@@ -251,6 +404,7 @@ public class HeroSelect : MonoBehaviour
 
                     if (hero0 != heroIndex && hero1 != heroIndex)
                     {
+                        directionUI.gameObject.SetActive(false);
                         activeParty.bank[partyIndex] = staticHeroList.bank[heroIndex];
                         hero2 = heroIndex;
                         //enemy assign

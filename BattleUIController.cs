@@ -27,8 +27,11 @@ public class BattleUIController : MonoBehaviour
     public int itemIndex;
 
     public GameObject levelUpUI;
+    public Button exitBT;
     public Image lvlHeroFace;
     public Text levelText;
+
+
 
     public bool activeUI;
     public GameObject currentUI;
@@ -128,11 +131,10 @@ public class BattleUIController : MonoBehaviour
                     button.image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].panelImage;
                 }
                 
-            }
+            }           
             
-            spellButtons[0].Select();
             spellPanel.gameObject.SetActive(true);
-
+            spellButtons[0].Select();
         }
     }
 
@@ -148,7 +150,7 @@ public class BattleUIController : MonoBehaviour
             itemPanel.gameObject.SetActive(true);
             activeUI = true;
             currentUI = itemPanel;
-            itemPanel.gameObject.SetActive(true);
+            
             foreach (Button button in itembuttons)
             {
                 int itemIndex = itembuttons.IndexOf(button);
@@ -208,6 +210,7 @@ public class BattleUIController : MonoBehaviour
     public void SpellBTDown()
     {
         battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.enemies[battlecontroller.focusIndex];
+        battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget.ToggleHighlighter();
         if (battlecontroller.enemies[0].dead == false)
         {
             battlecontroller.focusIndex = 0;
@@ -235,8 +238,14 @@ public class BattleUIController : MonoBehaviour
 
     public void LevelUpUI()
     {
-        activeUI = levelUpUI;
+        activeUI = true;
+        currentUI = levelUpUI;        
+        exitBT.Select();
+    }
 
+    public void ExitBattleUI()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
     }
 
     private void Update()

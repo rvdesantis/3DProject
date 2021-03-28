@@ -65,7 +65,31 @@ public class BattleController : MonoBehaviour
         heroes[1] = Instantiate<Player>(playerBank.bank[HeroSelect.hero1], spawnPoint1, Quaternion.identity);        
         heroes[2] = Instantiate<Player>(playerBank.bank[HeroSelect.hero2], spawnPoint2, Quaternion.identity);
 
-        // need to define enemies for specific launches, like mimics.
+        foreach (Player character in heroes)
+        {
+            if (character.berzerkerClass)
+            {
+                character.playerHealth = PlayerPrefs.GetInt("BerHealth");
+                character.playerMana = PlayerPrefs.GetInt("BerMaxMana");
+            }
+            if (character.archerClass)
+            {
+                character.playerHealth = PlayerPrefs.GetInt("ArHealth");
+                character.playerMana = PlayerPrefs.GetInt("ArMaxMana");
+            }
+            if (character.warriorClass)
+            {
+                character.playerHealth = PlayerPrefs.GetInt("WarHealth");
+                character.playerMana = PlayerPrefs.GetInt("WarMaxMana");
+            }
+            if (character.mageClass)
+            {
+                character.playerHealth = PlayerPrefs.GetInt("MagHealth");
+                character.playerMana = PlayerPrefs.GetInt("MagMaxMana");
+            }
+        }
+
+        // used to define enemies for specific launches, like Bosses && mimics.
         if (BattleLauncher.mimic == false && BattleLauncher.dunEnemy == false && BattleLauncher.bossEnemy == false)
         {            
             if (enemyNumber == 1)
@@ -140,6 +164,14 @@ public class BattleController : MonoBehaviour
         comboController.AssignPlayers();
         keyboard = true;
     }
+
+
+
+
+
+
+
+
 
     public void NextPlayerTurn() // for action selection prior to Action Cycle
     {
@@ -479,6 +511,7 @@ public class BattleController : MonoBehaviour
                     if (deadEnemies == enemies.Count)
                     {
                         // calculate experience.
+                        keyboard = false;
                         AreaController.battleReturn = true;
                         AfterBattle();
                         
@@ -501,6 +534,7 @@ public class BattleController : MonoBehaviour
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("ArXP", character.XP);
+                PlayerPrefs.SetInt("ArHealth", character.playerHealth);
                 if (character.playerLevel == 1 && character.XP >= 500)
                 {
                     character.LevelUp();
@@ -511,6 +545,7 @@ public class BattleController : MonoBehaviour
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("BerXP", character.XP);
+                PlayerPrefs.SetInt("BerHealth", character.playerHealth);
                 if (character.playerLevel == 1 && character.XP >= 500)
                 {
                     character.LevelUp();
@@ -521,6 +556,7 @@ public class BattleController : MonoBehaviour
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("WarXP", character.XP);
+                PlayerPrefs.SetInt("WarHealth", character.playerHealth);
                 if (character.playerLevel == 1 && character.XP >= 500)
                 {
                     character.LevelUp();
@@ -531,6 +567,7 @@ public class BattleController : MonoBehaviour
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("MagXP", character.XP);
+                PlayerPrefs.SetInt("MagHealth", character.playerHealth);
                 if (character.playerLevel == 1 && character.XP >= 500)
                 {
                     character.LevelUp();
@@ -540,9 +577,15 @@ public class BattleController : MonoBehaviour
             PlayerPrefs.Save();
         }
 
+        if (uiController.levelUpUI.activeSelf == false)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
+        }
+        if (uiController.levelUpUI.activeSelf)
+        {
+            uiController.LevelUpUI();
+        }
 
-
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
     }
 
     
@@ -798,7 +841,7 @@ public class BattleController : MonoBehaviour
                 }
                 if (uiController.activeUI == true)
                 {
-                    if (uiController.activeUI = uiController.spellPanel)
+                    if (uiController.activeUI == uiController.spellPanel)
                     {
                         // handled in BattleUIController since Space Key would only select active spell menu button
                         uiController.activeUI = false;
