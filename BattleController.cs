@@ -16,6 +16,7 @@ public class BattleController : MonoBehaviour
     public List<CinemachineVirtualCamera> virtualCams;
     // 0-2 Hero Player Back cams, 3-5, Hero Player Front Cams
     public List<CinemachineVirtualCamera> castingCams;
+    public CinemachineVirtualCamera mainCam;
     public CinemachineVirtualCamera activeCam;
     public CinemachineVirtualCamera meleeCam;
     public List<PlayableDirector> comboPlayables;   
@@ -56,14 +57,38 @@ public class BattleController : MonoBehaviour
     {        
         characterTurnIndex = 0;
         battleTurn = 0;
-        activeCam = virtualCams[0];
+        activeCam = mainCam;
         
         enemyNumber = Random.Range(1, 4);  // range does not include end number
 
+        if (heroes[0] == null) // in place for testing scene, may use for battles with required party members.
+        {
+            heroes[0] = Instantiate<Player>(playerBank.bank[HeroSelect.hero0], spawnPoint0, Quaternion.identity);
+        }
+        if (heroes[0] != null) 
+        {
+            heroes[0].gameObject.SetActive(true);
+            heroes[0].transform.position = spawnPoint0;
+        }
+        if (heroes[1] == null) 
+        {
+            heroes[1] = Instantiate<Player>(playerBank.bank[HeroSelect.hero1], spawnPoint1, Quaternion.identity);
+        }
+        if (heroes[1] != null)
+        {
+            heroes[1].gameObject.SetActive(true);
+            heroes[1].transform.position = spawnPoint1;
+        }
+        if (heroes[2] == null) 
+        {
+            heroes[2] = Instantiate<Player>(playerBank.bank[HeroSelect.hero2], spawnPoint2, Quaternion.identity);
+        }
+        if (heroes[2] != null)
+        {
+            heroes[2].gameObject.SetActive(true);
+            heroes[2].transform.position = spawnPoint2;
+        }
 
-        heroes[0] = Instantiate<Player>(playerBank.bank[HeroSelect.hero0], spawnPoint0, Quaternion.identity);
-        heroes[1] = Instantiate<Player>(playerBank.bank[HeroSelect.hero1], spawnPoint1, Quaternion.identity);        
-        heroes[2] = Instantiate<Player>(playerBank.bank[HeroSelect.hero2], spawnPoint2, Quaternion.identity);
 
         foreach (Player character in heroes)
         {
@@ -155,10 +180,17 @@ public class BattleController : MonoBehaviour
                 deadEnemies++;
             }
         }
-        
+
+        mainCam.LookAt = enemies[0].transform;
         virtualCams[0].LookAt = enemies[0].transform;
         virtualCams[1].LookAt = enemies[0].transform;
         virtualCams[2].LookAt = enemies[0].transform;        
+        IEnumerator CamTimer()
+        {
+            yield return new WaitForSeconds(.5f);
+            mainCam.m_Priority = 0;
+            virtualCams[0].m_Priority = 1;
+        } StartCoroutine(CamTimer());
         
                
         comboController.AssignPlayers();
@@ -224,7 +256,7 @@ public class BattleController : MonoBehaviour
                 }                
             }
 
-            virtualCams[0].Priority = 1;                        
+            mainCam.Priority = 1;                        
             virtualCams[2].Priority = 0;
             Debug.Log("End of Turn.  Start Enemy Turn");
             IEnumerator TurnTimer()
@@ -259,9 +291,9 @@ public class BattleController : MonoBehaviour
             {
                 endTurn = true;
                 Debug.Log("end of player list");
-                virtualCams[0].Priority = 1;
+                mainCam.Priority = 1;
                 meleeCam.m_Priority = 0;
-                virtualCams[0].m_LookAt = enemies[0].transform;
+                mainCam.m_LookAt = enemies[0].transform;
                 IEnumerator TurnTimer()
                 {
                     yield return new WaitForSeconds(2);
@@ -321,7 +353,7 @@ public class BattleController : MonoBehaviour
                     }
                     if (heroes[characterTurnIndex].actionType == Player.Action.ranged)
                     {
-                        heroes[characterTurnIndex].Melee();
+                        heroes[characterTurnIndex].Ranged();
                         virtualCams[characterTurnIndex].Priority = 2;
                         IEnumerator MeleeTimer()
                         {
@@ -458,7 +490,7 @@ public class BattleController : MonoBehaviour
         }
         if (characterTurnIndex <= enemies.Count - 1)
         {
-            virtualCams[0].m_LookAt = enemies[characterTurnIndex].transform;
+            mainCam.m_LookAt = enemies[characterTurnIndex].transform;
             enemies[characterTurnIndex].Act();
             IEnumerator TurnTimer()
             {
@@ -499,8 +531,10 @@ public class BattleController : MonoBehaviour
                 battleTurn = 0;                
                 heroes[0].attackTarget = enemies[0];
                 focusIndex = 0;
-                TargetChecker();               
-                virtualCams[0].m_LookAt = enemies[focusIndex].transform;                
+                TargetChecker();
+                virtualCams[0].m_LookAt = enemies[focusIndex].transform;
+                mainCam.m_Priority = 0;
+                virtualCams[0].m_Priority = 1;
                 Debug.Log("End of Turn.  Start Player Turn");
                 keyboard = true;
 

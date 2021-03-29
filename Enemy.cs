@@ -103,6 +103,10 @@ public class Enemy : Player
 
                 IEnumerator SpellTimer()
                 {
+                    int damage = selectedSpell.power;
+                    attackTarget.combatTextPrefab.damageAmount = damage;
+                    attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+
                     yield return new WaitForSeconds(selectedSpell.damageTimer);
                     if (selectedSpell.targetALL == false)
                     {
@@ -120,7 +124,8 @@ public class Enemy : Player
                         attackTarget.anim.SetTrigger("gotHit");
                     }
 
-                    int damage = selectedSpell.power;
+
+
                     if (damage > 0)
                     {
                         if (damage <= 0)
@@ -185,6 +190,8 @@ public class Enemy : Player
             
 
             int damage = playerSTR - attackTarget.playerDEF;
+            attackTarget.combatTextPrefab.damageAmount = damage;
+            attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
 
             if (damage > 0)
             {
@@ -263,7 +270,7 @@ public class Enemy : Player
     public override void Die()
     {
         dead = true;
-        anim.SetTrigger("Dead");
+        // anim.SetTrigger("Dead");  
         base.Die();
     }
 

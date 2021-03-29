@@ -27,7 +27,7 @@ public class Spell : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        transform.LookAt(targetPosition);
     }
 
     // Update is called once per frame

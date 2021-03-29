@@ -75,31 +75,31 @@ public class Player : MonoBehaviour
     public virtual void Melee()
     {
         IEnumerator HitTimer()
-        {            
-            transform.position = attackTarget.strikePoint.transform.position;
-            LookAtTarget();
-            attackTarget.transform.LookAt(this.transform);
-            yield return new WaitForSeconds(.25f);
-
-            anim.SetTrigger("AttackR");
+        {
             int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = damage;
                 attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
-                attackTarget.combatTextPrefab.ToggleCombatText();
                 attackTarget.playerHealth = attackTarget.playerHealth - damage;
-
             }
 
             if (damage <= 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = 0;
                 attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
-                attackTarget.combatTextPrefab.ToggleCombatText();
                 Debug.Log("damage 0 or less");
             }
+
+
+            transform.position = attackTarget.strikePoint.transform.position;
+            LookAtTarget();
+            attackTarget.transform.LookAt(this.transform);
+            yield return new WaitForSeconds(.25f);
+
+            anim.SetTrigger("AttackR");
+
 
             yield return new WaitForSeconds(1.75f);
             transform.position = idlePosition;
@@ -113,26 +113,27 @@ public class Player : MonoBehaviour
         IEnumerator HitTimer()
         {
             LookAtTarget();
-            yield return new WaitForSeconds(.25f);
-            anim.SetTrigger("AttackR");
-
             int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = damage;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
-                attackTarget.combatTextPrefab.ToggleCombatText();
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
                 attackTarget.playerHealth = attackTarget.playerHealth - damage;
             }
 
             if (damage <= 0)
             {
                 attackTarget.combatTextPrefab.damageAmount = damage;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
-                attackTarget.combatTextPrefab.ToggleCombatText();
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
                 Debug.Log("damage 0 or less");
             }
+
+
+            yield return new WaitForSeconds(.25f);
+            anim.SetTrigger("AttackR");
+
+            
 
             yield return new WaitForSeconds(1.75f);
             transform.position = idlePosition;       
@@ -182,28 +183,6 @@ public class Player : MonoBehaviour
             {
                 yield return new WaitForSeconds(selectedSpell.damageTimer);
                 int damage = selectedSpell.power + Weapon.magPower;
-                attackTarget.combatTextPrefab.damageAmount = damage;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
-                
-
-                if (selectedSpell.targetALL == false)
-                {
-                    attackTarget.anim.SetTrigger("gotHit");
-                }
-                if (selectedSpell.targetALL)
-                {
-                    foreach (Enemy enemy in FindObjectOfType<BattleController>().enemies)
-                    {
-                        if (enemy.dead == false)
-                        {
-                            enemy.anim.SetTrigger("gotHit");
-                        }                        
-                    }
-                    attackTarget.anim.SetTrigger("gotHit");
-                }
-
-
-
                 if (damage > 0)
                 {
                     if (damage <= 0)
@@ -213,18 +192,45 @@ public class Player : MonoBehaviour
                     if (selectedSpell.targetALL == false)
                     {
                         attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                        attackTarget.combatTextPrefab.damageAmount = damage;
+                        attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+
                     }
                     if (selectedSpell.targetALL == true)
-                    {                        
+                    {
                         foreach (Enemy enemy in FindObjectOfType<BattleController>().enemies)
                         {
                             if (enemy.dead == false)
                             {
                                 enemy.playerHealth = attackTarget.playerHealth - damage;
+                                enemy.combatTextPrefab.damageAmount = damage;
+                                enemy.combatTextPrefab.startingPosition = enemy.transform.position;
                             }
                         }
                     }
                 }
+
+                if (selectedSpell.targetALL == false)
+                {
+                    attackTarget.anim.SetTrigger("gotHit");
+                    attackTarget.combatTextPrefab.ToggleCombatText();
+                }
+                if (selectedSpell.targetALL)
+                {
+                    foreach (Enemy enemy in FindObjectOfType<BattleController>().enemies)
+                    {
+                        if (enemy.dead == false)
+                        {
+                            enemy.anim.SetTrigger("gotHit");
+                            enemy.combatTextPrefab.ToggleCombatText();
+                        }                        
+                    }
+                    attackTarget.anim.SetTrigger("gotHit");
+                }
+
+
+
+                
                     
             }
             StartCoroutine(SpellTimer());
@@ -241,17 +247,18 @@ public class Player : MonoBehaviour
     {
         if (attackTarget.playerHealth > 0)
         {
-            attackTarget.anim.SetTrigger("gotHit");            
-            return;
+            attackTarget.anim.SetTrigger("gotHit");
+            attackTarget.combatTextPrefab.ToggleCombatText();            
         }
         if (attackTarget.playerHealth <= 0)
         {
+            attackTarget.anim.SetTrigger("gotHit");
+            attackTarget.anim.SetTrigger("Dead");
+            attackTarget.combatTextPrefab.ToggleCombatText();
             if (attackTarget.dead == false)
             {
-                attackTarget.dead = true;
-                attackTarget.anim.SetTrigger("Dead");                
-            }
-            return;
+                attackTarget.dead = true;                
+            }            
         }        
     }
 

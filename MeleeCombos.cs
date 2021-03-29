@@ -71,9 +71,16 @@ public class MeleeCombos : MonoBehaviour
                 }
 
 
-                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[1].playerSTR + battleController.heroes[2].playerSTR + 25;
-                int damage = groupSTR - battleController.heroes[0].playerDEF;
+                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power +
+                battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power +
+                battleController.heroes[2].playerSTR + battleController.heroes[2].Weapon.power + 25;
+
+                int damage = groupSTR - battleController.heroes[0].attackTarget.playerDEF;
+                battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
+                battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
+
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
+                battleController.heroes[0].EnemyHitTrigger();
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
@@ -125,9 +132,17 @@ public class MeleeCombos : MonoBehaviour
                 }
 
 
-                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[1].playerSTR + battleController.heroes[2].playerSTR + 25;
-                int damage = groupSTR - battleController.heroes[0].playerDEF;
+                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power +
+                battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power +
+                battleController.heroes[2].playerSTR + battleController.heroes[2].Weapon.power + 25;
+
+                int damage = groupSTR - battleController.heroes[0].attackTarget.playerDEF; 
+
+                battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
+                battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
+
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
+                battleController.heroes[0].EnemyHitTrigger();
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
@@ -178,9 +193,17 @@ public class MeleeCombos : MonoBehaviour
                 }
 
 
-                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[1].playerSTR + battleController.heroes[2].playerSTR + 25;
-                int damage = groupSTR - battleController.heroes[0].playerDEF;
+                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power +
+                battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power +
+                battleController.heroes[2].playerSTR + battleController.heroes[2].Weapon.power + 25;
+
+                int damage = groupSTR - battleController.heroes[0].attackTarget.playerDEF; 
+
+                battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
+                battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
+
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
+                battleController.heroes[0].EnemyHitTrigger();
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
@@ -232,9 +255,16 @@ public class MeleeCombos : MonoBehaviour
                 }
 
 
-                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[1].playerSTR + battleController.heroes[2].playerSTR + 25;
-                int damage = groupSTR - battleController.heroes[0].playerDEF;
+                int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power + 
+                    battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power + 
+                    battleController.heroes[2].playerSTR + battleController.heroes[2].Weapon.power + 25;
+                int damage = groupSTR - battleController.heroes[0].attackTarget.playerDEF;
+
+                battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
+                battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
+
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
+                battleController.heroes[0].EnemyHitTrigger();
                 battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
