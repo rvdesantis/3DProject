@@ -92,26 +92,7 @@ public class BattleController : MonoBehaviour
 
         foreach (Player character in heroes)
         {
-            if (character.berzerkerClass)
-            {
-                character.playerHealth = PlayerPrefs.GetInt("BerHealth");
-                character.playerMana = PlayerPrefs.GetInt("BerMaxMana");
-            }
-            if (character.archerClass)
-            {
-                character.playerHealth = PlayerPrefs.GetInt("ArHealth");
-                character.playerMana = PlayerPrefs.GetInt("ArMaxMana");
-            }
-            if (character.warriorClass)
-            {
-                character.playerHealth = PlayerPrefs.GetInt("WarHealth");
-                character.playerMana = PlayerPrefs.GetInt("WarMaxMana");
-            }
-            if (character.mageClass)
-            {
-                character.playerHealth = PlayerPrefs.GetInt("MagHealth");
-                character.playerMana = PlayerPrefs.GetInt("MagMaxMana");
-            }
+            character.SetBattleStats();            
         }
 
         // used to define enemies for specific launches, like Bosses && mimics.
@@ -346,7 +327,9 @@ public class BattleController : MonoBehaviour
                         meleeCam.Priority = 2;
                         IEnumerator MeleeTimer()
                         {
-                            yield return new WaitForSeconds(3);
+                            yield return new WaitForSeconds(2.5f);
+                            meleeCam.Priority = 0;
+                            yield return new WaitForSeconds(.5f);
                             NextPlayerAct();
                         }
                         StartCoroutine(MeleeTimer());
@@ -424,6 +407,7 @@ public class BattleController : MonoBehaviour
                                 IEnumerator ItemTimer()
                                 {
                                     heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
+                                    heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
                                     battleItems.potions[0].target = heroes[characterTurnIndex].attackTarget;
                                     battleItems.potions[0].HealthPotion();
                                     battleItems.potions[0].quantity--;
@@ -440,6 +424,7 @@ public class BattleController : MonoBehaviour
                                 IEnumerator ItemTimer()
                                 {
                                     heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
+                                    heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
                                     battleItems.potions[1].target = heroes[characterTurnIndex].attackTarget;
                                     battleItems.potions[1].ManaPotion();
                                     battleItems.potions[1].quantity--;

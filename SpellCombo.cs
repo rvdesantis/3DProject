@@ -31,7 +31,7 @@ public class SpellCombo : MonoBehaviour
             fMage = comboController.fMage;
             fArcher = comboController.fArcher;
             mWarrior = comboController.mWarrior;
-            battleController.uiController.facePanel.gameObject.SetActive(false);
+            
 
             if (comboController.fBerzerkerCount == 1)
             {
@@ -98,7 +98,7 @@ public class SpellCombo : MonoBehaviour
                         }
                     }
                 }
-                battleController.uiController.facePanel.gameObject.SetActive(true);
+                
                 FireStrike = false;
                 battleController.combo = false;
                 LeftOverAction(); // will set end turn to true and go to next action ending turn
@@ -112,7 +112,7 @@ public class SpellCombo : MonoBehaviour
             fMage = comboController.fMage;
             fArcher = comboController.fArcher;
             mWarrior = comboController.mWarrior;
-            battleController.uiController.facePanel.gameObject.SetActive(false);
+            
 
             fMage.gameObject.SetActive(false);
             comboController.fMageTimelineAsset.attackTarget = fMage.attackTarget;
@@ -168,7 +168,7 @@ public class SpellCombo : MonoBehaviour
                         enemy.gameObject.SetActive(true);
                     }                    
                 }
-                battleController.uiController.facePanel.gameObject.SetActive(true);
+                
                 FireArrows = false;
                 battleController.combo = false;
                 LeftOverAction(); // will set end turn to true and go to next action ending turn

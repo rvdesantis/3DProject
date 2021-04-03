@@ -7,11 +7,61 @@ public class Archer : Player
     public GameObject ammoModel;
     public List<Ammo> quiver;
 
+    public int healthMirror;
+    public int manaMirror;
+    public int levelMirror;
+    public int XPMirror;
+
     public override void Start()
     {        
         base.Start();        
     }
 
+    public override void LevelUp()
+    {
+        if (playerLevel == 1 && XP >= 500)
+        {
+            XP = 0;
+            playerLevel = 2;
+            PlayerPrefs.SetInt("ArLevel", 2);
+            PlayerPrefs.SetInt("ArXP", 0);
+            PlayerPrefs.SetInt("ArMaxHealth", playerMaxHealth + Random.Range(10, 16));
+            PlayerPrefs.SetInt("ArHealth", PlayerPrefs.GetInt("ArMaxHealth"));
+            PlayerPrefs.SetInt("ArMaxMana", playerMaxMana + Random.Range(15, 21));
+            PlayerPrefs.SetInt("ArMana", PlayerPrefs.GetInt("ArMaxMana"));
+            PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
+            PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));
+            PlayerPrefs.Save();
+            SetBattleStats();
+        }
+    }
+
+    public override void LevelReset()
+    {
+        XP = 0;
+        playerLevel = 1;
+        PlayerPrefs.SetInt("ArLevel", 1);
+        PlayerPrefs.SetInt("ArXP", 0);
+        PlayerPrefs.SetInt("ArMaxHealth", 75);
+        PlayerPrefs.SetInt("ArHealth", 75);
+        PlayerPrefs.SetInt("ArMaxMana", 20);
+        PlayerPrefs.SetInt("ArMana", 20);
+        PlayerPrefs.SetInt("ArStr", 45);
+        PlayerPrefs.SetInt("ArDef", 35);
+        PlayerPrefs.Save();
+    }
+
+    public override void SetBattleStats()
+    {
+        playerMaxHealth = PlayerPrefs.GetInt("ArMaxHealth");
+        playerHealth = PlayerPrefs.GetInt("ArHealth");
+        playerMaxMana = PlayerPrefs.GetInt("ArMaxMana");
+        playerMana = playerMaxMana;
+        playerSTR = PlayerPrefs.GetInt("ArStr");
+        playerDEF = PlayerPrefs.GetInt("ArDef");
+        XP = PlayerPrefs.GetInt("ArXP");
+        playerLevel = PlayerPrefs.GetInt("ArLevel");
+    }
 
     public override void Melee()
     {       
@@ -59,5 +109,14 @@ public class Archer : Player
         ammoModel.gameObject.SetActive(true);
     }
 
+
+    public override void Update()
+    {
+        int healthMirror = PlayerPrefs.GetInt("ArMaxHealth");
+        int manaMirror = PlayerPrefs.GetInt("ArMaxMana");
+        int levelMirror = PlayerPrefs.GetInt("ArLevel");
+        int XPMirror = PlayerPrefs.GetInt("ArXP");
+        base.Update();
+    }
 
 }

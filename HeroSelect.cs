@@ -7,6 +7,11 @@ using Cinemachine;
 public class HeroSelect : MonoBehaviour
 {
 
+    public Button newGameBT;
+    public Button resumeBT;
+
+    public bool start;
+
     public PlayerBank staticHeroList;
     public PlayerBank activeParty;
     public PlayerBank heroBank;
@@ -16,12 +21,18 @@ public class HeroSelect : MonoBehaviour
     public static int hero2;
     public static int enemy0;
 
+    public static int keys;
+    public static int wallsFound;
+    public static int chestsFound;
+    public static int BBattles;
+
     public CinemachineVirtualCamera cam1;
     public CinemachineVirtualCamera cam2;
     public List<CinemachineVirtualCamera> focusCams;
     public int heroIndex;
     public int partyIndex;
     public bool focused;
+    public bool door;
 
     public List<GameObject> camAimers;
     public GameObject backgroundAimer;
@@ -52,12 +63,45 @@ public class HeroSelect : MonoBehaviour
     public GameObject iconPanel;
     public Text partyCounter;
 
+    public GameObject dungeonInfoUI;
+    public Text dungeonInfoTXT;
+
+
 
     private void Start()
-    {        
+    {
+        newGameBT.Select();
         cam1.m_LookAt = camAimers[0].transform;
         lights[0].gameObject.SetActive(true);
         directionUIanim = directionUI.GetComponent<Animator>();
+    }
+
+    public void NewRun()
+    {
+        IEnumerator StartTimer()
+        {
+            foreach (Player hero in heroBank.bank)
+            {
+                hero.LevelReset();
+            }
+            yield return new WaitForSeconds(.25f);
+            start = false;
+        }StartCoroutine(StartTimer());
+        
+    }
+
+    public void ResumeRun()
+    {
+        IEnumerator StartTimer()
+        {
+            foreach (Player hero in heroBank.bank)
+            {
+                hero.SetBattleStats();
+            }
+            yield return new WaitForSeconds(.25f);
+            start = false;
+        }
+        StartCoroutine(StartTimer());
     }
 
     public void SaveToPrefs()
@@ -65,49 +109,70 @@ public class HeroSelect : MonoBehaviour
         if (hero0 == 0 || hero1 == 0 || hero2 == 0)
         {
             PlayerPrefs.SetString("BerName", "Berserker");
-            PlayerPrefs.SetInt("BerLevel", staticHeroList.bank[0].playerLevel);
-            PlayerPrefs.SetInt("BerHealth", staticHeroList.bank[0].playerMaxHealth); // sets player health to max when starting dungeon
-            PlayerPrefs.SetInt("BerMaxHealth", staticHeroList.bank[0].playerMaxHealth);
-            PlayerPrefs.SetInt("BerMaxMana", staticHeroList.bank[0].playerMaxMana);
-            PlayerPrefs.SetInt("BerStr", staticHeroList.bank[0].playerSTR);
-            PlayerPrefs.SetInt("BerDef", staticHeroList.bank[0].playerDEF);            
+            PlayerPrefs.SetInt("BerLevel", heroBank.bank[0].playerLevel);
+            PlayerPrefs.SetInt("BerHealth", heroBank.bank[0].playerMaxHealth); // sets player health to max when starting dungeon
+            PlayerPrefs.SetInt("BerMaxHealth", heroBank.bank[0].playerMaxHealth);
+            PlayerPrefs.SetInt("BerMaxMana", heroBank.bank[0].playerMaxMana);
+            PlayerPrefs.SetInt("BerStr", heroBank.bank[0].playerSTR);
+            PlayerPrefs.SetInt("BerDef", heroBank.bank[0].playerDEF);            
         }
         if (hero0 == 1 || hero1 == 1 || hero2 == 1)
         {
             PlayerPrefs.SetString("ArName", "Archer");
-            PlayerPrefs.SetInt("ArLevel", staticHeroList.bank[1].playerLevel);
-            PlayerPrefs.SetInt("ArHealth", staticHeroList.bank[1].playerMaxHealth);
-            PlayerPrefs.SetInt("ArMaxHealth", staticHeroList.bank[1].playerMaxHealth);
-            PlayerPrefs.SetInt("ArMaxMana", staticHeroList.bank[1].playerMaxMana);
-            PlayerPrefs.SetInt("ArStr", staticHeroList.bank[1].playerSTR);
-            PlayerPrefs.SetInt("ArDef", staticHeroList.bank[1].playerDEF);
+            PlayerPrefs.SetInt("ArLevel", heroBank.bank[1].playerLevel);
+            PlayerPrefs.SetInt("ArHealth", heroBank.bank[1].playerMaxHealth);
+            PlayerPrefs.SetInt("ArMaxHealth", heroBank.bank[1].playerMaxHealth);
+            PlayerPrefs.SetInt("ArMaxMana", heroBank.bank[1].playerMaxMana);
+            PlayerPrefs.SetInt("ArStr", heroBank.bank[1].playerSTR);
+            PlayerPrefs.SetInt("ArDef", heroBank.bank[1].playerDEF);
         }
         if (hero0 == 2 || hero1 == 2 || hero2 == 2)
         {
             PlayerPrefs.SetString("WarName", "Warrior");
-            PlayerPrefs.SetInt("WarLevel", staticHeroList.bank[2].playerLevel);
-            PlayerPrefs.SetInt("WarHealth", staticHeroList.bank[2].playerMaxHealth);
-            PlayerPrefs.SetInt("WarMaxHealth", staticHeroList.bank[2].playerMaxHealth);
-            PlayerPrefs.SetInt("WarMaxMana", staticHeroList.bank[2].playerMaxMana);
-            PlayerPrefs.SetInt("WarStr", staticHeroList.bank[2].playerSTR);
-            PlayerPrefs.SetInt("WarDef", staticHeroList.bank[2].playerDEF);
+            PlayerPrefs.SetInt("WarLevel", heroBank.bank[2].playerLevel);
+            PlayerPrefs.SetInt("WarHealth", heroBank.bank[2].playerMaxHealth);
+            PlayerPrefs.SetInt("WarMaxHealth", heroBank.bank[2].playerMaxHealth);
+            PlayerPrefs.SetInt("WarMaxMana", heroBank.bank[2].playerMaxMana);
+            PlayerPrefs.SetInt("WarStr", heroBank.bank[2].playerSTR);
+            PlayerPrefs.SetInt("WarDef", heroBank.bank[2].playerDEF);
         }
         if (hero0 == 3 || hero1 == 3 || hero2 == 3)
         {
             PlayerPrefs.SetString("MagName", "Mage");
-            PlayerPrefs.SetInt("MagLevel", staticHeroList.bank[3].playerLevel);
-            PlayerPrefs.SetInt("MagHealth", staticHeroList.bank[3].playerMaxHealth);
-            PlayerPrefs.SetInt("MagMaxHealth", staticHeroList.bank[3].playerMaxHealth);
-            PlayerPrefs.SetInt("MagMaxMana", staticHeroList.bank[3].playerMaxMana);
-            PlayerPrefs.SetInt("MagStr", staticHeroList.bank[3].playerSTR);
-            PlayerPrefs.SetInt("MagDef", staticHeroList.bank[3].playerDEF);
+            PlayerPrefs.SetInt("MagLevel", heroBank.bank[3].playerLevel);
+            PlayerPrefs.SetInt("MagHealth", heroBank.bank[3].playerMaxHealth);
+            PlayerPrefs.SetInt("MagMaxHealth", heroBank.bank[3].playerMaxHealth);
+            PlayerPrefs.SetInt("MagMaxMana", heroBank.bank[3].playerMaxMana);
+            PlayerPrefs.SetInt("MagStr", heroBank.bank[3].playerSTR);
+            PlayerPrefs.SetInt("MagDef", heroBank.bank[3].playerDEF);
         }
         PlayerPrefs.Save();
+        Debug.Log("Player Prefs Saved");
     }
 
     public void UpdateDirections()
     {
-        if (!focused)
+        if (door)
+        {
+            if (joystick)
+            {
+                greenButton.gameObject.SetActive(true);
+                redButton.gameObject.SetActive(true);
+            }
+            if (!joystick)
+            {
+                spaceBar.gameObject.SetActive(true);
+                escButton.gameObject.SetActive(true);
+            }
+            directionText.text = "Enter Dungeon";
+            directionUIanim.SetBool("left", false);
+            directionUIanim.SetBool("right", false);
+            backText.text = "Back";
+            backText.gameObject.SetActive(true); 
+
+            blueButton.gameObject.SetActive(false);
+        }
+        if (!focused && !door)
         {
             directionText.text = "Select " + staticHeroList.bank[heroIndex].playerName;
             directionUIanim.SetBool("left", false);
@@ -115,7 +180,7 @@ public class HeroSelect : MonoBehaviour
 
             redButton.gameObject.SetActive(false); backText.gameObject.SetActive(false); escButton.gameObject.SetActive(false); blueButton.gameObject.SetActive(false);
         }
-        if (focused)
+        if (focused && !door)
         {
             backText.text = "Return";
             if (heroIndex != hero0 || heroIndex != hero1 || heroIndex != hero2)
@@ -303,7 +368,7 @@ public class HeroSelect : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
         {
-            if (focused)
+            if (focused && start == false)
             {
                 focused = false;
                 cam1.m_Priority = 1;
@@ -312,11 +377,17 @@ public class HeroSelect : MonoBehaviour
                 staticHeroList.bank[heroIndex].GetComponent<Animator>().SetTrigger("sit");                
                 iconPanel.gameObject.SetActive(true);
             }
+            if (door)
+            {
+                door = false;
+                cam2.m_Priority = 0;
+                dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", false);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton2))
         {
-            if (focused)
+            if (focused && start == false)
             {
                 if (staticHeroList.bank[heroIndex].anim.GetBool("select") == true)
                 {
@@ -354,7 +425,11 @@ public class HeroSelect : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
-            if (!focused)
+            if (door)
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");                
+            }            
+            if (!focused && start == false)
             {                
                 cam1.m_Priority = 0;
                 focusCams[heroIndex].m_Priority = 1;
@@ -403,8 +478,7 @@ public class HeroSelect : MonoBehaviour
                 {
 
                     if (hero0 != heroIndex && hero1 != heroIndex)
-                    {
-                        directionUI.gameObject.SetActive(false);
+                    {                        
                         activeParty.bank[partyIndex] = staticHeroList.bank[heroIndex];
                         hero2 = heroIndex;
                         //enemy assign
@@ -417,13 +491,24 @@ public class HeroSelect : MonoBehaviour
 
 
                         SaveToPrefs();
-
+                        door = true;
 
 
                         IEnumerator Timer()
                         {
-                            yield return new WaitForSeconds(1);
-                            UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
+                            yield return new WaitForSeconds(1);                            
+                            directionText.text = "Enter Dungeon";
+                            directionUI.gameObject.SetActive(true);
+
+                            keys = 1;
+                            wallsFound = AreaController.foundWalls;
+                            chestsFound = AreaController.openedChests;
+                            BBattles = AreaController.bossBattles;
+                            // values will need to be set 
+
+                            dungeonInfoTXT.text = "Dungeon Keys Needed: " + keys + "\nHidden Walls: " + wallsFound + " / ?\nDungeon Chests: " + chestsFound + " / ?\nBoss Battles: " + BBattles + " / 2";
+                            dungeonInfoUI.gameObject.SetActive(true);
+                            dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", true);                            
                         }
                         StartCoroutine(Timer());
                         return;

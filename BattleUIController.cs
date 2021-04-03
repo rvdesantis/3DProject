@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 public class BattleUIController : MonoBehaviour
 {
     public BattleController battlecontroller;
+    public List<FacePanel> facePanels;
     public List<Image> heroFaces;
     public List<Slider> healthbars;
     public List<Slider> manabars;
@@ -16,8 +17,7 @@ public class BattleUIController : MonoBehaviour
     public List<Text> heroMana;
 
     public List<Button> spellButtons;
-    public GameObject spellPanel;
-    public GameObject facePanel;
+    public GameObject spellPanel;    
     public int spellIndex;
 
 
@@ -99,8 +99,11 @@ public class BattleUIController : MonoBehaviour
 
     public void SetFace()
     {
+        facePanels[0].targetHero = battlecontroller.heroes[0];        
         heroFaces[0].sprite = battlecontroller.heroes[0].playerFace;
+        facePanels[1].targetHero = battlecontroller.heroes[1];
         heroFaces[1].sprite = battlecontroller.heroes[1].playerFace;
+        facePanels[1].targetHero = battlecontroller.heroes[1];
         heroFaces[2].sprite = battlecontroller.heroes[2].playerFace;
     }
 

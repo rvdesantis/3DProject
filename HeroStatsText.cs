@@ -14,11 +14,11 @@ public class HeroStatsText : MonoBehaviour
     {
         if (heroSelect.heroIndex == 0)
         {
-            int playerLevel = PlayerPrefs.GetInt("BerLevel", 0);
-            int playerHealth = PlayerPrefs.GetInt("BerMaxHealth", 0);
-            int playerMana = PlayerPrefs.GetInt("BerMaxMana", 0);
-            int playerSTR = PlayerPrefs.GetInt("BerStr", 0);
-            int playerDEF = PlayerPrefs.GetInt("BerDef", 0);
+            int playerLevel = PlayerPrefs.GetInt("BerLevel");
+            int playerHealth = PlayerPrefs.GetInt("BerMaxHealth");
+            int playerMana = PlayerPrefs.GetInt("BerMaxMana");
+            int playerSTR = PlayerPrefs.GetInt("BerStr");
+            int playerDEF = PlayerPrefs.GetInt("BerDef");
             heroStats[0].text = playerLevel.ToString() + "\n" + playerHealth.ToString() + "\n" + playerMana.ToString() + "\n" + (playerSTR + heroSelect.heroBank.bank[heroSelect.heroIndex].Weapon.power).ToString() + "\n" + playerDEF.ToString();
         }
         if (heroSelect.heroIndex == 1)

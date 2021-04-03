@@ -7,13 +7,13 @@ public class Chest : MonoBehaviour
     public AreaController areaController;
     public FirstPersonPlayer player;
     public GameObject contents;
-    public static bool opened;
+    public static int opened;
     public Items treasure;
     public bool inArea;
 
     private void Start()
     {
-        if (opened)
+        if (opened == 1)
         {
             GetComponent<Animator>().SetTrigger("openLid");
         }
@@ -23,11 +23,11 @@ public class Chest : MonoBehaviour
     {
         if (Vector3.Distance(player.transform.position, transform.position) < 8)
         {
-            if (opened == false)
+            if (opened == 0)
             {
                 inArea = true;
             }
-            if (inArea && opened == false)
+            if (inArea && opened == 0)
             {
                 areaController.areaUI.messageText.text = "Open Chest?";
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", true);
@@ -45,10 +45,11 @@ public class Chest : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
-            if (Vector3.Distance(player.transform.position, this.transform.position) < 7 && opened == false)
+            if (Vector3.Distance(player.transform.position, this.transform.position) < 7 && opened == 0)
             {
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
-                opened = true;
+                opened = 1;
+                AreaController.openedChests++;
                 GetComponent<Animator>().SetTrigger("openLid");
                 if (treasure.weapon)
                 {

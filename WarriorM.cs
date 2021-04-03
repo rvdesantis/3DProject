@@ -7,7 +7,51 @@ using UnityEngine.Playables;
 public class WarriorM : Player
 {
 
+    public override void LevelUp()
+    {
+        if (playerLevel == 1 && XP >= 500)
+        {
+            XP = 0;
+            playerLevel = 2;
+            PlayerPrefs.SetInt("WarLevel", 2);
+            PlayerPrefs.SetInt("WarXP", 0);
+            PlayerPrefs.SetInt("WarMaxHealth", playerMaxHealth + Random.Range(20, 26));
+            PlayerPrefs.SetInt("WarHealth", PlayerPrefs.GetInt("WarMaxHealth"));
+            PlayerPrefs.SetInt("WarMana", 20);
+            PlayerPrefs.SetInt("WarMaxMana", 20);
+            PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(15, 21));
+            PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(15, 21));
+            PlayerPrefs.Save();
+            SetBattleStats();
+        }
+    }
 
+    public override void LevelReset()
+    {
+        XP = 0;
+        playerLevel = 1;
+        PlayerPrefs.SetInt("WarLevel", 1);
+        PlayerPrefs.SetInt("WarXP", 0);
+        PlayerPrefs.SetInt("WarMaxHealth", 85);
+        PlayerPrefs.SetInt("WarHealth", 85);
+        PlayerPrefs.SetInt("WarMana", 20);
+        PlayerPrefs.SetInt("WarMaxMana", 20);
+        PlayerPrefs.SetInt("WarStr", 40);
+        PlayerPrefs.SetInt("WarDef", 40);
+        PlayerPrefs.Save();
+    }
+
+    public override void SetBattleStats()
+    {
+        playerMaxHealth = PlayerPrefs.GetInt("WarMaxHealth");
+        playerHealth = PlayerPrefs.GetInt("WarHealth");
+        playerMaxMana = PlayerPrefs.GetInt("WarMaxMana");
+        playerMana = playerMaxMana;
+        playerSTR = PlayerPrefs.GetInt("WarStr");
+        playerDEF = PlayerPrefs.GetInt("WarDef");
+        XP = PlayerPrefs.GetInt("WarXP");
+        playerLevel = PlayerPrefs.GetInt("WarLevel");
+    }
 
     public override void CastSpell()
     {

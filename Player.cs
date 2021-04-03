@@ -94,9 +94,11 @@ public class Player : MonoBehaviour
 
 
             transform.position = attackTarget.strikePoint.transform.position;
-            LookAtTarget();
-            attackTarget.transform.LookAt(this.transform);
+            
+            
             yield return new WaitForSeconds(.25f);
+            attackTarget.transform.LookAt(this.transform);
+            LookAtTarget();
 
             anim.SetTrigger("AttackR");
 
@@ -228,7 +230,7 @@ public class Player : MonoBehaviour
                     attackTarget.anim.SetTrigger("gotHit");
                 }
 
-
+                Debug.Log(playerName + " has cast " + selectedSpell.spellName + " at " + attackTarget.playerName);
 
                 
                     
@@ -287,62 +289,19 @@ public class Player : MonoBehaviour
     }
 
 
-    public void LevelUp()
+    public virtual void LevelUp()
     {
-        if (playerLevel == 1 && XP >= 500)
-        {
-            XP = 0;
-            if (berzerkerClass)
-            {
-                PlayerPrefs.SetInt("BerLevel", 2);
-                PlayerPrefs.SetInt("BarXP", 0);
-                PlayerPrefs.SetInt("BerMaxHealth", playerMaxHealth + Random.Range(15, 21));
-                PlayerPrefs.SetInt("BerHealth", PlayerPrefs.GetInt("BerMaxHealth"));
-                PlayerPrefs.SetInt("BerMaxMana", 20);
-                PlayerPrefs.SetInt("BerMana", 20);
-                PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
-                PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
-                PlayerPrefs.Save();
-                return;
-            }
-            if (archerClass)
-            {
-                PlayerPrefs.SetInt("ArLevel", 2);
-                PlayerPrefs.SetInt("ArXP", 0);
-                PlayerPrefs.SetInt("ArMaxHealth", playerMaxHealth + Random.Range(10, 16));
-                PlayerPrefs.SetInt("ArHealth", PlayerPrefs.GetInt("ArMaxHealth"));
-                PlayerPrefs.SetInt("ArMaxMana", playerMaxMana + Random.Range(15, 21));
-                PlayerPrefs.SetInt("ArMana", PlayerPrefs.GetInt("ArMaxMana"));
-                PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
-                PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));
-                PlayerPrefs.Save();
-                return;
-            }
-            if (warriorClass)
-            {
-                PlayerPrefs.SetInt("WarLevel", 2);
-                PlayerPrefs.SetInt("WarXP", 0);
-                PlayerPrefs.SetInt("WarMaxHealth", playerMaxHealth + Random.Range(20, 26));
-                PlayerPrefs.SetInt("WarHealth", PlayerPrefs.GetInt("WarMaxHealth"));
-                PlayerPrefs.SetInt("WarMana", 20);
-                PlayerPrefs.SetInt("WarMaxMana", 20);
-                PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(15, 21));
-                PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(15, 21));
-                PlayerPrefs.Save();
-            }
-            if (mageClass)
-            {
-                PlayerPrefs.SetInt("MagLevel", 2);
-                PlayerPrefs.SetInt("MagXP", 0);
-                PlayerPrefs.SetInt("MagMaxHealth", playerMaxHealth + Random.Range(15, 21));
-                PlayerPrefs.SetInt("MagHealth", PlayerPrefs.GetInt("MagMaxHealth"));
-                PlayerPrefs.SetInt("MagMaxMana", playerMaxMana + Random.Range(20, 31));
-                PlayerPrefs.SetInt("MagMana", PlayerPrefs.GetInt("MagMaxMana"));
-                PlayerPrefs.SetInt("MagStr", playerSTR + Random.Range(10, 16));
-                PlayerPrefs.SetInt("MagDef", playerDEF + Random.Range(10, 16));
-                PlayerPrefs.Save();
-            }
-        }
+
+    }
+
+    public virtual void LevelReset()
+    {
+
+    }
+
+    public virtual void SetBattleStats()
+    {
+
     }
 
     public virtual void Update()

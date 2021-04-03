@@ -7,7 +7,7 @@ using Cinemachine;
 using UnityEngine.UI;
 
 public class AreaController : MonoBehaviour
-{
+{    
     public CharacterController moveController;
     public AreaUIController areaUI;    
     public FirstPerson FPcontroller;
@@ -25,8 +25,13 @@ public class AreaController : MonoBehaviour
     public static Quaternion respawnRotation;
     public Vector3 respawnPointMirror;
 
+    public static int openedChests;
+    public static int mimicChests;
+    public static int bossBattles;
+    public static int foundWalls;
 
 
+    public static bool firstLoad;
     public static bool battleReturn;
     public int respawnAttempt;
 
@@ -73,42 +78,7 @@ public class AreaController : MonoBehaviour
 
         foreach (Player character in activeBank.bank)
         {
-            if (character.playerName == "Berserker")
-            {
-                character.playerLevel = PlayerPrefs.GetInt("BerLevel");
-                character.playerMaxHealth = PlayerPrefs.GetInt("BerMaxHealth");
-                character.playerMaxMana = PlayerPrefs.GetInt("BerMaxMana");
-                character.playerSTR = PlayerPrefs.GetInt("BerStr");
-                character.playerDEF = PlayerPrefs.GetInt("BerDef");
-                character.XP = PlayerPrefs.GetInt("BerXP");
-            }
-            if (character.playerName == "Archer")
-            {
-                character.playerLevel = PlayerPrefs.GetInt("ArLevel");
-                character.playerMaxHealth = PlayerPrefs.GetInt("ArMaxHealth");
-                character.playerMaxMana = PlayerPrefs.GetInt("ArMaxMana");
-                character.playerSTR = PlayerPrefs.GetInt("ArStr");
-                character.playerDEF = PlayerPrefs.GetInt("ArDef");
-                character.XP = PlayerPrefs.GetInt("ArXP");
-            }
-            if (character.playerName == "Warrior")
-            {
-                character.playerLevel = PlayerPrefs.GetInt("WarLevel");
-                character.playerMaxHealth = PlayerPrefs.GetInt("WarMaxHealth");
-                character.playerMaxMana = PlayerPrefs.GetInt("WarMaxMana");
-                character.playerSTR = PlayerPrefs.GetInt("WarStr");
-                character.playerDEF = PlayerPrefs.GetInt("WarDef");
-                character.XP = PlayerPrefs.GetInt("WarXP");
-            }
-            if (character.playerName == "Mage")
-            {
-                character.playerLevel = PlayerPrefs.GetInt("MagLevel");
-                character.playerMaxHealth = PlayerPrefs.GetInt("MagMaxHealth");
-                character.playerMaxMana = PlayerPrefs.GetInt("MagMaxMana");
-                character.playerSTR = PlayerPrefs.GetInt("MagStr");
-                character.playerDEF = PlayerPrefs.GetInt("MagDef");
-                character.XP = PlayerPrefs.GetInt("MagXP");
-            }
+            character.SetBattleStats();
         }
     }
 
@@ -147,9 +117,8 @@ public class AreaController : MonoBehaviour
                                 wall.dunEnemy.launchable = true;
                                 wall.enemyTrigger = false;
                             }
-                            wall.open = true;
-                            wall.gameObject.SetActive(false);
-                            wall.disolver.gameObject.SetActive(true);
+                            wall.WallDisolver();
+                            foundWalls++;
                             yield return new WaitForSeconds(2);
                             wall.disolver.gameObject.SetActive(false);
                         }

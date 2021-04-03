@@ -5,7 +5,51 @@ using UnityEngine;
 public class Berserker : Player
 {
 
+    public override void LevelUp()
+    {
+        if (playerLevel == 1 && XP >= 500)
+        {
+            XP = 0;
+            playerLevel = 2;
+            PlayerPrefs.SetInt("BerLevel", 2);
+            PlayerPrefs.SetInt("BerXP", 0);
+            PlayerPrefs.SetInt("BerMaxHealth", playerMaxHealth + Random.Range(15, 21));
+            PlayerPrefs.SetInt("BerHealth", PlayerPrefs.GetInt("BerMaxHealth"));
+            PlayerPrefs.SetInt("BerMaxMana", 20);
+            PlayerPrefs.SetInt("BerMana", 20);
+            PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
+            PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
+            PlayerPrefs.Save();
+            SetBattleStats();
+        }
+    }
 
+    public override void LevelReset()
+    {
+        XP = 0;
+        playerLevel = 1;
+        PlayerPrefs.SetInt("BerLevel", 1);
+        PlayerPrefs.SetInt("BerXP", 0);
+        PlayerPrefs.SetInt("BerMaxHealth",100);
+        PlayerPrefs.SetInt("BerHealth", 100);
+        PlayerPrefs.SetInt("BerMaxMana", 0);
+        PlayerPrefs.SetInt("BerMana", 0);
+        PlayerPrefs.SetInt("BerStr", 50);
+        PlayerPrefs.SetInt("BerDef", 35);
+        PlayerPrefs.Save();
+    }
+
+    public override void SetBattleStats()
+    {
+        playerMaxHealth = PlayerPrefs.GetInt("BerMaxHealth");
+        playerHealth = PlayerPrefs.GetInt("BerHealth");
+        playerMaxMana = PlayerPrefs.GetInt("BerMaxMana");
+        playerMana = playerMaxMana;
+        playerSTR = PlayerPrefs.GetInt("BerStr");
+        playerDEF = PlayerPrefs.GetInt("BerDef");
+        XP = PlayerPrefs.GetInt("BerXP");
+        playerLevel = PlayerPrefs.GetInt("BerLevel");
+    }
 
     public override void CastSpell()
     {

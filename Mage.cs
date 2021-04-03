@@ -7,7 +7,52 @@ public class Mage : Player
     public ParticleSystem meleeStrike;
     public ParticleSystem fireAuara;
 
+    public override void LevelUp()
+    {
+        if (playerLevel == 1 && XP >= 500)
+        {
+            XP = 0;
+            playerLevel = 2;
+            PlayerPrefs.SetInt("MagLevel", 2);
+            PlayerPrefs.SetInt("MagXP", 0);
+            PlayerPrefs.SetInt("MagMaxHealth", playerMaxHealth + Random.Range(15, 21));
+            PlayerPrefs.SetInt("MagHealth", PlayerPrefs.GetInt("MagMaxHealth"));
+            PlayerPrefs.SetInt("MagMaxMana", playerMaxMana + Random.Range(20, 31));
+            PlayerPrefs.SetInt("MagMana", PlayerPrefs.GetInt("MagMaxMana"));
+            PlayerPrefs.SetInt("MagStr", playerSTR + Random.Range(10, 16));
+            PlayerPrefs.SetInt("MagDef", playerDEF + Random.Range(10, 16));
+            PlayerPrefs.Save();
+            SetBattleStats();
+        }
+    }
 
+    public override void LevelReset()
+    {
+        XP = 0;
+        playerLevel = 1;
+        PlayerPrefs.SetInt("MagLevel", 1);
+        PlayerPrefs.SetInt("MagXP", 0);
+        PlayerPrefs.SetInt("MagMaxHealth", 50);
+        PlayerPrefs.SetInt("MagHealth", 50);
+        PlayerPrefs.SetInt("MagMaxMana", 60);
+        PlayerPrefs.SetInt("MagMana", 60);
+        PlayerPrefs.SetInt("MagStr", 35);
+        PlayerPrefs.SetInt("MagDef", 30);
+        PlayerPrefs.Save();
+        SetBattleStats();
+    }
+
+    public override void SetBattleStats()
+    {
+        playerMaxHealth = PlayerPrefs.GetInt("MagMaxHealth");
+        playerHealth = PlayerPrefs.GetInt("MagHealth");
+        playerMaxMana = PlayerPrefs.GetInt("MagMaxMana");
+        playerMana = playerMaxMana;
+        playerSTR = PlayerPrefs.GetInt("MagStr");
+        playerDEF = PlayerPrefs.GetInt("MagDef");
+        XP = PlayerPrefs.GetInt("MagXP");
+        playerLevel = PlayerPrefs.GetInt("MagLevel");
+    }
 
     public void FireAura()
     {

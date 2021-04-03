@@ -207,7 +207,10 @@ public class AreaUIController : MonoBehaviour
     public void TogglePlayerStats()
     {
         
-        areaController.SetPlayerBank();
+        foreach(Player hero in areaController.activeBank.bank)
+        {
+            hero.SetBattleStats();
+        }
 
         playerFaces[0].sprite = faceSprites[HeroSelect.hero0];
         playerFaces[1].sprite = faceSprites[HeroSelect.hero1];

@@ -11,10 +11,16 @@ public class Door : MonoBehaviour
     public Items matchingKey;
     public bool opened;
 
+    public AudioSource audioSource;
+    public AudioClip lockedSound;
+    public AudioClip openSound;
+
     // Start is called before the first frame update
     void Start()
     {
         areaUI = FindObjectOfType<AreaUIController>();
+        audioSource = GetComponent<AudioSource>();
+        player = FindObjectOfType<CharacterController>().gameObject;
     }
 
     // Update is called once per frame
@@ -40,7 +46,10 @@ public class Door : MonoBehaviour
             }
             if (locked == false && opened)
             {
-                // no message
+                if (areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)
+                {
+                    areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                }
             }
         }
         if (Vector3.Distance(player.transform.position, transform.position) >= 5 && inArea == true)
@@ -50,17 +59,20 @@ public class Door : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
-            if (Vector3.Distance(player.transform.position, transform.position) < 5)
+            if (inArea)
             {                
                 if (locked == false)
                 {                    
                     GetComponent<Animator>().SetTrigger("open");
                     opened = true;
+                    audioSource.clip = openSound;
+                    audioSource.Play();
                     return;
                 }       
                 if (locked == true)
                 {
-                    // null
+                    audioSource.clip = lockedSound;
+                    audioSource.Play();
                 }
             }
         }

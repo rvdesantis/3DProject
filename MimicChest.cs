@@ -72,6 +72,7 @@ public class MimicChest : MonoBehaviour
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 GetComponent<Animator>().SetTrigger("open");
                 opened = true;
+                AreaController.mimicChests++;
                 IEnumerator LaunchTimer()
                 {
                     yield return new WaitForSeconds(2f);
