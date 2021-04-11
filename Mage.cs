@@ -54,6 +54,15 @@ public class Mage : Player
         playerLevel = PlayerPrefs.GetInt("MagLevel");
     }
 
+    public override void SaveStats()
+    {        
+        PlayerPrefs.SetInt("MagXP", XP);        
+        PlayerPrefs.SetInt("MagHealth", 50);     
+        PlayerPrefs.Save();
+    }
+
+
+
     public void FireAura()
     {
         fireAuara.gameObject.SetActive(true);
@@ -74,6 +83,9 @@ public class Mage : Player
 
     public override void CastSpell()
     {
+        int damage = selectedSpell.power + Weapon.magPower;
+        attackTarget.combatTextPrefab.damageAmount = damage;       
+
         if (selectedSpell.manaCost <= playerMana)
         {
             playerMana = playerMana - selectedSpell.manaCost;
@@ -91,6 +103,7 @@ public class Mage : Player
             {
                 IEnumerator CastTimer()
                 {
+                    attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
                     yield return new WaitForSeconds(1.5f);
                     Spell spellToCast = Instantiate<Spell>(selectedSpell, transform.position, Quaternion.identity);
                     spellToCast.targetPosition = attackTarget.head.transform.position;
@@ -109,6 +122,8 @@ public class Mage : Player
                             yield return new WaitForSeconds(1.5f);
                             Spell spellToCast = Instantiate<Spell>(selectedSpell, enemy.transform.position, Quaternion.identity);
                             spellToCast.targetPosition = enemy.head.transform.position;
+                            enemy.combatTextPrefab.damageAmount = damage;
+                            
                         }
                         StartCoroutine(CastTimer());
 
@@ -123,6 +138,7 @@ public class Mage : Player
                 if (selectedSpell.targetALL == false)
                 {
                     attackTarget.anim.SetTrigger("gotHit");
+                    attackTarget.combatTextPrefab.ToggleCombatText();
                 }
                 if (selectedSpell.targetALL)
                 {
@@ -131,11 +147,13 @@ public class Mage : Player
                         if (enemy.dead == false)
                         {
                             enemy.anim.SetTrigger("gotHit");
+                            enemy.combatTextPrefab.startingPosition = enemy.transform.position;
+                            enemy.combatTextPrefab.ToggleCombatText();
                         }
                     }
                     attackTarget.anim.SetTrigger("gotHit");
                 }
-                int damage = selectedSpell.power;
+                
                 if (damage > 0)
                 {
                     if (damage <= 0)

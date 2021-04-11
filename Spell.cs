@@ -28,6 +28,7 @@ public class Spell : MonoBehaviour
     void Start()
     {
         transform.LookAt(targetPosition);
+
     }
 
     // Update is called once per frame

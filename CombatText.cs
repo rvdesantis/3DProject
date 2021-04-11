@@ -21,13 +21,10 @@ public class CombatText : MonoBehaviour
 
     public void ToggleCombatText()
     {
-        Debug.Log("Start Combat Text");
+        
         CombatText damageText = Instantiate<CombatText>(this, startingPosition, Quaternion.identity);
-        Debug.Log("Instatiate Combat Text");
         damageText.battleController = FindObjectOfType<BattleController>();
-        damageText.anim = damageText.floatingText.GetComponent<Animator>();
-        Debug.Log("Battle Controller & Animator Set");
-
+        damageText.anim = damageText.floatingText.GetComponent<Animator>();    
         damageText.floatingText.gameObject.SetActive(true);
         damageText.floatingText.text = damageAmount.ToString();
         damageText.floatingText.transform.position = startingPosition;

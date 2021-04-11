@@ -63,6 +63,13 @@ public class Archer : Player
         playerLevel = PlayerPrefs.GetInt("ArLevel");
     }
 
+    public override void SaveStats()
+    {
+        PlayerPrefs.SetInt("ArXP", XP);        
+        PlayerPrefs.SetInt("ArHealth", playerHealth);
+        PlayerPrefs.Save();
+    }
+
     public override void Melee()
     {       
         

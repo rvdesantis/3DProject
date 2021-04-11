@@ -16,6 +16,8 @@ public class BattleUIController : MonoBehaviour
     public List<Text> heroHealth;
     public List<Text> heroMana;
 
+    public BattleBTPanel buttonUIPanel;
+
     public List<Button> spellButtons;
     public GameObject spellPanel;    
     public int spellIndex;
@@ -107,38 +109,60 @@ public class BattleUIController : MonoBehaviour
         heroFaces[2].sprite = battlecontroller.heroes[2].playerFace;
     }
 
-
+    public void ToggleButtonIcons()
+    {
+        if (buttonUIPanel.gameObject.activeSelf)
+        {
+            buttonUIPanel.gameObject.SetActive(false);
+            return;
+        }
+        if (buttonUIPanel.gameObject.activeSelf == false)
+        {
+            buttonUIPanel.gameObject.SetActive(true);
+        }
+    }
 
     public void ToggleSpellPanel()
     {
         if (spellPanel.gameObject.activeSelf)
         {
-            spellPanel.gameObject.SetActive(false);
-            return;
-        }
-        activeUI = true;
-        currentUI = spellPanel;
-        if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count != 0)
-        {
-            spellIndex = 0;
             foreach (Button button in spellButtons)
             {
-                int spellCount = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count;
-                if (spellButtons.IndexOf(button) > spellCount - 1)
-                {
-                    button.gameObject.SetActive(false);
-                }
-                if (spellButtons.IndexOf(button) <= spellCount - 1)
-                {
-                    button.gameObject.SetActive(true);
-                    button.image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].panelImage;
-                }
-                
-            }           
-            
-            spellPanel.gameObject.SetActive(true);
-            spellButtons[0].Select();
+                button.gameObject.SetActive(false);                
+            }
+            spellPanel.gameObject.SetActive(false);
+            ToggleButtonIcons();
+            activeUI = false;
+
+            return;
         }
+        if (spellPanel.gameObject.activeSelf == false)
+        {
+            activeUI = true;
+            currentUI = spellPanel;
+            if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count != 0)
+            {
+                spellIndex = 0;
+                spellPanel.gameObject.SetActive(true);
+                foreach (Button button in spellButtons)
+                {
+                    button.gameObject.SetActive(true);                    
+                    int spellCount = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count;
+                    spellButtons[spellCount - 1].Select(); // to trick UI into reselecting 0 button after first use
+                    if (spellButtons.IndexOf(button) > spellCount - 1)
+                    {
+                        button.gameObject.SetActive(false);
+                    }
+                    if (spellButtons.IndexOf(button) <= spellCount - 1)
+                    {
+                        button.gameObject.SetActive(true);
+                        button.image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].panelImage;
+                    }
+
+                }                
+                spellButtons[0].Select();
+            }
+        }        
     }
 
     public void ToggleItemPanel()
@@ -146,6 +170,7 @@ public class BattleUIController : MonoBehaviour
         if (itemPanel.activeSelf)
         {
             itemPanel.gameObject.SetActive(false);
+            ToggleButtonIcons();
             return;
         }
         if (itemPanel.activeSelf == false)
@@ -183,7 +208,7 @@ public class BattleUIController : MonoBehaviour
         battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.heroes[battlecontroller.characterTurnIndex];
         battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.item;
         itemPanel.gameObject.SetActive(false);
-
+        ToggleButtonIcons();
 
         if (battlecontroller.enemies[0].dead == false)
         {
@@ -233,6 +258,7 @@ public class BattleUIController : MonoBehaviour
         battlecontroller.heroes[battlecontroller.characterTurnIndex].selectedSpell = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellIndex];        
         battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.casting;
         spellPanel.gameObject.SetActive(false);
+        ToggleButtonIcons();
         if (battlecontroller.characterTurnIndex <= 2)
         {
             battlecontroller.NextPlayerTurn();

@@ -53,12 +53,21 @@ public class WarriorM : Player
         playerLevel = PlayerPrefs.GetInt("WarLevel");
     }
 
+    public override void SaveStats()
+    {
+        PlayerPrefs.SetInt("WarXP", playerHealth);        
+        PlayerPrefs.SetInt("WarHealth", playerHealth);
+        PlayerPrefs.Save();
+    }
+
     public override void CastSpell()
     {
         if (selectedSpell.manaCost <= playerMana)
         {
             playerMana = playerMana - selectedSpell.manaCost;
-            
+            int damage = selectedSpell.power + Weapon.magPower;
+            attackTarget.combatTextPrefab.damageAmount = damage;
+
             if (selectedSpell == spells[0])
             {
                 GetComponent<Animator>().SetTrigger("castStart");
@@ -81,23 +90,9 @@ public class WarriorM : Player
                 IEnumerator SpellTimer()
                 {
                     yield return new WaitForSeconds(selectedSpell.damageTimer);
-                    if (selectedSpell.targetALL == false)
-                    {
-                        attackTarget.anim.SetTrigger("gotHit");
-                    }
-                    if (selectedSpell.targetALL)
-                    {
-                        foreach (Enemy enemy in FindObjectOfType<BattleController>().enemies)
-                        {
-                            if (enemy.dead == false)
-                            {
-                                enemy.anim.SetTrigger("gotHit");
-                            }
-                        }
-                        attackTarget.anim.SetTrigger("gotHit");
-                    }
-
-                    int damage = selectedSpell.power;
+                    attackTarget.anim.SetTrigger("gotHit");
+                    attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                    attackTarget.combatTextPrefab.ToggleCombatText();
                     if (damage > 0)
                     {
                         if (damage <= 0)
@@ -138,6 +133,9 @@ public class WarriorM : Player
                             Spell spellToCast = Instantiate<Spell>(selectedSpell, player.transform.position, Quaternion.identity);
                             spellToCast.targetPosition = player.transform.position;
                             player.playerDEF = player.playerDEF + selectedSpell.power;
+                            player.combatTextPrefab.startingPosition = player.transform.position;
+                            player.combatTextPrefab.floatingText.color = Color.white;
+                            player.combatTextPrefab.ToggleCombatText();
                         }
                         StartCoroutine(CastTimer());
 

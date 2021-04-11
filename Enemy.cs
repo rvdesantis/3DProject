@@ -16,7 +16,7 @@ public class Enemy : Player
         }
         if (spells.Count > 0)
         {
-            dieRoll = Random.Range(0, 2);
+            dieRoll = Random.Range(0, 3); // does not include 3
         }
 
 
@@ -38,8 +38,7 @@ public class Enemy : Player
                         }
                     }
                 }
-                targetPos = attackTarget.transform.position;
-                transform.LookAt(attackTarget.transform);
+                targetPos = attackTarget.transform.position;                
                 Melee();
                 break;
 
@@ -135,6 +134,17 @@ public class Enemy : Player
                         if (selectedSpell.targetALL == false)
                         {
                             attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                            if (attackTarget.playerHealth <= 0)
+                            {
+                                if (attackTarget.danger == true)
+                                {
+                                    attackTarget.Die();
+                                }
+                                if (attackTarget.danger == false)
+                                {
+                                    attackTarget.Danger();
+                                }
+                            }
                         }
                         if (selectedSpell.targetALL == true)
                         {
@@ -143,6 +153,17 @@ public class Enemy : Player
                                 if (enemy.dead == false)
                                 {
                                     enemy.playerHealth = attackTarget.playerHealth - damage;
+                                    if (enemy.playerHealth <= 0)
+                                    {
+                                        if (enemy.danger == true)
+                                        {
+                                            enemy.Die();
+                                        }
+                                        if (enemy.danger == false)
+                                        {
+                                            enemy.Danger();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -203,6 +224,63 @@ public class Enemy : Player
                 Debug.Log("damage 0 or less");
             }
 
+            if (attackTarget.playerHealth <= 0)
+            {
+                if (attackTarget.danger == true)
+                {
+                    attackTarget.Die();
+                }
+                if (attackTarget.danger == false)
+                {
+                    attackTarget.Danger();                    
+                }
+            }
+        }
+        StartCoroutine(HitTimer());
+    }
+
+    public override void Ranged()
+    {
+        IEnumerator HitTimer()
+        {
+            LookAtTarget();
+            int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
+
+            if (damage > 0)
+            {
+                attackTarget.combatTextPrefab.damageAmount = damage;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+            }
+
+            if (damage <= 0)
+            {
+                attackTarget.combatTextPrefab.damageAmount = damage;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                Debug.Log("damage 0 or less");
+            }
+
+
+            yield return new WaitForSeconds(.25f);
+            anim.SetTrigger("AttackR");
+            yield return new WaitForSeconds(1.75f);
+            if (damage > 0)
+            {
+                attackTarget.playerHealth = attackTarget.playerHealth - damage;
+            }
+
+            if (attackTarget.playerHealth <= 0)
+            {
+                if (attackTarget.danger == true)
+                {
+                    attackTarget.Die();
+                }
+                if (attackTarget.danger == false)
+                {
+                    attackTarget.Danger();
+                }
+            }
+
+            transform.position = idlePosition;
         }
         StartCoroutine(HitTimer());
     }
@@ -270,7 +348,7 @@ public class Enemy : Player
     public override void Die()
     {
         dead = true;
-        // anim.SetTrigger("Dead");  
+        anim.SetTrigger("Dead");  
         base.Die();
     }
 
@@ -281,10 +359,11 @@ public class Enemy : Player
             if (dead == false)
             {
                 Die();
-            }            
+            }
         }
 
         base.Update();
+
     }
 }
 

@@ -216,6 +216,7 @@ public class BattleController : MonoBehaviour
             virtualCams[0].Priority = 1;
             virtualCams[2].Priority = 0;
             characterTurnIndex = 0;
+            uiController.buttonUIPanel.gameObject.SetActive(false);
             PlayerAct();
         }
 
@@ -309,6 +310,13 @@ public class BattleController : MonoBehaviour
         }
         if (!endTurn)
         {
+            foreach (FacePanel face in uiController.facePanels)
+            {
+                if (face.gameObject.activeSelf)
+                {
+                    face.gameObject.SetActive(false);
+                }
+            }
             comboController.ComboChecker();
 
             if (combo == false)
@@ -520,6 +528,14 @@ public class BattleController : MonoBehaviour
                 virtualCams[0].m_LookAt = enemies[focusIndex].transform;
                 mainCam.m_Priority = 0;
                 virtualCams[0].m_Priority = 1;
+                foreach (FacePanel face in uiController.facePanels)
+                {
+                    if (face.gameObject.activeSelf == false)
+                    {
+                        face.gameObject.SetActive(true);
+                    }
+                }
+                uiController.buttonUIPanel.gameObject.SetActive(true);
                 Debug.Log("End of Turn.  Start Player Turn");
                 keyboard = true;
 
@@ -642,14 +658,42 @@ public class BattleController : MonoBehaviour
     private void Update()
     {
         CamTracker();
-        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.JoystickButton2))
+        if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.JoystickButton2)) // X on XBOX Controller
         {
-            uiController.ToggleSpellPanel();
+            if (uiController.spellPanel.activeSelf == false && uiController.itemPanel.activeSelf == false)
+            {
+                uiController.ToggleSpellPanel();
+                uiController.ToggleButtonIcons();
+            }
         }
-        if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.JoystickButton3))
+        if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.JoystickButton3)) // Y on XBOX Controller
         {
-            uiController.ToggleItemPanel();
+            if (uiController.itemPanel.activeSelf == false && uiController.spellPanel.activeSelf == false)
+            {
+                uiController.ToggleItemPanel();
+                uiController.ToggleButtonIcons();
+            }
         }
+        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton1)) // B on XBOX Controller
+        {
+            if (uiController.spellPanel.activeSelf != true && uiController.itemPanel.activeSelf != true)
+            {
+                if (battleTurn == 0)
+                {
+                    if (characterTurnIndex != 0)
+                    {
+                        characterTurnIndex = characterTurnIndex - 1;
+                        virtualCams[characterTurnIndex].Priority = 1;
+                        virtualCams[characterTurnIndex + 1].Priority = 0;
+                        if (heroes[characterTurnIndex].attackTarget.highlighter.activeSelf == false)
+                        {
+                            TargetChecker();
+                        }
+                    }
+                }
+            }
+        }
+
 
         if (keyboard)
         {
@@ -828,9 +872,19 @@ public class BattleController : MonoBehaviour
                     }
                 }
             }
+            if (Input.GetKeyDown(KeyCode.JoystickButton1))
+            {
+                if (uiController.spellPanel.activeSelf)
+                {
+                    uiController.ToggleSpellPanel();
+                }
+                if (uiController.itemPanel.activeSelf)
+                {
+                    uiController.ToggleItemPanel();
+                }
+            }
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
             {
-
                 if (uiController.activeUI == false)
                 {
                     heroes[characterTurnIndex].attackTarget = enemies[focusIndex];

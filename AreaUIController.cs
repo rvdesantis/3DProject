@@ -37,7 +37,7 @@ public class AreaUIController : MonoBehaviour
     public GameObject compassLarge;
 
     public GameObject menuUI;
-    public List<Button> menuButtons;
+    public List<DunMenuBT> menuButtons;
 
     public GameObject fadeOutPanel;
 
@@ -45,6 +45,10 @@ public class AreaUIController : MonoBehaviour
     public Text messageText;
     public Image SpaceBT;
     public Image GreenBT;
+
+    public GameObject homeUI;
+    public List<DunMenuBT> homeButtons;
+    public int homeBTIndex;
 
 
     private void Start()
@@ -143,6 +147,31 @@ public class AreaUIController : MonoBehaviour
 
     }
 
+    public void TogglePartyMenu()
+    {
+        if (menuUI.activeSelf == false && inventoryPanel.activeSelf == false && playerPanel.activeSelf == false && compassLarge.activeSelf == false)
+        {
+            if (homeUI.activeSelf)
+            {
+                homeUI.gameObject.SetActive(false);
+                homeBTIndex = 0;
+                areaController.moveController.enabled = true;
+                uiNavigation = false;
+                return;
+            }
+            if (homeUI.activeSelf == false)
+            {
+                uiNavigation = true;
+                homeUI.gameObject.SetActive(true);
+                homeButtons[0].selfBT.Select();
+                homeBTIndex = 0;
+                areaController.moveController.enabled = false;
+                return;
+            }
+        }
+
+    }
+
     public void HealthBTDown()
     {        
         foreach (Player character in areaController.activeBank.bank)
@@ -155,7 +184,10 @@ public class AreaUIController : MonoBehaviour
                     areaController.potions[0].HealthPotion();
                     inventoryPanel.gameObject.SetActive(false);
                     areaController.potions[0].potionQuantity--; Debug.Log(areaController.potions[0].potionQuantity + " Health Potions Left");
+                    messageText.text = "Party is healed + 25 health";
+                    TriggerMessage();
                     Debug.Log(character.playerName + " healed 25 Health");
+                    character.SaveStats();
                 }
                 else
                 {
@@ -171,12 +203,23 @@ public class AreaUIController : MonoBehaviour
                     {
                         inventoryPanel.gameObject.SetActive(false);
                         Debug.Log("All Heroes at Max Health");
+                        messageText.text = "No Party Members Injured";
+                        TriggerMessage();
                     }
                 }
             }
         }
+
+        areaController.moveController.enabled = true;
     }
 
+    public void QuickSaveBT()
+    {
+        foreach (Player hero in areaController.activeBank.bank)
+        {
+            hero.SaveStats();            
+        }
+    }
 
     public void ToggleUINav() // for UI button use only
     {
@@ -294,6 +337,7 @@ public class AreaUIController : MonoBehaviour
     }
 
 
+
     public void ToggleMenu()
     {
         if (menuUI.activeSelf)
@@ -307,7 +351,7 @@ public class AreaUIController : MonoBehaviour
         {
             areaController.moveController.enabled = false;
             menuUI.SetActive(true);
-            menuButtons[0].Select();            
+            menuButtons[0].selfBT.Select();            
             return;
         }
     }

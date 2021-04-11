@@ -86,6 +86,7 @@ public class HeroSelect : MonoBehaviour
             }
             yield return new WaitForSeconds(.25f);
             start = false;
+            AreaController.firstLoad = true;
         }StartCoroutine(StartTimer());
         
     }
@@ -94,6 +95,7 @@ public class HeroSelect : MonoBehaviour
     {
         IEnumerator StartTimer()
         {
+            AreaController.firstLoad = false;
             foreach (Player hero in heroBank.bank)
             {
                 hero.SetBattleStats();

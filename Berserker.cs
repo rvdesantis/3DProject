@@ -50,6 +50,12 @@ public class Berserker : Player
         XP = PlayerPrefs.GetInt("BerXP");
         playerLevel = PlayerPrefs.GetInt("BerLevel");
     }
+    public override void SaveStats()
+    {
+        PlayerPrefs.SetInt("BerXP", XP);        
+        PlayerPrefs.SetInt("BerHealth", playerHealth);
+        PlayerPrefs.Save();
+    }
 
     public override void CastSpell()
     {
@@ -90,12 +96,16 @@ public class Berserker : Player
             {
                 IEnumerator CastTimer()
                 {
+                    int damage = selectedSpell.power + Weapon.magPower;
+                    attackTarget.combatTextPrefab.damageAmount = damage;
+                    attackTarget.combatTextPrefab.damageAmount = damage;
                     yield return new WaitForSeconds(1.5f);
                     Spell spellToCast = Instantiate<Spell>(selectedSpell, transform.position, Quaternion.identity);
                     spellToCast.transform.LookAt(attackTarget.transform);
+                    attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
                     yield return new WaitForSeconds(selectedSpell.damageTimer);
                     attackTarget.anim.SetTrigger("gotHit");
-                    int damage = selectedSpell.power;
+                    attackTarget.combatTextPrefab.ToggleCombatText();
                     if (damage > 0)
                     {
                         attackTarget.playerHealth = attackTarget.playerHealth - damage;   
