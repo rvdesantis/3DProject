@@ -24,6 +24,9 @@ public class BattleController : MonoBehaviour
     
     public PlayerBank playerBank;
     public List<GameObject> partyInventory;
+
+    public List<Trinket> masterTrinketlist;
+    public List<Trinket> activeTrinketlist;
     
     public EnemyBank staticEnemyBank;
     public EnemyBank SpecialEnemyBank;
@@ -50,6 +53,8 @@ public class BattleController : MonoBehaviour
 
     public bool endTurn;
     public bool combo;
+
+
 
     
 
@@ -163,25 +168,50 @@ public class BattleController : MonoBehaviour
         }
 
         mainCam.LookAt = enemies[0].transform;
-        virtualCams[0].LookAt = enemies[0].transform;
-        virtualCams[1].LookAt = enemies[0].transform;
-        virtualCams[2].LookAt = enemies[0].transform;        
+        virtualCams[0].LookAt = enemies[0].head.transform;
+        virtualCams[1].LookAt = enemies[0].head.transform;
+        virtualCams[2].LookAt = enemies[0].head.transform;    
+        
+        foreach (Enemy enemy in enemies)
+        {
+            virtualCams.Add(enemy.selfMeleeCam);
+        }
         IEnumerator CamTimer()
         {
             yield return new WaitForSeconds(.5f);
             mainCam.m_Priority = 0;
-            virtualCams[0].m_Priority = 1;
+            virtualCams[0].m_Priority = 1;           
+
         } StartCoroutine(CamTimer());
         
                
         comboController.AssignPlayers();
+        TrinketChecker();
         keyboard = true;
     }
 
 
 
 
-
+    public void TrinketChecker()
+    {        
+        foreach(Trinket battleTrinket in masterTrinketlist)
+        {            
+            if (PlayerPrefs.GetInt(battleTrinket.trinketName) == 1)
+            {
+                activeTrinketlist.Add(battleTrinket);
+            }
+        }
+        foreach(Trinket trinket in activeTrinketlist)
+        {
+            Trinket newTrinket = Instantiate(trinket, Vector3.zero, Quaternion.identity);
+            newTrinket.battleController = this;
+            newTrinket.active = true;
+            newTrinket.BattleEffect();
+            uiController.trinketIcons[activeTrinketlist.IndexOf(trinket)].sprite = trinket.trinketSprite;
+            uiController.trinketIcons[activeTrinketlist.IndexOf(trinket)].gameObject.SetActive(true);
+        }
+    }
 
 
 
@@ -199,7 +229,7 @@ public class BattleController : MonoBehaviour
             meleeCam.Priority = 0;
             virtualCams[characterTurnIndex].Priority = 1;
             virtualCams[characterTurnIndex - 1].Priority = 0;
-            virtualCams[characterTurnIndex].LookAt = enemies[focusIndex].transform;
+            virtualCams[characterTurnIndex].LookAt = enemies[focusIndex].head.transform;
             return;
         }
         if (characterTurnIndex == 2)
@@ -325,13 +355,14 @@ public class BattleController : MonoBehaviour
                 {
                     heroes[characterTurnIndex].attackTarget = GetHighestEnemy();
                     heroes[characterTurnIndex].transform.LookAt(GetHighestEnemy().transform);
-                    virtualCams[characterTurnIndex].LookAt = GetHighestEnemy().transform;
+                    virtualCams[characterTurnIndex].LookAt = GetHighestEnemy().head.transform;
                 }
                 if (heroes[characterTurnIndex].attackTarget.playerHealth > 0)
                 {
                     if (heroes[characterTurnIndex].actionType == Player.Action.melee)
                     {
                         heroes[characterTurnIndex].Melee();
+                        meleeCam = heroes[characterTurnIndex].attackTarget.selfMeleeCam;
                         meleeCam.Priority = 2;
                         IEnumerator MeleeTimer()
                         {
@@ -713,18 +744,18 @@ public class BattleController : MonoBehaviour
                                 }
                             }
                             focusIndex++;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                             if (enemies[focusIndex].dead && focusIndex < enemies.Count - 1)
                             {
                                 focusIndex++;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             if (enemies[focusIndex].dead && focusIndex == enemies.Count - 1)
                             {
                                 focusIndex = 0;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             return;
@@ -739,18 +770,18 @@ public class BattleController : MonoBehaviour
                                 }
                             }
                             focusIndex = 0;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                             if (enemies[focusIndex].dead)
                             {
                                 focusIndex++;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             if (enemies[focusIndex].dead)
                             {
                                 focusIndex++;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             return;
@@ -810,18 +841,18 @@ public class BattleController : MonoBehaviour
                                 }
                             }
                             focusIndex--;                            
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                             if (enemies[focusIndex].dead && focusIndex > 0)
                             {
                                 focusIndex--;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             if (enemies[focusIndex].dead && focusIndex == 0)
                             {
                                 focusIndex = 2;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             return;
@@ -836,18 +867,18 @@ public class BattleController : MonoBehaviour
                                 }
                             }
                             focusIndex = enemies.Count - 1;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                             if (enemies[focusIndex].dead)
                             {
                                 focusIndex--;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             if (enemies[focusIndex].dead)
                             {
                                 focusIndex--;
-                                activeCam.LookAt = enemies[focusIndex].transform;
+                                activeCam.LookAt = enemies[focusIndex].head.transform;
                                 enemies[focusIndex].ToggleHighlighter();
                             }
                             return;
@@ -945,18 +976,18 @@ public class BattleController : MonoBehaviour
                             }
                         }
                         focusIndex--;
-                        activeCam.LookAt = enemies[focusIndex].transform;
+                        activeCam.LookAt = enemies[focusIndex].head.transform;
                         enemies[focusIndex].ToggleHighlighter();
                         if (enemies[focusIndex].dead && focusIndex > 0)
                         {
                             focusIndex--;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         if (enemies[focusIndex].dead && focusIndex == 0)
                         {
                             focusIndex = 2;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         return;
@@ -971,18 +1002,18 @@ public class BattleController : MonoBehaviour
                             }
                         }
                         focusIndex = enemies.Count - 1;
-                        activeCam.LookAt = enemies[focusIndex].transform;
+                        activeCam.LookAt = enemies[focusIndex].head.transform;
                         enemies[focusIndex].ToggleHighlighter();
                         if (enemies[focusIndex].dead)
                         {
                             focusIndex--;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         if (enemies[focusIndex].dead)
                         {
                             focusIndex--;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         return;
@@ -1024,18 +1055,18 @@ public class BattleController : MonoBehaviour
                             }
                         }
                         focusIndex++;
-                        activeCam.LookAt = enemies[focusIndex].transform;
+                        activeCam.LookAt = enemies[focusIndex].head.transform;
                         enemies[focusIndex].ToggleHighlighter();
                         if (enemies[focusIndex].dead && focusIndex < enemies.Count - 1)
                         {
                             focusIndex++;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         if (enemies[focusIndex].dead && focusIndex == enemies.Count - 1)
                         {
                             focusIndex = 0;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         return;
@@ -1050,18 +1081,18 @@ public class BattleController : MonoBehaviour
                             }
                         }
                         focusIndex = 0;
-                        activeCam.LookAt = enemies[focusIndex].transform;
+                        activeCam.LookAt = enemies[focusIndex].head.transform;
                         enemies[focusIndex].ToggleHighlighter();
                         if (enemies[focusIndex].dead)
                         {
                             focusIndex++;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         if (enemies[focusIndex].dead)
                         {
                             focusIndex++;
-                            activeCam.LookAt = enemies[focusIndex].transform;
+                            activeCam.LookAt = enemies[focusIndex].head.transform;
                             enemies[focusIndex].ToggleHighlighter();
                         }
                         return;

@@ -13,15 +13,21 @@ public class Items : MonoBehaviour
     
     
     public bool key;
+    public bool trinket;
+    public bool potion;
+    public bool weapon;
+
     public Door targetDoor;
 
-    public bool potion;
+    
     public Player potionTarget;
     public int potionQuantity;
 
+  
+
       
 
-    public bool weapon;    
+       
     public int weaponNum;
     public int weaponHero;
 
@@ -96,6 +102,8 @@ public class Items : MonoBehaviour
                 gameObject.SetActive(false);                
             }
         }
+
+
     }
 
 }

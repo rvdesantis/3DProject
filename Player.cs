@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
+using Cinemachine;
 
 
 
@@ -11,11 +12,12 @@ public class Player : MonoBehaviour
     public Animator anim;
     public Player attackTarget;
     
-
     public Vector3 targetPos;   
 
     public Vector3 idlePosition;
     public GameObject strikePoint;
+    public CinemachineVirtualCamera selfMeleeCam;
+
     public GameObject highlighter;
     public GameObject head;
     public Hitbox hitBox;
@@ -229,6 +231,7 @@ public class Player : MonoBehaviour
             {
                 if (anim.GetBool("danger") == false)
                 {
+                    danger = true;
                     anim.SetBool("danger", true);
                 }
             }

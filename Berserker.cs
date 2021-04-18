@@ -37,6 +37,8 @@ public class Berserker : Player
         PlayerPrefs.SetInt("BerStr", 50);
         PlayerPrefs.SetInt("BerDef", 35);
         PlayerPrefs.Save();
+
+        Weapon = equipedWeapons[0];
     }
 
     public override void SetBattleStats()

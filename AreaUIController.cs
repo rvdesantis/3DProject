@@ -8,6 +8,9 @@ public class AreaUIController : MonoBehaviour
     public AreaController areaController;
     public bool uiNavigation;
 
+    public List<Image> trinketImages;
+    public int trinketIndex;
+
     public List<Items> keys;    
     public Items activeItem; // for assigning and equiping
 
@@ -54,6 +57,7 @@ public class AreaUIController : MonoBehaviour
     private void Start()
     {
         TriggerMessage();
+        SetTrinketImages();
     }
 
     public void ExitGame()
@@ -82,6 +86,18 @@ public class AreaUIController : MonoBehaviour
             yield return new WaitForSeconds(2);
             itemPanel.gameObject.SetActive(false);
         } StartCoroutine(ToggleItemPanel());       
+    }
+
+    public void SetTrinketImages()
+    {
+        foreach (Trinket trinket in areaController.dungeonTrinkets)
+        {
+            if (trinket.active)
+            {
+                trinketImages[areaController.dungeonTrinkets.IndexOf(trinket)].sprite = trinket.trinketSprite;
+                trinketImages[areaController.dungeonTrinkets.IndexOf(trinket)].gameObject.SetActive(true);
+            }
+        }
     }
 
     public void WeaponImage()
@@ -188,11 +204,13 @@ public class AreaUIController : MonoBehaviour
                     TriggerMessage();
                     Debug.Log(character.playerName + " healed 25 Health");
                     character.SaveStats();
+                    uiNavigation = false;
                 }
                 else
                 {
                     inventoryPanel.gameObject.SetActive(false);
                     Debug.Log("Health Potion Quantity 0");
+                    uiNavigation = false;
                 }
             }
             if (areaController.activeBank.bank[0].playerHealth == areaController.activeBank.bank[0].playerMaxHealth)
@@ -204,6 +222,7 @@ public class AreaUIController : MonoBehaviour
                         inventoryPanel.gameObject.SetActive(false);
                         Debug.Log("All Heroes at Max Health");
                         messageText.text = "No Party Members Injured";
+                        uiNavigation = false;
                         TriggerMessage();
                     }
                 }

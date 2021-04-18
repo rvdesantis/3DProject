@@ -11,6 +11,7 @@ public class DunEnemy : MonoBehaviour
     public Animator anim;
     public bool launchable;
     public static bool launched;
+    public static bool finished;
 
     public Items treasure;
 
@@ -22,16 +23,62 @@ public class DunEnemy : MonoBehaviour
         anim = GetComponent<Animator>();
 
 
-        if (launched)
+        if (launched && finished == false)
         {
             if (this.gameObject.activeSelf)
             {
+                finished = true;
                 gameObject.SetActive(false);
+
                 if (treasure.weapon)
                 {
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
                     areaController.areaUI.activeItem = treasure;
                     areaController.areaUI.WeaponImage();
+                }
+                if (treasure.trinket)
+                {
+                    areaController.areaUI.activeItem = treasure;
+                    string trinketName = treasure.itemName;
+                    bool owned = false;
+                    PlayerPrefs.SetInt(trinketName, 1);
+                    PlayerPrefs.Save();
+
+                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    {
+                        if (trinketName == trinket.trinketName)
+                        {
+                            Debug.Log("Already holding tricket " + trinketName);
+                            owned = true;
+                        }
+
+                    }
+                    if (!owned)
+                    {
+                        foreach (Trinket masterTrinket in areaController.trinketMasterList)
+                        {
+                            if (trinketName == masterTrinket.trinketName)
+                            {
+                                areaController.dungeonTrinkets.Add(masterTrinket);
+                                PlayerPrefs.SetInt(trinketName, 1);
+                                PlayerPrefs.Save();
+                            }
+                        }
+                    }
+                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    {
+                        if (trinketName == trinket.trinketName)
+                        {
+                            trinket.active = true;
+                            Instantiate(trinket, areaController.playerBody.transform.position, Quaternion.identity);
+                        }
+                    }
+                    areaController.areaUI.SetTrinketImages();
+                    areaController.areaUI.messageText.text = trinketName + " added to Trinkets";
+
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
+                    areaController.areaUI.itemImage.sprite = treasure.itemSprite;
+                    areaController.areaUI.ItemImage();
                 }
                 else
                 {

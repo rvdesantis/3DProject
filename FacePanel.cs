@@ -8,7 +8,7 @@ public class FacePanel : MonoBehaviour
 
     public BattleController battleController;
     public Player targetHero;
-    public int heroPosition;
+    public int faceIndex;
     public Animator anim;
     public Color faded;
     public Image health;
@@ -17,21 +17,39 @@ public class FacePanel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        anim = GetComponent<Animator>();        
+        anim = GetComponent<Animator>();
+        targetHero = battleController.heroes[faceIndex];
     }
+
+    
 
 
     // Update is called once per frame
     void Update()
     {
-        if (battleController.characterTurnIndex == heroPosition && battleController.battleTurn == 0)
-        {
-            faded.a = .3f;
+        if (battleController.characterTurnIndex == faceIndex && battleController.battleTurn == 0)
+        {            
             anim.SetBool("active", true);
         }
-        if (battleController.characterTurnIndex != heroPosition)
+        if (battleController.characterTurnIndex != faceIndex)
         {
             anim.SetBool("active", false);
+        }
+        if (targetHero.danger)
+        {
+            anim.SetBool("danger", true);
+        }
+        if (targetHero.danger == false)
+        {
+            anim.SetBool("danger", false);
+        }
+        if (targetHero.dead)
+        {
+            anim.SetBool("dead", true);
+        }
+        if (targetHero.dead == false)
+        {
+            anim.SetBool("dead", false);
         }
     }
 }

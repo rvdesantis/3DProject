@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class MeleeCombos : MonoBehaviour
 {
     public BattleController battleController;
@@ -11,6 +12,9 @@ public class MeleeCombos : MonoBehaviour
     public Player fWarrior;
     public Player fArcher;
     public Player fMage;
+
+    public Player target;
+
 
 
     public void MeleeCombo()
@@ -69,7 +73,7 @@ public class MeleeCombos : MonoBehaviour
                 {
                     character.transform.position = character.idlePosition;
                 }
-
+                battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
 
                 int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power +
                 battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power +
@@ -130,7 +134,7 @@ public class MeleeCombos : MonoBehaviour
                 {
                     character.transform.position = character.idlePosition;
                 }
-
+                battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
 
                 int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power +
                 battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power +
@@ -191,7 +195,7 @@ public class MeleeCombos : MonoBehaviour
                 {
                     character.transform.position = character.idlePosition;
                 }
-
+                battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
 
                 int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power +
                 battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power +
@@ -253,7 +257,7 @@ public class MeleeCombos : MonoBehaviour
                 {
                     character.transform.position = character.idlePosition;
                 }
-
+                battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
 
                 int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power + 
                     battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power + 

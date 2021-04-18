@@ -39,6 +39,12 @@ public class Mage : Player
         PlayerPrefs.SetInt("MagStr", 35);
         PlayerPrefs.SetInt("MagDef", 30);
         PlayerPrefs.Save();
+
+        Weapon = equipedWeapons[0];
+
+
+
+
         SetBattleStats();
     }
 
@@ -120,8 +126,7 @@ public class Mage : Player
                         IEnumerator CastTimer()
                         {
                             yield return new WaitForSeconds(1.5f);
-                            Spell spellToCast = Instantiate<Spell>(selectedSpell, enemy.transform.position, Quaternion.identity);
-                            spellToCast.targetPosition = enemy.head.transform.position;
+                            Spell spellToCast = Instantiate<Spell>(selectedSpell, enemy.transform.position, Quaternion.identity);                            
                             enemy.combatTextPrefab.damageAmount = damage;
                             
                         }

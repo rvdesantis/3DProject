@@ -67,10 +67,10 @@ public class Combo : MonoBehaviour
         {
             if (fArcher.actionType == Player.Action.casting && fMage.actionType == Player.Action.casting)
             {
-                if (fArcher.selectedSpell == fArcher.spells[0] && fMage.selectedSpell == fMage.spells[0])
+                if (fArcher.selectedSpell == fArcher.spells[0] && fMage.selectedSpell == fMage.spells[0] && spellCombos.fireArrowsfinish == false)
                 {
                     battleController.combo = true;
-                    spellCombos.FireArrows = true;
+                    spellCombos.fireArrows = true;
                     spellCombos.SpellComboTrigger();
                     Debug.Log("Fire Arrows Combo Trigger");
                     return;
@@ -81,10 +81,10 @@ public class Combo : MonoBehaviour
         {
             if (fMage.attackTarget == mWarrior.attackTarget)
             {
-                if (fMage.selectedSpell == fMage.spells[0] && mWarrior.selectedSpell == mWarrior.spells[0])
+                if (fMage.selectedSpell == fMage.spells[0] && mWarrior.selectedSpell == mWarrior.spells[0] && spellCombos.firestrikefinish == false)
                 {
                     battleController.combo = true;
-                    spellCombos.FireStrike = true;
+                    spellCombos.fireStrike = true;
                     spellCombos.SpellComboTrigger();
                     Debug.Log("FireStrike Combo Trigger");
                     return;

@@ -19,14 +19,17 @@ public class SpellCombo : MonoBehaviour
     public Vector3 comboThreePosition;
     public Vector3 leftoverPosition;
 
-    public bool FireStrike;
-    public bool FireArrows;
+    public bool fireStrike;
+    public bool firestrikefinish;
+    public bool fireArrows;
+    public bool fireArrowsfinish;
 
 
     public void SpellComboTrigger()
     {
-        if (FireStrike)
+        if (fireStrike)
         {
+            firestrikefinish = true;
             fWarrior = comboController.fWarrior;
             fMage = comboController.fMage;
             fArcher = comboController.fArcher;
@@ -99,15 +102,16 @@ public class SpellCombo : MonoBehaviour
                     }
                 }
                 
-                FireStrike = false;
+                fireStrike = false;
                 battleController.combo = false;
                 LeftOverAction(); // will set end turn to true and go to next action ending turn
             }
             StartCoroutine(CamTimer());
         }
 
-        if (FireArrows)
+        if (fireArrows)
         {
+            fireArrowsfinish = true;
             fWarrior = comboController.fWarrior;
             fMage = comboController.fMage;
             fArcher = comboController.fArcher;
@@ -169,7 +173,7 @@ public class SpellCombo : MonoBehaviour
                     }                    
                 }
                 
-                FireArrows = false;
+                fireArrows = false;
                 battleController.combo = false;
                 LeftOverAction(); // will set end turn to true and go to next action ending turn
             }

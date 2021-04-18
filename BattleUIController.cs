@@ -33,7 +33,7 @@ public class BattleUIController : MonoBehaviour
     public Image lvlHeroFace;
     public Text levelText;
 
-
+    public List<Image> trinketIcons;
 
     public bool activeUI;
     public GameObject currentUI;

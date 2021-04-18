@@ -15,6 +15,7 @@ public class HeroSelect : MonoBehaviour
     public PlayerBank staticHeroList;
     public PlayerBank activeParty;
     public PlayerBank heroBank;
+    public List<Trinket> masterTrinketList;
 
     public static int hero0;
     public static int hero1;
@@ -84,6 +85,11 @@ public class HeroSelect : MonoBehaviour
             {
                 hero.LevelReset();
             }
+            foreach (Trinket trinket in masterTrinketList)
+            {
+                PlayerPrefs.SetInt(trinket.trinketName, 0);
+                PlayerPrefs.Save();
+            }
             yield return new WaitForSeconds(.25f);
             start = false;
             AreaController.firstLoad = true;
@@ -106,51 +112,7 @@ public class HeroSelect : MonoBehaviour
         StartCoroutine(StartTimer());
     }
 
-    public void SaveToPrefs()
-    {
-        if (hero0 == 0 || hero1 == 0 || hero2 == 0)
-        {
-            PlayerPrefs.SetString("BerName", "Berserker");
-            PlayerPrefs.SetInt("BerLevel", heroBank.bank[0].playerLevel);
-            PlayerPrefs.SetInt("BerHealth", heroBank.bank[0].playerMaxHealth); // sets player health to max when starting dungeon
-            PlayerPrefs.SetInt("BerMaxHealth", heroBank.bank[0].playerMaxHealth);
-            PlayerPrefs.SetInt("BerMaxMana", heroBank.bank[0].playerMaxMana);
-            PlayerPrefs.SetInt("BerStr", heroBank.bank[0].playerSTR);
-            PlayerPrefs.SetInt("BerDef", heroBank.bank[0].playerDEF);            
-        }
-        if (hero0 == 1 || hero1 == 1 || hero2 == 1)
-        {
-            PlayerPrefs.SetString("ArName", "Archer");
-            PlayerPrefs.SetInt("ArLevel", heroBank.bank[1].playerLevel);
-            PlayerPrefs.SetInt("ArHealth", heroBank.bank[1].playerMaxHealth);
-            PlayerPrefs.SetInt("ArMaxHealth", heroBank.bank[1].playerMaxHealth);
-            PlayerPrefs.SetInt("ArMaxMana", heroBank.bank[1].playerMaxMana);
-            PlayerPrefs.SetInt("ArStr", heroBank.bank[1].playerSTR);
-            PlayerPrefs.SetInt("ArDef", heroBank.bank[1].playerDEF);
-        }
-        if (hero0 == 2 || hero1 == 2 || hero2 == 2)
-        {
-            PlayerPrefs.SetString("WarName", "Warrior");
-            PlayerPrefs.SetInt("WarLevel", heroBank.bank[2].playerLevel);
-            PlayerPrefs.SetInt("WarHealth", heroBank.bank[2].playerMaxHealth);
-            PlayerPrefs.SetInt("WarMaxHealth", heroBank.bank[2].playerMaxHealth);
-            PlayerPrefs.SetInt("WarMaxMana", heroBank.bank[2].playerMaxMana);
-            PlayerPrefs.SetInt("WarStr", heroBank.bank[2].playerSTR);
-            PlayerPrefs.SetInt("WarDef", heroBank.bank[2].playerDEF);
-        }
-        if (hero0 == 3 || hero1 == 3 || hero2 == 3)
-        {
-            PlayerPrefs.SetString("MagName", "Mage");
-            PlayerPrefs.SetInt("MagLevel", heroBank.bank[3].playerLevel);
-            PlayerPrefs.SetInt("MagHealth", heroBank.bank[3].playerMaxHealth);
-            PlayerPrefs.SetInt("MagMaxHealth", heroBank.bank[3].playerMaxHealth);
-            PlayerPrefs.SetInt("MagMaxMana", heroBank.bank[3].playerMaxMana);
-            PlayerPrefs.SetInt("MagStr", heroBank.bank[3].playerSTR);
-            PlayerPrefs.SetInt("MagDef", heroBank.bank[3].playerDEF);
-        }
-        PlayerPrefs.Save();
-        Debug.Log("Player Prefs Saved");
-    }
+   
 
     public void UpdateDirections()
     {
@@ -490,9 +452,7 @@ public class HeroSelect : MonoBehaviour
                         cam1.m_Priority = 0;
                         cam2.m_Priority = 1;
                         backgroundFollower.transform.position = Vector3.MoveTowards(transform.position, backgroundAimer.transform.position, .00025f);
-
-
-                        SaveToPrefs();
+                                               
                         door = true;
 
 

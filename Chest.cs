@@ -7,17 +7,11 @@ public class Chest : MonoBehaviour
     public AreaController areaController;
     public FirstPersonPlayer player;
     public GameObject contents;
-    public static int opened;
+    public int opened;
     public Items treasure;
     public bool inArea;
 
-    private void Start()
-    {
-        if (opened == 1)
-        {
-            GetComponent<Animator>().SetTrigger("openLid");
-        }
-    }
+
 
     void Update()
     {
@@ -47,6 +41,8 @@ public class Chest : MonoBehaviour
         {
             if (Vector3.Distance(player.transform.position, this.transform.position) < 7 && opened == 0)
             {
+                PlayerPrefs.SetInt("chest" + areaController.chests.IndexOf(this), 1);
+                PlayerPrefs.Save();
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 opened = 1;
                 AreaController.openedChests++;
@@ -62,6 +58,50 @@ public class Chest : MonoBehaviour
                     equipHero.Weapon.gameObject.SetActive(false);
                     equipHero.Weapon = equipHero.equipedWeapons[treasure.weaponNum];
                     equipHero.equipedWeapons[treasure.weaponNum].gameObject.SetActive(true);
+                }
+                if (treasure.trinket)
+                {                    
+                    areaController.areaUI.activeItem = treasure;
+                    string trinketName = treasure.itemName;
+                    bool owned = false;
+                    PlayerPrefs.SetInt(trinketName, 1);
+                    PlayerPrefs.Save();
+                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    {
+                        if (PlayerPrefs.GetInt(trinketName) == 1)
+                        {
+                            Debug.Log("Already holding tricket " + trinketName);
+                            owned = true;
+                        }
+
+                    }
+                    if (!owned)
+                    {
+                        foreach (Trinket masterTrinket in areaController.trinketMasterList)
+                        {
+                            if (trinketName == masterTrinket.trinketName)
+                            {
+                                areaController.dungeonTrinkets.Add(masterTrinket);   
+                            }
+                        }
+                    }
+                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    {
+                        if (trinketName == trinket.trinketName)
+                        {
+                            trinket.active = true;
+                            if (trinket.dungeon)
+                            {
+                                Instantiate(trinket, areaController.playerBody.transform.position, Quaternion.identity);
+                            }                            
+                        }
+                    }
+                    areaController.areaUI.SetTrinketImages();
+                    areaController.areaUI.messageText.text = trinketName + " added to Trinkets";
+
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
+                    areaController.areaUI.itemImage.sprite = treasure.itemSprite;    
+                    areaController.areaUI.ItemImage();
                 }
                 else
                 {

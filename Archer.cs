@@ -49,6 +49,9 @@ public class Archer : Player
         PlayerPrefs.SetInt("ArStr", 45);
         PlayerPrefs.SetInt("ArDef", 35);
         PlayerPrefs.Save();
+        Weapon = equipedWeapons[0];
+
+
     }
 
     public override void SetBattleStats()

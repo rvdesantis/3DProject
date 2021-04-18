@@ -13,9 +13,15 @@ public class AreaController : MonoBehaviour
     public FirstPerson FPcontroller;
     public GameObject playerBody;
     public List<SecretWall> secretWalls;
+    public List<Chest> chests;
+    public List<MimicChest> mimics;
     public GameObject bossDoor;
     public List<Items> areaInventory;
     public List<Items> potions;
+
+    public List<Trinket> dungeonTrinkets;
+    public List<Trinket> trinketMasterList;
+    
     public List<PlayableDirector> areaPlayables;
 
     public PlayerBank activeBank;
@@ -50,7 +56,9 @@ public class AreaController : MonoBehaviour
         {
             Debug.Log("firstload false");
         }
-        WallChecker();
+        SetStartingTrinkets();
+        SetChestsMimics();
+        WallChecker(); // sets firstload to false when finished
         if (battleReturn)
         {
             Debug.Log("battle return");
@@ -58,7 +66,7 @@ public class AreaController : MonoBehaviour
         } 
 
         SetPlayerBank();
-        SetStartingItems();        
+        SetStartingItems();
         
     }
 
@@ -97,6 +105,84 @@ public class AreaController : MonoBehaviour
         areaInventory.Add(potions[0]);
     }
 
+    public void SetChestsMimics()
+    {
+        if (firstLoad)
+        {
+            foreach (Chest chest in chests)
+            {
+                PlayerPrefs.SetInt("chest" + chests.IndexOf(chest), 0);
+                PlayerPrefs.Save();
+            }
+            foreach (MimicChest mimic in mimics)
+            {
+                PlayerPrefs.SetInt("mimic" + mimics.IndexOf(mimic), 0);
+                PlayerPrefs.Save();
+            }
+            return;
+        }
+        if (!firstLoad)
+        {
+            foreach (MimicChest mimic in mimics)
+            {
+                Debug.Log("Chest Checker");
+                mimic.ChestChecker();
+            }
+            foreach (Chest chest in chests)
+            {
+                if (PlayerPrefs.GetInt("chest" + chests.IndexOf(chest)) == 0)
+                {
+                    chest.opened = 0;
+                }
+                if (PlayerPrefs.GetInt("chest" + chests.IndexOf(chest)) == 1)
+                {
+                    chest.opened = 1;
+                }
+                if (chest.opened == 1)
+                {
+                    chest.GetComponent<Animator>().SetTrigger("openLid");
+                }
+            }
+        }
+
+    }
+
+    public void SetStartingTrinkets()
+    {
+        if (firstLoad)
+        {
+            if (dungeonTrinkets.Count != 0)
+            {
+                foreach (Trinket trinket in dungeonTrinkets)
+                {
+                    dungeonTrinkets.Remove(trinket);
+                    Debug.Log("Trinkets Cleared");
+                }
+                foreach (Trinket masterTrinket in trinketMasterList)
+                {
+                    PlayerPrefs.SetInt(masterTrinket.trinketName, 0);
+                    PlayerPrefs.Save();
+                }
+            }
+        }
+        if (!firstLoad)
+        {
+            foreach (Trinket masterTrinket in trinketMasterList)
+            {
+                if (PlayerPrefs.GetInt(masterTrinket.trinketName) == 1)
+                {
+                    dungeonTrinkets.Add(masterTrinket);
+                }
+            }
+            foreach (Trinket trinket in dungeonTrinkets)
+            {
+                trinket.active = true;
+                Instantiate(trinket, playerBody.transform.position, Quaternion.identity);
+                Debug.Log(trinket.trinketName + " set active");
+            }
+        }
+    }
+
     public void WallChecker()
     {
         foreach (SecretWall wall in secretWalls)
@@ -125,6 +211,11 @@ public class AreaController : MonoBehaviour
             firstLoad = false;
         }
         PlayerPrefs.Save();
+    }
+
+    public void ChestChecker()
+    {
+
     }
 
     // Update is called once per frame

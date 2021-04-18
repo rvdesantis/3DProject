@@ -39,6 +39,10 @@ public class WarriorM : Player
         PlayerPrefs.SetInt("WarStr", 40);
         PlayerPrefs.SetInt("WarDef", 40);
         PlayerPrefs.Save();
+
+        Weapon = equipedWeapons[0];
+
+
     }
 
     public override void SetBattleStats()
