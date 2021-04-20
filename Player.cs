@@ -29,7 +29,8 @@ public class Player : MonoBehaviour
     public bool danger;
 
     public List<PlayableDirector> playables;
-
+    public AudioSource audioSource;
+    public List<AudioClip> audioClips;
 
 
 
@@ -66,6 +67,7 @@ public class Player : MonoBehaviour
     public virtual void Start()
     {        
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         Debug.Log(playerName + " idle position set");
         LookAtTarget();
         idlePosition = transform.position;
@@ -243,8 +245,12 @@ public class Player : MonoBehaviour
         
     }
 
-    public void EnemyHitTrigger()  // for use in anims & timelines to trigger hit anim but not calculate damage;
+    public void EnemyHitTrigger()  // for use in anims to trigger hit to trigger weapon noise and popup text
     {
+        if (Weapon.attackSound != null)
+        {
+            Weapon.AttackSound();
+        }               
         if (attackTarget.playerHealth > 0)
         {
             attackTarget.anim.SetTrigger("gotHit");
@@ -259,6 +265,15 @@ public class Player : MonoBehaviour
                 attackTarget.dead = true;                
             }            
         }        
+    }
+
+    public void TimelineHitTrigger()  // for use in timelines to trigger hit anim but not toggle popup text;
+    {
+        if (Weapon.attackSound != null)
+        {
+            Weapon.AttackSound();
+        }        
+        attackTarget.anim.SetTrigger("gotHit");   
     }
 
     public void LookAtTarget()

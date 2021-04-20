@@ -38,7 +38,9 @@ public class Berserker : Player
         PlayerPrefs.SetInt("BerDef", 35);
         PlayerPrefs.Save();
 
+        Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
+        Weapon.gameObject.SetActive(true);
     }
 
     public override void SetBattleStats()

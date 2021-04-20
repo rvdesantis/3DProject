@@ -15,7 +15,7 @@ public class HeroSelect : MonoBehaviour
     public PlayerBank staticHeroList;
     public PlayerBank activeParty;
     public PlayerBank heroBank;
-    public List<Trinket> masterTrinketList;
+    
 
     public static int hero0;
     public static int hero1;
@@ -66,6 +66,10 @@ public class HeroSelect : MonoBehaviour
 
     public GameObject dungeonInfoUI;
     public Text dungeonInfoTXT;
+
+    public GameObject trinketPanel;    
+    public List<Image> trinketImages;
+    public List<Trinket> masterTrinketList;
 
 
 
@@ -346,6 +350,7 @@ public class HeroSelect : MonoBehaviour
                 door = false;
                 cam2.m_Priority = 0;
                 dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", false);
+                trinketPanel.gameObject.SetActive(false);
             }
         }
 
@@ -470,7 +475,30 @@ public class HeroSelect : MonoBehaviour
 
                             dungeonInfoTXT.text = "Dungeon Keys Needed: " + keys + "\nHidden Walls: " + wallsFound + " / ?\nDungeon Chests: " + chestsFound + " / ?\nBoss Battles: " + BBattles + " / 2";
                             dungeonInfoUI.gameObject.SetActive(true);
-                            dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", true);                            
+                            dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", true);
+
+                            foreach (Image image in trinketImages)
+                            {
+                                int x = trinketImages.IndexOf(image);
+                                if (x > masterTrinketList.Count - 1)
+                                {
+                                    image.gameObject.SetActive(false);
+                                }
+                                if (x <= masterTrinketList.Count - 1)
+                                {
+                                    if (PlayerPrefs.GetInt(masterTrinketList[x].trinketName) == 0)
+                                    {
+                                        image.gameObject.SetActive(false);
+                                    }
+                                    if (PlayerPrefs.GetInt(masterTrinketList[x].trinketName) == 1)
+                                    {
+                                        image.sprite = masterTrinketList[x].trinketSprite;
+                                        image.gameObject.SetActive(true);
+                                    }
+                                }
+                            }
+                            trinketPanel.gameObject.SetActive(true);
+
                         }
                         StartCoroutine(Timer());
                         return;

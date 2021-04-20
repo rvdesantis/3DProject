@@ -11,12 +11,15 @@ public class MimicChest : MonoBehaviour
     public Items treasure;
     public bool inArea;
 
+    public MimicGhost ghost;
+
 
    
 
     private void Start()
     {
         GetComponent<Animator>().SetTrigger("shut");
+
     }
 
     public void ChestChecker()
@@ -36,6 +39,13 @@ public class MimicChest : MonoBehaviour
             gameObject.SetActive(false);
         }
     }
+
+    public void ActivateGhost()
+    {
+        ghost.gameObject.SetActive(true);
+    }
+
+    
 
     public void OpenedUI()
     {

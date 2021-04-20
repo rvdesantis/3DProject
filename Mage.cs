@@ -40,7 +40,9 @@ public class Mage : Player
         PlayerPrefs.SetInt("MagDef", 30);
         PlayerPrefs.Save();
 
+        Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
+        Weapon.gameObject.SetActive(true);
 
 
 

@@ -38,7 +38,8 @@ public class Enemy : Player
                         }
                     }
                 }
-                targetPos = attackTarget.transform.position;                
+                targetPos = attackTarget.transform.position;
+                LookAtTarget();
                 Melee();
                 break;
 

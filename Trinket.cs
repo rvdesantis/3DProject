@@ -69,6 +69,13 @@ public class Trinket : MonoBehaviour
                     }                    
                 }
             }
+            if (trinketName == "Mimic Charm")
+            {
+                foreach (MimicChest mimic in areaController.mimics)
+                {
+                    mimic.ghost.gameObject.SetActive(true);
+                }
+            }
         }
     }
 

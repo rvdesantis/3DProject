@@ -85,11 +85,18 @@ public class SpellCombo : MonoBehaviour
                 {
                     character.transform.position = character.idlePosition;
                 }
+                foreach (Enemy enemy in battleController.enemies)
+                {
+                    if (enemy.dead == false)
+                    {
+                        enemy.transform.position = enemy.idlePosition;
+                    }
+                }
 
-
-                int groupSTR = mWarrior.playerSTR + fMage.spells[0].power + 25;
+                int groupSTR = mWarrior.playerSTR + fMage.spells[0].power + fMage.Weapon.magPower + 25;
                 int damage = groupSTR;
-                battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
+                fMage.attackTarget.playerHealth = fMage.attackTarget.playerHealth - damage;
+
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
@@ -99,10 +106,12 @@ public class SpellCombo : MonoBehaviour
                         {
                             enemy.gameObject.SetActive(true);
                         }
+                        if (enemy.playerHealth <= 0)
+                        {
+                            enemy.Die();
+                        }
                     }
-                }
-                
-                fireStrike = false;
+                }                
                 battleController.combo = false;
                 LeftOverAction(); // will set end turn to true and go to next action ending turn
             }
@@ -170,7 +179,11 @@ public class SpellCombo : MonoBehaviour
                     if (enemy.playerHealth > 0)
                     {
                         enemy.gameObject.SetActive(true);
-                    }                    
+                    }
+                    if (enemy.playerHealth <= 0)
+                    {
+                        enemy.Die();
+                    }
                 }
                 
                 fireArrows = false;

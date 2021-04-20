@@ -11,7 +11,7 @@ public class Potion : MonoBehaviour
     public Sprite itemImage;
     public ParticleSystem castingEffect;
 
-    
+    public List<AudioClip> audioClips;
 
 
     public int health;
@@ -26,10 +26,16 @@ public class Potion : MonoBehaviour
 
     public void HealthPotion()
     {
+        
         target.playerHealth = target.playerHealth + health;
         if (target.playerHealth > target.playerMaxHealth)
         {
             target.playerHealth = target.playerMaxHealth;
+        }
+        if (target.danger)
+        {
+            target.danger = false;
+            target.anim.SetBool("danger", false);
         }
         Potion castingPotion = Instantiate<Potion>(this, target.transform.position, Quaternion.identity);        
         castingPotion.castingEffect.Play();
