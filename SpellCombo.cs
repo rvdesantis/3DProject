@@ -71,7 +71,7 @@ public class SpellCombo : MonoBehaviour
 
             IEnumerator CamTimer()
             {
-                yield return new WaitForSeconds(4.5f);
+                yield return new WaitForSeconds(3.25f);
                 leftover.gameObject.SetActive(true);
 
 
@@ -93,7 +93,7 @@ public class SpellCombo : MonoBehaviour
                     }
                 }
 
-                int groupSTR = mWarrior.playerSTR + fMage.spells[0].power + fMage.Weapon.magPower + 25;
+                int groupSTR = mWarrior.spells[0].power + fMage.spells[0].power + fMage.Weapon.magPower + 25;
                 int damage = groupSTR;
                 fMage.attackTarget.playerHealth = fMage.attackTarget.playerHealth - damage;
 
@@ -199,10 +199,13 @@ public class SpellCombo : MonoBehaviour
     {
         if (leftover.actionType == Player.Action.melee)
         {
+            battleController.meleeCam = leftover.attackTarget.selfMeleeCam;
+            battleController.meleeCam.Priority = 2;
             leftover.Melee();            
             IEnumerator MeleeTimer()
             {
                 yield return new WaitForSeconds(2);
+                battleController.meleeCam.Priority = 0;
                 battleController.endTurn = true;
                 battleController.NextPlayerAct();
             }
@@ -210,6 +213,7 @@ public class SpellCombo : MonoBehaviour
         }
         if (leftover.actionType == Player.Action.ranged)
         {
+            battleController.activeCam = battleController.virtualCams[0];
             leftover.Melee();            
             IEnumerator MeleeTimer()
             {
@@ -221,7 +225,8 @@ public class SpellCombo : MonoBehaviour
         }
         if (leftover.actionType == Player.Action.casting)
         {
-           leftover.CastSpell();
+            battleController.activeCam = battleController.virtualCams[0];
+            leftover.CastSpell();
             IEnumerator CamTimer()
             {
                 yield return new WaitForSeconds(2);

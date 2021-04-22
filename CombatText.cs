@@ -7,6 +7,7 @@ using Cinemachine;
 
 public class CombatText : MonoBehaviour
 {
+    public Player attachedPlayer;
     public Text floatingText;
     public Animator anim;
     public BattleController battleController;
@@ -15,23 +16,33 @@ public class CombatText : MonoBehaviour
     public Vector3 startingPosition;
 
 
-
+    private void Start()
+    {
+        attachedPlayer = GetComponentInParent<Player>();
+        battleController = FindObjectOfType<BattleController>();        
+        startingPosition = transform.position;
+    }
 
 
 
     public void ToggleCombatText()
-    {
-        
-        CombatText damageText = Instantiate<CombatText>(this, startingPosition, Quaternion.identity);
-        damageText.battleController = FindObjectOfType<BattleController>();
-        damageText.anim = damageText.floatingText.GetComponent<Animator>();    
-        damageText.floatingText.gameObject.SetActive(true);
-        damageText.floatingText.text = damageAmount.ToString();
-        damageText.floatingText.transform.position = startingPosition;
-        damageText.anim.SetTrigger("float");
+    {        
+        gameObject.SetActive(true);
+        floatingText.gameObject.SetActive(true);
+        floatingText.text = damageAmount.ToString();
+        transform.position = startingPosition;
+        anim.SetTrigger("float");        
     }
 
-    
+    public void TextRefresh() // added to end of float animation above to reset at last frame of animation
+    {        
+        transform.position = startingPosition;
+        floatingText.gameObject.SetActive(false);
+        gameObject.SetActive(false);
+    }
+  
+
+
 
     private void Update()
     {

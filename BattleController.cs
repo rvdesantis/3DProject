@@ -436,7 +436,47 @@ public class BattleController : MonoBehaviour
                         }
                     }
                     if (heroes[characterTurnIndex].actionType == Player.Action.item)
-                    {                       
+                    {    
+                        if (characterTurnIndex == 0)
+                        {
+                            castingCams[0].Priority = 2;                            
+                            IEnumerator CamTimer()
+                            {
+                                yield return new WaitForSeconds(.25f);
+                                castingCams[1].Priority = 2;
+                                castingCams[0].Priority = 0;
+                                yield return new WaitForSeconds(1);
+                                castingCams[1].Priority = 0;        
+                            }
+                            StartCoroutine(CamTimer());
+                        }
+                        if (characterTurnIndex == 1)
+                        {
+                            castingCams[2].Priority = 2;
+                            IEnumerator CamTimer()
+                            {
+                                yield return new WaitForSeconds(.25f);
+                                castingCams[3].Priority = 2;
+                                castingCams[2].Priority = 0;
+                                yield return new WaitForSeconds(1);
+                                castingCams[3].Priority = 0;
+                            }
+                            StartCoroutine(CamTimer());
+                        }
+                        if (characterTurnIndex == 2)
+                        {
+                            castingCams[4].Priority = 2;
+                            IEnumerator CamTimer()
+                            {
+                                yield return new WaitForSeconds(.25f);
+                                castingCams[5].Priority = 2;
+                                castingCams[4].Priority = 0;
+                                yield return new WaitForSeconds(1);
+                                castingCams[5].Priority = 0;
+                            }
+                            StartCoroutine(CamTimer());
+                        }
+
                         if (heroes[characterTurnIndex].activeItem == battleItems.potions[0].gameObject)
                         {
                             Debug.Log(heroes[characterTurnIndex].playerName + " is using Health Potion");
@@ -672,7 +712,7 @@ public class BattleController : MonoBehaviour
         {
             enemies[2].ToggleHighlighter();
             focusIndex = 2;
-        }
+        }        
     }
 
     public void CamTracker()
@@ -928,6 +968,7 @@ public class BattleController : MonoBehaviour
                         if (characterTurnIndex <= 2)
                         {
                             TargetChecker();
+                            heroes[characterTurnIndex].LookAtTarget();
                             NextPlayerTurn();
                         }
                         return;
@@ -938,6 +979,7 @@ public class BattleController : MonoBehaviour
                         if (characterTurnIndex <= 2)
                         {
                             TargetChecker();
+                            heroes[characterTurnIndex].LookAtTarget();
                             NextPlayerTurn();
                         }
                         return;

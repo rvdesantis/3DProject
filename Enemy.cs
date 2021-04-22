@@ -184,6 +184,7 @@ public class Enemy : Player
                     Potion enemyHealer = FindObjectOfType<BattleController>().battleItems.potions[0];
                     enemyHealer.target = this;
                     enemyHealer.HealthPotion();
+                    return;
                 }
                 if (playerHealth >= playerMaxHealth / 2)
                 {
