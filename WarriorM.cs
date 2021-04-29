@@ -120,9 +120,8 @@ public class WarriorM : Player
                             }
                         }
                     }
-                    this.transform.position = idlePosition;
+                    transform.position = idlePosition;
                     LookAtTarget();
-
                 }
                 StartCoroutine(SpellTimer());
 

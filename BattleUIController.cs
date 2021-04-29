@@ -126,11 +126,8 @@ public class BattleUIController : MonoBehaviour
     {
         if (spellPanel.gameObject.activeSelf)
         {
-            foreach (Button button in spellButtons)
-            {
-                button.gameObject.SetActive(false);                
-            }
             spellPanel.gameObject.SetActive(false);
+            spellIndex = 0;
             ToggleButtonIcons();
             activeUI = false;
 
@@ -239,21 +236,7 @@ public class BattleUIController : MonoBehaviour
     {
         battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.enemies[battlecontroller.focusIndex];
         battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget.ToggleHighlighter();
-        if (battlecontroller.enemies[0].dead == false)
-        {
-            battlecontroller.focusIndex = 0;
-            battlecontroller.enemies[0].ToggleHighlighter();
-        }
-        if (battlecontroller.enemies[0].dead == true && battlecontroller.enemies[1].dead == false)
-        {
-            battlecontroller.enemies[1].ToggleHighlighter();
-            battlecontroller.focusIndex = 1;
-        }
-        if (battlecontroller.enemies[0].dead == true && battlecontroller.enemies[1].dead == true)
-        {
-            battlecontroller.enemies[2].ToggleHighlighter();
-            battlecontroller.focusIndex = 2;
-        }
+        battlecontroller.TargetChecker();
 
         battlecontroller.heroes[battlecontroller.characterTurnIndex].selectedSpell = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellIndex];        
         battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.casting;

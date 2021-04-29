@@ -15,7 +15,7 @@ public class Combo : MonoBehaviour
     public List<Player> comboParty;
 
     public Player mWarrior;
-    public Player fWarrior;
+    public Player fBerzerker;
     public Player fArcher;
     public Player fMage;
     public Player target; // for use with a single enemy target
@@ -91,10 +91,22 @@ public class Combo : MonoBehaviour
                 } 
             }
         }
-
+        if (fMageCount == 1 && fBerzerkerCount == 1)
+        {
+            if (fMage.selectedSpell == fMage.spells[1] && fBerzerker.selectedSpell == fBerzerker.spells[1] && spellCombos.lavaStrikeFinish == false)
+            {
+                battleController.combo = true;
+                spellCombos.lavaStrike = true;
+                spellCombos.SpellComboTrigger();
+                Debug.Log("LavaStrike Combo Trigger");
+                return;
+            }
+        }
         else
-        battleController.combo = false;
-        Debug.Log("Combo = False");        
+        {
+            battleController.combo = false;
+            Debug.Log("Combo = False");
+        }
     }
 
         
@@ -122,7 +134,7 @@ public class Combo : MonoBehaviour
             }
             if (character.berzerkerClass)
             {
-                fWarrior = character;
+                fBerzerker = character;
                 fBerzerkerCount++;
             }
         }

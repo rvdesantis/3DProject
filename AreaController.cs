@@ -151,6 +151,7 @@ public class AreaController : MonoBehaviour
     {
         if (firstLoad)
         {
+            areaUI.topBarUI.gameObject.SetActive(false);
             if (dungeonTrinkets.Count != 0)
             {
                 foreach (Trinket trinket in dungeonTrinkets)
@@ -173,6 +174,10 @@ public class AreaController : MonoBehaviour
                 {
                     dungeonTrinkets.Add(masterTrinket);
                 }
+            }
+            if (dungeonTrinkets.Count > 0)
+            {
+                areaUI.topBarUI.gameObject.SetActive(true);
             }
             foreach (Trinket trinket in dungeonTrinkets)
             {

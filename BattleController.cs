@@ -170,8 +170,11 @@ public class BattleController : MonoBehaviour
         mainCam.LookAt = enemies[0].transform;
         virtualCams[0].LookAt = enemies[0].head.transform;
         virtualCams[1].LookAt = enemies[0].head.transform;
-        virtualCams[2].LookAt = enemies[0].head.transform;    
-        
+        virtualCams[2].LookAt = enemies[0].head.transform;
+        foreach (Player hero in heroes)
+        {
+            virtualCams.Add(hero.selfMeleeCam);
+        }
         foreach (Enemy enemy in enemies)
         {
             virtualCams.Add(enemy.selfMeleeCam);
@@ -316,6 +319,21 @@ public class BattleController : MonoBehaviour
             }
         }     
     }
+
+    public Player GetCurrentPlayer()
+    {
+        Player currentPlayer = heroes[0];
+        if (battleTurn == 0)
+        {
+            currentPlayer = heroes[characterTurnIndex];
+        }
+        if (battleTurn == 1)
+        {
+            currentPlayer = enemies[characterTurnIndex];
+        }
+        return currentPlayer;
+    }
+
 
     public Player GetHighestEnemy()
     {
@@ -488,6 +506,9 @@ public class BattleController : MonoBehaviour
                                     heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
                                     heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
                                     battleItems.potions[0].target = heroes[characterTurnIndex].attackTarget;
+                                    battleItems.potions[0].target.combatTextPrefab.floatingText.color = Color.green;
+                                    battleItems.potions[0].target.combatTextPrefab.damageAmount = battleItems.potions[0].health;
+                                    battleItems.potions[0].target.combatTextPrefab.ToggleCombatText();
                                     battleItems.potions[0].HealthPotion();
                                     battleItems.potions[0].quantity--;
                                     yield return new WaitForSeconds(2);
@@ -505,6 +526,9 @@ public class BattleController : MonoBehaviour
                                     heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
                                     heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
                                     battleItems.potions[1].target = heroes[characterTurnIndex].attackTarget;
+                                    battleItems.potions[1].target.combatTextPrefab.floatingText.color = Color.blue;
+                                    battleItems.potions[1].target.combatTextPrefab.damageAmount = battleItems.potions[0].health;
+                                    battleItems.potions[1].target.combatTextPrefab.ToggleCombatText();
                                     battleItems.potions[1].ManaPotion();
                                     battleItems.potions[1].quantity--;
                                     yield return new WaitForSeconds(2);
@@ -556,9 +580,14 @@ public class BattleController : MonoBehaviour
         {
             mainCam.m_LookAt = enemies[characterTurnIndex].transform;
             enemies[characterTurnIndex].Act();
+
             IEnumerator TurnTimer()
             {
-                yield return new WaitForSeconds(3);
+
+                yield return new WaitForSeconds(2);
+                mainCam.Priority = 1;
+                meleeCam.Priority = 0;
+                yield return new WaitForSeconds(1);
                 NextEnemyAct();
             } StartCoroutine(TurnTimer());
                
@@ -722,7 +751,7 @@ public class BattleController : MonoBehaviour
             if (cam.m_Priority > activeCam.m_Priority)
             {
                 activeCam = cam;
-            }
+            }            
         }
     }
 
@@ -833,15 +862,13 @@ public class BattleController : MonoBehaviour
                     {
                         if (uiController.activeUI = uiController.spellPanel)
                         {
-                            if (uiController.spellIndex == 0)
+                            if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
                             {
-                                uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
-
+                                uiController.spellIndex = 0;
                             }
-                            if (uiController.spellIndex > 0)
+                            if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
                             {
-                                uiController.spellIndex--;
-
+                                uiController.spellIndex++;
                             }
                         }
                     }
@@ -930,15 +957,19 @@ public class BattleController : MonoBehaviour
                     {
                         if (uiController.currentUI = uiController.spellPanel)
                         {
-                            if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
+                            if (uiController.activeUI = uiController.spellPanel)
                             {
-                                uiController.spellIndex = 0;
-                            }
-                            if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
-                            {
-                                uiController.spellIndex++;
-                            }
+                                if (uiController.spellIndex == 0)
+                                {
+                                    uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
 
+                                }
+                                if (uiController.spellIndex > 0)
+                                {
+                                    uiController.spellIndex--;
+
+                                }
+                            }
                         }
                     }
                 }
@@ -1067,16 +1098,16 @@ public class BattleController : MonoBehaviour
                 {
                     if (uiController.currentUI == uiController.spellPanel)
                     {
-                        if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
+                        if (uiController.spellIndex == 0)
                         {
-                            uiController.spellIndex = 0;                            
+                            uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
                         }
-                        if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
+                        if (uiController.spellIndex > 0)
                         {
-                            uiController.spellIndex++;                            
+                            uiController.spellIndex--;
                         }
-
                     }
+
                 }
             }
         }
@@ -1146,17 +1177,17 @@ public class BattleController : MonoBehaviour
                 {
                     if (uiController.currentUI == uiController.spellPanel)
                     {
-                        if (uiController.spellIndex == 0)
+                        if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
                         {
-                            uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;                            
+                            uiController.spellIndex = 0;
                         }
-                        if (uiController.spellIndex > 0)
+                        if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
                         {
-                            uiController.spellIndex--;                            
+                            uiController.spellIndex++;
                         }
+
                     }
-                    
-                }
+                }               
             }
         }
 

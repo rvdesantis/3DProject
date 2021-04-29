@@ -9,6 +9,7 @@ public class AreaUIController : MonoBehaviour
     public bool uiNavigation;
 
     public List<Image> trinketImages;
+    public GameObject topBarUI;
     public int trinketIndex;
 
     public List<Items> keys;    
@@ -52,6 +53,8 @@ public class AreaUIController : MonoBehaviour
     public GameObject homeUI;
     public List<DunMenuBT> homeButtons;
     public int homeBTIndex;
+
+    public AudioSource audioSource;
 
 
     private void Start()
@@ -197,6 +200,8 @@ public class AreaUIController : MonoBehaviour
                 if (areaController.potions[0].potionQuantity > 0)
                 {
                     areaController.potions[0].potionTarget = character;
+                    audioSource.clip = areaController.potions[0].activatedSound;
+                    audioSource.PlayOneShot(areaController.potions[0].activatedSound, 1);
                     areaController.potions[0].HealthPotion();
                     inventoryPanel.gameObject.SetActive(false);
                     areaController.potions[0].potionQuantity--; Debug.Log(areaController.potions[0].potionQuantity + " Health Potions Left");

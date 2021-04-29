@@ -71,9 +71,28 @@ public class FirstPerson : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
+
+
         // Joystick
 
         float jx = Input.GetAxis("JHorizontal");
+        if (Input.GetKey(KeyCode.Q))
+        {
+            jx = -.55f;
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                jx = 0;
+            }
+        }        
+        if (Input.GetKey(KeyCode.E))
+        {
+            jx = .55f;
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                jx = 0;
+            }
+        }
+
         if (areaController.areaUI.uiNavigation == false)
         {
             if (jx > .5f)
@@ -99,22 +118,26 @@ public class FirstPerson : MonoBehaviour
         }
 
 
-        playerBody.rotation = Quaternion.Slerp(playerBody.rotation, rotator.transform.rotation, .0075f);
+        
         float yRotation = playerBody.transform.eulerAngles.y;
-        if (yRotation >= 325 || yRotation < 45)
+        if (yRotation >= 335 || yRotation < 25)
         {
+            playerBody.rotation = Quaternion.Slerp(playerBody.rotation, rotator.transform.rotation, .0075f);
             rotator = rotator0;
         }
-        if (yRotation >= 46 && yRotation < 134)
+        if (yRotation >= 66 && yRotation < 114)
         {
+            playerBody.rotation = Quaternion.Slerp(playerBody.rotation, rotator.transform.rotation, .0075f);
             rotator = rotator90;
         }
-        if (yRotation >= 135 && yRotation < 224)
+        if (yRotation >= 146 && yRotation < 204)
         {
+            playerBody.rotation = Quaternion.Slerp(playerBody.rotation, rotator.transform.rotation, .0075f);
             rotator = rotator180;
         }
-        if (yRotation >= 225 && yRotation < 324)
+        if (yRotation >= 245 && yRotation < 304)
         {
+            playerBody.rotation = Quaternion.Slerp(playerBody.rotation, rotator.transform.rotation, .0075f);
             rotator = rotator270;
         }
     }

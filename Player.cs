@@ -68,7 +68,6 @@ public class Player : MonoBehaviour
     {        
         anim = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
-        Debug.Log(playerName + " idle position set");
         LookAtTarget();
         idlePosition = transform.position;
     }
@@ -86,12 +85,14 @@ public class Player : MonoBehaviour
 
             if (damage > 0)
             {
+                attackTarget.combatTextPrefab.floatingText.color = Color.red;
                 attackTarget.combatTextPrefab.damageAmount = damage;
                 attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
             }
 
             if (damage <= 0)
             {
+                attackTarget.combatTextPrefab.floatingText.color = Color.red;
                 attackTarget.combatTextPrefab.damageAmount = 0;
                 attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
                 Debug.Log("damage 0 or less");
@@ -125,12 +126,14 @@ public class Player : MonoBehaviour
 
             if (damage > 0)
             {
+                attackTarget.combatTextPrefab.floatingText.color = Color.red;
                 attackTarget.combatTextPrefab.damageAmount = damage;
                 attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
             }
 
             if (damage <= 0)
             {
+                attackTarget.combatTextPrefab.floatingText.color = Color.red;
                 attackTarget.combatTextPrefab.damageAmount = damage;
                 attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
                 Debug.Log("damage 0 or less");
@@ -154,6 +157,7 @@ public class Player : MonoBehaviour
     public virtual void CastSpell()
     {
         int damage = selectedSpell.power + Weapon.magPower;
+        attackTarget.combatTextPrefab.floatingText.color = Color.red;
         attackTarget.combatTextPrefab.damageAmount = damage;
         attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
         if (selectedSpell.manaCost <= playerMana)
@@ -197,7 +201,8 @@ public class Player : MonoBehaviour
 
                 if (selectedSpell.targetALL == false)
                 {
-                    attackTarget.anim.SetTrigger("gotHit");                    
+                    attackTarget.anim.SetTrigger("gotHit");
+                    attackTarget.combatTextPrefab.floatingText.color = Color.red;
                     attackTarget.combatTextPrefab.ToggleCombatText();
                     attackTarget.playerHealth = attackTarget.playerHealth - damage;
 
@@ -209,6 +214,7 @@ public class Player : MonoBehaviour
                         if (enemy.dead == false)
                         {
                             enemy.anim.SetTrigger("gotHit");
+                            attackTarget.combatTextPrefab.floatingText.color = Color.red;
                             enemy.combatTextPrefab.startingPosition = enemy.transform.position;
                             enemy.combatTextPrefab.ToggleCombatText();
                             enemy.playerHealth = attackTarget.playerHealth - damage;
@@ -242,7 +248,8 @@ public class Player : MonoBehaviour
 
     public virtual void Die()
     {
-        
+        dead = true;
+        anim.SetTrigger("Dead");
     }
 
     public void EnemyHitTrigger()  // for use in anims to trigger hit to trigger weapon noise and popup text

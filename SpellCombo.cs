@@ -8,7 +8,7 @@ public class SpellCombo : MonoBehaviour
     public Combo comboController;
 
     public Player mWarrior;
-    public Player fWarrior;
+    public Player fBerzerker;
     public Player fArcher;
     public Player fMage;
 
@@ -23,6 +23,8 @@ public class SpellCombo : MonoBehaviour
     public bool firestrikefinish;
     public bool fireArrows;
     public bool fireArrowsfinish;
+    public bool lavaStrike;
+    public bool lavaStrikeFinish;
 
 
     public void SpellComboTrigger()
@@ -30,7 +32,7 @@ public class SpellCombo : MonoBehaviour
         if (fireStrike)
         {
             firestrikefinish = true;
-            fWarrior = comboController.fWarrior;
+            fBerzerker = comboController.fBerzerker;
             fMage = comboController.fMage;
             fArcher = comboController.fArcher;
             mWarrior = comboController.mWarrior;
@@ -38,8 +40,8 @@ public class SpellCombo : MonoBehaviour
 
             if (comboController.fBerzerkerCount == 1)
             {
-                fWarrior.gameObject.SetActive(false);
-                leftover = fWarrior;
+                fBerzerker.gameObject.SetActive(false);
+                leftover = fBerzerker;
             }
             if (comboController.fArcherCount == 1)
             {
@@ -96,6 +98,8 @@ public class SpellCombo : MonoBehaviour
                 int groupSTR = mWarrior.spells[0].power + fMage.spells[0].power + fMage.Weapon.magPower + 25;
                 int damage = groupSTR;
                 fMage.attackTarget.playerHealth = fMage.attackTarget.playerHealth - damage;
+                fMage.attackTarget.combatTextPrefab.damageAmount = damage;
+                fMage.attackTarget.combatTextPrefab.ToggleCombatText();
 
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
@@ -105,10 +109,6 @@ public class SpellCombo : MonoBehaviour
                         if (enemy.playerHealth > 0)
                         {
                             enemy.gameObject.SetActive(true);
-                        }
-                        if (enemy.playerHealth <= 0)
-                        {
-                            enemy.Die();
                         }
                     }
                 }                
@@ -121,7 +121,7 @@ public class SpellCombo : MonoBehaviour
         if (fireArrows)
         {
             fireArrowsfinish = true;
-            fWarrior = comboController.fWarrior;
+            fBerzerker = comboController.fBerzerker;
             fMage = comboController.fMage;
             fArcher = comboController.fArcher;
             mWarrior = comboController.mWarrior;
@@ -136,8 +136,8 @@ public class SpellCombo : MonoBehaviour
 
             if (comboController.fBerzerkerCount == 1)
             {
-                fWarrior.gameObject.SetActive(false);
-                leftover = fWarrior;
+                fBerzerker.gameObject.SetActive(false);
+                leftover = fBerzerker;
             }
             if (comboController.mWarriorCount == 1)
             {
@@ -158,6 +158,8 @@ public class SpellCombo : MonoBehaviour
                     {
                         enemy.anim.SetTrigger("gotHit");
                         enemy.playerHealth = enemy.playerHealth - damage;
+                        enemy.combatTextPrefab.damageAmount = damage;
+                        enemy.combatTextPrefab.ToggleCombatText();
                     }
                 }
                 leftover.gameObject.SetActive(true);
@@ -180,14 +182,83 @@ public class SpellCombo : MonoBehaviour
                     {
                         enemy.gameObject.SetActive(true);
                     }
-                    if (enemy.playerHealth <= 0)
-                    {
-                        enemy.Die();
-                    }
                 }
                 
                 fireArrows = false;
                 battleController.combo = false;
+                LeftOverAction(); // will set end turn to true and go to next action ending turn
+            }
+            StartCoroutine(CamTimer());
+        }
+
+        if (lavaStrike)
+        {
+            lavaStrikeFinish = true;
+            fBerzerker = comboController.fBerzerker;
+            fMage = comboController.fMage;
+            fArcher = comboController.fArcher;
+            mWarrior = comboController.mWarrior;
+
+
+            fMage.gameObject.SetActive(false);
+            comboController.fMageTimelineAsset.attackTarget = battleController.enemies[0];
+
+            fBerzerker.gameObject.SetActive(false);
+            comboController.fWarriorTimelineAsset.attackTarget = battleController.enemies[0];
+
+
+            if (comboController.fArcherCount == 1)
+            {
+                fArcher.gameObject.SetActive(false);
+                leftover = fArcher;
+            }
+            if (comboController.mWarriorCount == 1)
+            {
+                mWarrior.gameObject.SetActive(false);
+                leftover = mWarrior;
+            }
+
+            battleController.comboPlayables[6].Play();
+
+            IEnumerator CamTimer()
+            {
+                yield return new WaitForSeconds(5);
+                int groupSTR = fBerzerker.spells[1].power + fMage.spells[1].power + fMage.Weapon.magPower;
+                int damage = groupSTR;
+                foreach (Enemy enemy in battleController.enemies)
+                {
+                    if (enemy.dead == false)
+                    {
+                        enemy.anim.SetTrigger("gotHit");
+                        enemy.playerHealth = enemy.playerHealth - damage;
+                        enemy.combatTextPrefab.damageAmount = damage;
+                        enemy.combatTextPrefab.ToggleCombatText();
+                    }
+                }
+                leftover.gameObject.SetActive(true);
+
+
+                fMage.gameObject.SetActive(true);
+                comboController.fMageTimelineAsset.gameObject.SetActive(false);
+
+                fBerzerker.gameObject.SetActive(true);
+                comboController.fWarriorTimelineAsset.gameObject.SetActive(false);
+
+                foreach (Player character in battleController.heroes)
+                {
+                    character.transform.position = character.idlePosition;
+                }                
+                foreach (Enemy enemy in battleController.enemies)
+                {
+                    if (enemy.playerHealth > 0)
+                    {
+                        enemy.gameObject.SetActive(true);
+                    }
+                }
+
+                lavaStrike = false;
+                battleController.combo = false;
+                yield return new WaitForSeconds(2);
                 LeftOverAction(); // will set end turn to true and go to next action ending turn
             }
             StartCoroutine(CamTimer());
@@ -197,43 +268,54 @@ public class SpellCombo : MonoBehaviour
 
     public void LeftOverAction()
     {
-        if (leftover.actionType == Player.Action.melee)
+        if (battleController.deadEnemies < battleController.enemies.Count)
         {
-            battleController.meleeCam = leftover.attackTarget.selfMeleeCam;
-            battleController.meleeCam.Priority = 2;
-            leftover.Melee();            
-            IEnumerator MeleeTimer()
+            if (leftover.actionType == Player.Action.melee && leftover.attackTarget.dead == false)
             {
-                yield return new WaitForSeconds(2);
-                battleController.meleeCam.Priority = 0;
-                battleController.endTurn = true;
-                battleController.NextPlayerAct();
+                battleController.meleeCam = leftover.attackTarget.selfMeleeCam;
+                battleController.meleeCam.Priority = 2;
+                leftover.Melee();
+                IEnumerator MeleeTimer()
+                {
+                    yield return new WaitForSeconds(2);
+                    battleController.meleeCam.Priority = 0;
+                    battleController.endTurn = true;
+                    battleController.NextPlayerAct();
+                }
+                StartCoroutine(MeleeTimer());
             }
-            StartCoroutine(MeleeTimer());
+            if (leftover.actionType == Player.Action.ranged && leftover.attackTarget.dead == false)
+            {
+                battleController.activeCam = battleController.virtualCams[0];
+                leftover.Melee();
+                IEnumerator MeleeTimer()
+                {
+                    yield return new WaitForSeconds(2);
+                    battleController.endTurn = true;
+                    battleController.NextPlayerAct();
+                }
+                StartCoroutine(MeleeTimer());
+            }
+            if (leftover.actionType == Player.Action.casting && leftover.attackTarget.dead == false)
+            {
+                battleController.activeCam = battleController.virtualCams[0];
+                leftover.CastSpell();
+                IEnumerator CamTimer()
+                {
+                    yield return new WaitForSeconds(2);
+                    battleController.endTurn = true;
+                    battleController.NextPlayerAct();
+                }
+                StartCoroutine(CamTimer());
+            }
         }
-        if (leftover.actionType == Player.Action.ranged)
+        if (battleController.deadEnemies == battleController.enemies.Count)
         {
-            battleController.activeCam = battleController.virtualCams[0];
-            leftover.Melee();            
-            IEnumerator MeleeTimer()
-            {
-                yield return new WaitForSeconds(2);
-                battleController.endTurn = true;
-                battleController.NextPlayerAct();
-            }
-            StartCoroutine(MeleeTimer());
+            battleController.NextPlayerAct();
         }
-        if (leftover.actionType == Player.Action.casting)
+        else
         {
-            battleController.activeCam = battleController.virtualCams[0];
-            leftover.CastSpell();
-            IEnumerator CamTimer()
-            {
-                yield return new WaitForSeconds(2);
-                battleController.endTurn = true;
-                battleController.NextPlayerAct();
-            }
-            StartCoroutine(CamTimer());
+            battleController.NextPlayerAct();
         }
     }
 }

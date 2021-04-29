@@ -76,8 +76,6 @@ public class HeroSelect : MonoBehaviour
     private void Start()
     {
         newGameBT.Select();
-        cam1.m_LookAt = camAimers[0].transform;
-        lights[0].gameObject.SetActive(true);
         directionUIanim = directionUI.GetComponent<Animator>();
     }
 
@@ -91,13 +89,20 @@ public class HeroSelect : MonoBehaviour
             }
             foreach (Trinket trinket in masterTrinketList)
             {
+                trinket.active = false;
                 PlayerPrefs.SetInt(trinket.trinketName, 0);
                 PlayerPrefs.Save();
             }
+            PlayerPrefs.SetInt("openedChests", 0);
+            AreaController.openedChests = 0;
+
             yield return new WaitForSeconds(.25f);
             start = false;
             AreaController.firstLoad = true;
-        }StartCoroutine(StartTimer());
+            cam1.m_LookAt = camAimers[0].transform;
+            lights[0].gameObject.SetActive(true);
+        }
+        StartCoroutine(StartTimer());
         
     }
 
@@ -110,8 +115,11 @@ public class HeroSelect : MonoBehaviour
             {
                 hero.SetBattleStats();
             }
+            AreaController.openedChests = PlayerPrefs.GetInt("openedChests");
             yield return new WaitForSeconds(.25f);
             start = false;
+            cam1.m_LookAt = camAimers[0].transform;
+            lights[0].gameObject.SetActive(true);
         }
         StartCoroutine(StartTimer());
     }
@@ -220,7 +228,7 @@ public class HeroSelect : MonoBehaviour
             {
                 joystick = true;
             }
-            if (!focused)
+            if (!focused && newGameBT.gameObject.activeSelf == false)
             {
                 rightArrow.ArrowTrigger();
                 if (heroIndex < staticHeroList.bank.Count - 1)
@@ -248,7 +256,7 @@ public class HeroSelect : MonoBehaviour
             {
                 joystick = true;
             }
-            if (!focused)
+            if (!focused && newGameBT.gameObject.activeSelf == false)
             {
                 leftArrow.ArrowTrigger();
                 if (heroIndex > 0)
@@ -275,7 +283,7 @@ public class HeroSelect : MonoBehaviour
 
 
     private void Update()
-    {
+    {        
         UpdateDirections();
         if (Input.GetKeyUp(KeyCode.D))
         {
@@ -283,7 +291,7 @@ public class HeroSelect : MonoBehaviour
             {
                 joystick = false;
             }
-            if (!focused)
+            if (!focused && newGameBT.gameObject.activeSelf == false)
             {
                 rightArrow.ArrowTrigger();
                 if (heroIndex < staticHeroList.bank.Count - 1)
@@ -311,7 +319,7 @@ public class HeroSelect : MonoBehaviour
             {
                 joystick = false;
             }
-            if (!focused)
+            if (!focused && newGameBT.gameObject.activeSelf == false)
             {
                 leftArrow.ArrowTrigger();
                 if (heroIndex > 0)

@@ -11,6 +11,8 @@ public class Chest : MonoBehaviour
     public Items treasure;
     public bool inArea;
 
+    public AudioSource audioSource;
+
 
 
     void Update()
@@ -46,7 +48,9 @@ public class Chest : MonoBehaviour
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 opened = 1;
                 AreaController.openedChests++;
+                PlayerPrefs.SetInt("openedChests", AreaController.openedChests); PlayerPrefs.Save();
                 GetComponent<Animator>().SetTrigger("openLid");
+                audioSource.Play();
                 if (treasure.weapon)
                 {
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
@@ -60,12 +64,15 @@ public class Chest : MonoBehaviour
                     equipHero.equipedWeapons[treasure.weaponNum].gameObject.SetActive(true);
                 }
                 if (treasure.trinket)
-                {                    
+                {
+                    if (areaController.areaUI.topBarUI.activeSelf == false)
+                    {
+                        areaController.areaUI.topBarUI.gameObject.SetActive(true);
+                    }
                     areaController.areaUI.activeItem = treasure;
                     string trinketName = treasure.itemName;
                     bool owned = false;
-                    PlayerPrefs.SetInt(trinketName, 1);
-                    PlayerPrefs.Save();
+
                     foreach (Trinket trinket in areaController.dungeonTrinkets)
                     {
                         if (PlayerPrefs.GetInt(trinketName) == 1)
@@ -75,6 +82,7 @@ public class Chest : MonoBehaviour
                         }
 
                     }
+
                     if (!owned)
                     {
                         foreach (Trinket masterTrinket in areaController.trinketMasterList)
@@ -93,11 +101,14 @@ public class Chest : MonoBehaviour
                             if (trinket.dungeon)
                             {
                                 Instantiate(trinket, areaController.playerBody.transform.position, Quaternion.identity);
+                                Debug.Log("activated " + trinket.trinketName);
                             }                            
                         }
                     }
                     areaController.areaUI.SetTrinketImages();
                     areaController.areaUI.messageText.text = trinketName + " added to Trinkets";
+                    PlayerPrefs.SetInt(trinketName, 1);
+                    PlayerPrefs.Save();
 
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                     areaController.areaUI.itemImage.sprite = treasure.itemSprite;    

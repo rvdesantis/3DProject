@@ -27,7 +27,8 @@ public class Enemy : Player
             case 0:
                 Debug.Log("Melee");
                 int randomTarget = Random.Range(0, 3);
-                attackTarget = FindObjectOfType<BattleController>().heroes[randomTarget];
+                BattleController battleController = FindObjectOfType<BattleController>();
+                attackTarget = battleController.heroes[randomTarget];
                 if (attackTarget.dead)
                 {
                     foreach (Player hero in FindObjectOfType<BattleController>().heroes)
@@ -40,6 +41,8 @@ public class Enemy : Player
                 }
                 targetPos = attackTarget.transform.position;
                 LookAtTarget();
+                battleController.meleeCam = attackTarget.selfMeleeCam;
+                battleController.meleeCam.Priority = 2;
                 Melee();
                 break;
 
@@ -205,16 +208,17 @@ public class Enemy : Player
             transform.position = attackTarget.strikePoint.transform.position;
             attackTarget.transform.LookAt(this.transform);
             yield return new WaitForSeconds(1);
-            
+            int damage = playerSTR - attackTarget.playerDEF;
+            attackTarget.combatTextPrefab.floatingText.color = Color.red;
+            attackTarget.combatTextPrefab.damageAmount = damage;
+            attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+
             anim.SetTrigger("attack1");
 
             yield return new WaitForSeconds(1.75f);
-            transform.position = idlePosition;
-            
+            transform.position = idlePosition;          
 
-            int damage = playerSTR - attackTarget.playerDEF;
-            attackTarget.combatTextPrefab.damageAmount = damage;
-            attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+            
 
             if (damage > 0)
             {
@@ -350,8 +354,7 @@ public class Enemy : Player
     public override void Die()
     {
         dead = true;
-        anim.SetTrigger("Dead");  
-        base.Die();
+        anim.SetTrigger("Dead");          
     }
 
     public override void Update()

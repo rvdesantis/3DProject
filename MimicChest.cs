@@ -8,6 +8,9 @@ public class MimicChest : MonoBehaviour
     public AreaController areaController;
     public bool opened;
 
+    public AudioSource audioSource;
+    public AudioClip openSound;
+
     public Items treasure;
     public bool inArea;
 
@@ -62,12 +65,14 @@ public class MimicChest : MonoBehaviour
             }
             if (treasure.trinket)
             {
+                if (areaController.areaUI.topBarUI.activeSelf == false)
+                {
+                    areaController.areaUI.topBarUI.gameObject.SetActive(true);
+                }
                 areaController.areaUI.activeItem = treasure;
                 string trinketName = treasure.itemName;
                 bool owned = false;
 
-                PlayerPrefs.SetInt(trinketName, 1);
-                PlayerPrefs.Save();
 
                 foreach (Trinket trinket in areaController.dungeonTrinkets)
                 {
@@ -104,6 +109,7 @@ public class MimicChest : MonoBehaviour
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                 areaController.areaUI.itemImage.sprite = treasure.itemSprite;
                 areaController.areaUI.ItemImage();
+                PlayerPrefs.SetInt(trinketName, 1);     
                 PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 100);
                 PlayerPrefs.Save();
             }
@@ -154,6 +160,8 @@ public class MimicChest : MonoBehaviour
             {
                 PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 1);
                 PlayerPrefs.Save();
+                audioSource.clip = openSound;
+                audioSource.Play();
 
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 GetComponent<Animator>().SetTrigger("open");

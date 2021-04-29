@@ -7,6 +7,7 @@ public class Items : MonoBehaviour
     public AreaController areaController;
     public AreaUIController areaUI;
     public FirstPersonPlayer player;
+    public AudioClip activatedSound;
 
     public string itemName;
     public bool usable;
@@ -88,8 +89,11 @@ public class Items : MonoBehaviour
                     areaController.areaInventory.Add(this);
                     areaUI.itemImage.sprite = itemSprite;
                     targetDoor.locked = false;
-                    gameObject.SetActive(false);
                     pickedUp = true;
+                    areaUI.audioSource.clip = activatedSound;
+                    areaUI.audioSource.PlayOneShot(activatedSound, 1);
+
+                    gameObject.SetActive(false);                    
                     areaUI.ItemImage();
                     return;
                 }

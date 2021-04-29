@@ -38,11 +38,14 @@ public class DunEnemy : MonoBehaviour
                 }
                 if (treasure.trinket)
                 {
+                    if (areaController.areaUI.topBarUI.activeSelf == false)
+                    {
+                        areaController.areaUI.topBarUI.gameObject.SetActive(true);
+                    }
                     areaController.areaUI.activeItem = treasure;
                     string trinketName = treasure.itemName;
                     bool owned = false;
-                    PlayerPrefs.SetInt(trinketName, 1);
-                    PlayerPrefs.Save();
+
 
                     foreach (Trinket trinket in areaController.dungeonTrinkets)
                     {
@@ -75,6 +78,9 @@ public class DunEnemy : MonoBehaviour
                     }
                     areaController.areaUI.SetTrinketImages();
                     areaController.areaUI.messageText.text = trinketName + " added to Trinkets";
+                    PlayerPrefs.SetInt(trinketName, 1);
+                    PlayerPrefs.SetInt("DunEnemy", 1);
+                    PlayerPrefs.Save();
 
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                     areaController.areaUI.itemImage.sprite = treasure.itemSprite;

@@ -19,7 +19,7 @@ public class MeleeCombos : MonoBehaviour
 
     public void MeleeCombo()
     {
-        fWarrior = comboController.fWarrior;
+        fWarrior = comboController.fBerzerker;
         fMage = comboController.fMage;
         fArcher = comboController.fArcher;
         mWarrior = comboController.mWarrior;
