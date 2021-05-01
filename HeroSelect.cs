@@ -96,6 +96,8 @@ public class HeroSelect : MonoBehaviour
             PlayerPrefs.SetInt("openedChests", 0);
             AreaController.openedChests = 0;
 
+    
+
             yield return new WaitForSeconds(.25f);
             start = false;
             AreaController.firstLoad = true;
@@ -108,9 +110,11 @@ public class HeroSelect : MonoBehaviour
 
     public void ResumeRun()
     {
+        
         IEnumerator StartTimer()
         {
             AreaController.firstLoad = false;
+
             foreach (Player hero in heroBank.bank)
             {
                 hero.SetBattleStats();
@@ -404,7 +408,7 @@ public class HeroSelect : MonoBehaviour
         {
             if (door)
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");                
+                UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");                
             }            
             if (!focused && start == false)
             {                
@@ -472,18 +476,14 @@ public class HeroSelect : MonoBehaviour
                         IEnumerator Timer()
                         {
                             yield return new WaitForSeconds(1);                            
-                            directionText.text = "Enter Dungeon";
+                            directionText.text = "Enter Random Dungeon";
                             directionUI.gameObject.SetActive(true);
 
                             keys = 1;
                             wallsFound = AreaController.foundWalls;
                             chestsFound = AreaController.openedChests;
                             BBattles = AreaController.bossBattles;
-                            // values will need to be set 
-
-                            dungeonInfoTXT.text = "Dungeon Keys Needed: " + keys + "\nHidden Walls: " + wallsFound + " / ?\nDungeon Chests: " + chestsFound + " / ?\nBoss Battles: " + BBattles + " / 2";
-                            dungeonInfoUI.gameObject.SetActive(true);
-                            dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", true);
+                            // values will need to be set                            
 
                             foreach (Image image in trinketImages)
                             {

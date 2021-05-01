@@ -714,7 +714,8 @@ public class BattleController : MonoBehaviour
 
         if (uiController.levelUpUI.activeSelf == false)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
+            DunBuilder.createDungeon = false;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
         }
         if (uiController.levelUpUI.activeSelf)
         {

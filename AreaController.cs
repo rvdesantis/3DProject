@@ -56,9 +56,9 @@ public class AreaController : MonoBehaviour
         {
             Debug.Log("firstload false");
         }
-        SetStartingTrinkets();
-        SetChestsMimics();
-        WallChecker(); // sets firstload to false when finished
+        //SetStartingTrinkets();
+        //SetChestsMimics();
+        //WallChecker(); // sets firstload to false when finished
         if (battleReturn)
         {
             Debug.Log("battle return");
@@ -66,7 +66,7 @@ public class AreaController : MonoBehaviour
         } 
 
         SetPlayerBank();
-        SetStartingItems();
+        //SetStartingItems();
         
     }
 
@@ -147,7 +147,7 @@ public class AreaController : MonoBehaviour
 
     }
 
-    public void SetStartingTrinkets()
+    /*public void SetStartingTrinkets()
     {
         if (firstLoad)
         {
@@ -186,7 +186,7 @@ public class AreaController : MonoBehaviour
                 Debug.Log(trinket.trinketName + " set active");
             }
         }
-    }
+    }*/
 
     public void WallChecker()
     {
