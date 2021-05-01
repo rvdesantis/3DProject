@@ -975,7 +975,7 @@ public class BattleController : MonoBehaviour
                     }
                 }
             }
-            if (Input.GetKeyDown(KeyCode.JoystickButton1))
+            if (Input.GetKeyDown(KeyCode.JoystickButton1) || Input.GetKeyDown(KeyCode.Backspace))
             {
                 if (uiController.spellPanel.activeSelf)
                 {

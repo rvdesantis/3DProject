@@ -101,6 +101,7 @@ public class HeroSelect : MonoBehaviour
             yield return new WaitForSeconds(.25f);
             start = false;
             AreaController.firstLoad = true;
+            DunBuilder.createDungeon = true;
             cam1.m_LookAt = camAimers[0].transform;
             lights[0].gameObject.SetActive(true);
         }
@@ -114,6 +115,7 @@ public class HeroSelect : MonoBehaviour
         IEnumerator StartTimer()
         {
             AreaController.firstLoad = false;
+            DunBuilder.createDungeon = false; // should load last dungeon generated on DunBuilder Load.
 
             foreach (Player hero in heroBank.bank)
             {

@@ -62,7 +62,7 @@ public class AreaController : MonoBehaviour
         if (battleReturn)
         {
             Debug.Log("battle return");
-            Respawn();            
+            // Respawn();            
         } 
 
         SetPlayerBank();

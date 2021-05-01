@@ -20,16 +20,17 @@ public class OriginCube : DunCube
         areaController = FindObjectOfType<AreaController>();
         CharacterController characterSpawn = Instantiate(characterController, spawnPlatform.transform.position, spawnPlatform.transform.rotation);        
         areaController.moveController = characterSpawn;        
-        areaController.FPcontroller = characterSpawn.GetComponentInChildren<FirstPerson>(); 
-        firstPerson = characterSpawn.GetComponentInChildren<FirstPerson>();
-        firstPerson.areaController = areaController;
-        firstPerson.rotator0 = dunBuilder.characterRotators[0];
-        firstPerson.rotator90 = dunBuilder.characterRotators[1];
-        firstPerson.rotator180 = dunBuilder.characterRotators[2];
-        firstPerson.rotator270 = dunBuilder.characterRotators[3];
+        areaController.FPcontroller = characterSpawn.GetComponentInChildren<FirstPerson>();
+        areaController.areaUI.compass1.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().transform;
+        areaController.areaUI.compass2.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().transform;
+        characterSpawn.GetComponentInChildren<FirstPerson>().areaController = areaController;
+        characterSpawn.GetComponentInChildren<FirstPerson>().rotator0 = dunBuilder.characterRotators[0];
+        characterSpawn.GetComponentInChildren<FirstPerson>().rotator90 = dunBuilder.characterRotators[1];
+        characterSpawn.GetComponentInChildren<FirstPerson>().rotator180 = dunBuilder.characterRotators[2];
+        characterSpawn.GetComponentInChildren<FirstPerson>().rotator270 = dunBuilder.characterRotators[3];
         exitdoor.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>();
         battleLauncher = FindObjectOfType<BattleLauncher>();
-        battleLauncher.FPcontroller = firstPerson;
+        battleLauncher.FPcontroller = characterSpawn.GetComponentInChildren<FirstPerson>();
 
     }
 

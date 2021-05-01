@@ -30,6 +30,7 @@ public class DunBuilder : MonoBehaviour
     public List<GameObject> characterRotators;
 
     public int startCubeCount;
+    public int turnCounter;
     public int cubeCounter;
     public int totalCubes;
 
@@ -41,6 +42,9 @@ public class DunBuilder : MonoBehaviour
 
     public bool bossRoomCreated;
     public bool closedDun;
+    public bool bossRoomRespawned;
+    public bool closedRespawn;
+
     public CinemachineVirtualCamera buildCam;
     public CinemachineVirtualCamera firstPersonCam;
 
@@ -50,6 +54,11 @@ public class DunBuilder : MonoBehaviour
         if (createDungeon)
         {
             createDungeonMirror = true;
+        }
+        if (createDungeon == false)
+        {
+            createDungeonMirror = false;
+            RebuildDungeon();
         }
 
     }
@@ -68,31 +77,26 @@ public class DunBuilder : MonoBehaviour
         }
         if (createDungeonMirror == false)
         {
-            RebuildDungeon();
+            
         }
     }
 
     public void RebuildDungeon()
     {
-        int sc = 0;
+        DunCube start = Instantiate(originCube, transform.position, Quaternion.identity);
 
-        for (sc = 0; sc < PlayerPrefs.GetInt("TotalStartCubes"); sc++)
-        {
-            createdStartCubes.Add(startingCube);
-        }
-        foreach(DunCube startingCube in createdStartCubes)
-        {
-            Vector3 respawnPoint = new Vector3(PlayerPrefs.GetInt("StartCube" + createdStartCubes.IndexOf(startingCube) + "X"), 0, PlayerPrefs.GetInt("StartCube" + createdStartCubes.IndexOf(startingCube) + "Z"));
-            Instantiate(startingCube, respawnPoint, Quaternion.identity);
-            startingCube.transform.rotation = Quaternion.Euler(0, PlayerPrefs.GetFloat("StartCube" + createdStartCubes.IndexOf(startingCube) + "Rotate"), 0);
-            startingCube.Rebuild();
-        }
+        start.posPosition = start.positive.gameObject.transform.position;
+        start.negPosition = start.negative.gameObject.transform.position;
+        start.dunBuilder = this;
+        createdCube = start;
+        start.targetCube = start;
+        start.Rebuild();
 
-        int turn = 0;
-        for (turn = 0; sc < PlayerPrefs.GetInt("TotalTurnCubes"); turn++)
+        int tc = 0;
+        for (tc = 0; tc < PlayerPrefs.GetInt("TotalTurnCubes"); tc++)
         {
-            createdTurnCubes.Add(startingCube);
-        }
+           
+        }    
     }
 
 
@@ -100,16 +104,12 @@ public class DunBuilder : MonoBehaviour
 
     public void AttachRoom()
     {
-        foreach (GameObject hallwaystarter in createdTurn.junctNegs)
+        foreach (GameObject hallwaystarter in createdTurn.junctSpawners)
         {
-            if (hallwaystarter != createdTurn.junctNegs[0]) // to not build hallway on hallway that entered room
+            if (hallwaystarter != createdTurn.junctSpawners[0]) // to not build hallway on hallway that entered room
             {
                 DunCube start = Instantiate(startingCube, hallwaystarter.transform.position, hallwaystarter.gameObject.transform.rotation);
-                createdStartCubes.Add(start);
-                PlayerPrefs.SetFloat("StartCube" + createdStartCubes.IndexOf(start) + "X", start.transform.position.x);
-                PlayerPrefs.SetFloat("StartCube" + createdStartCubes.IndexOf(start) + "Y", start.transform.position.y);
-                PlayerPrefs.SetFloat("StartCube" + createdStartCubes.IndexOf(start) + "Z", start.transform.position.z);
-                PlayerPrefs.SetFloat("StartCube" + createdStartCubes.IndexOf(start) + "Rotate", start.transform.rotation.y);
+                createdStartCubes.Add(start);               
 
                 start.dunBuilder = this;
                 start.cubeCheck = totalCubes;
@@ -120,6 +120,9 @@ public class DunBuilder : MonoBehaviour
                 start.negPosition = start.negative.gameObject.transform.position;
                 start.targetCube = start;
                 start.nextSpawnPosition = start.transform.position;
+                start.respawnPosition = start.transform.position;
+                start.respawnQuat.y = start.transform.rotation.y;
+                start.cubeIndex = createdStartCubes.IndexOf(start);   
             }
         }
     }
@@ -159,11 +162,64 @@ public class DunBuilder : MonoBehaviour
 
                 areaController.moveController.gameObject.SetActive(true);
                 areaController.areaUI.gameObject.SetActive(true);
+                areaController.areaUI.compassSmall.gameObject.SetActive(true);
+
                 buildCam.gameObject.SetActive(false);
 
                 PlayerPrefs.SetInt("TotalStartCubes", createdStartCubes.Count);
-                PlayerPrefs.SetInt("TotalTurnCubes", createdTurnCubes.Count);
+                PlayerPrefs.SetInt("TotalTurnCubes", turnCounter);
                 PlayerPrefs.SetInt("TotalBossCubes", createdBossRooms.Count);
+                PlayerPrefs.Save();
+                createDungeon = false;
+                createDungeonMirror = false;
+
+                this.gameObject.SetActive(false);
+            }
+        }
+    }
+
+
+
+    public void CloseRespawn()
+    {
+        if (closedRespawn == false && bossRoomRespawned == false)
+        {
+            DunCube bossHallway = createdStartCubes[startCubeCount];
+            if (bossHallway.ColliderCheck() == true)
+            {
+                DunCube deadEndCube = Instantiate(deadEnd, bossHallway.transform.position, bossHallway.transform.rotation);
+                totalCubes++;
+                startCubeCount++;
+                CloseRespawn();
+                return;
+            }
+            if (bossHallway.ColliderCheck() == false)
+            {
+                bossHallStarter = bossHallway;
+                bossHallway.Rebuild();
+                totalCubes++;
+                startCubeCount++;
+                return;
+            }
+
+        }
+        if (closedRespawn == false && bossRoomRespawned == true)
+        {
+            foreach (DunCube leftoverCube in createdStartCubes)
+            {
+                if (createdStartCubes.IndexOf(leftoverCube) >= startCubeCount)
+                {
+                    DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                }
+                closedRespawn = true;
+
+                areaController.moveController.gameObject.SetActive(true);
+                areaController.areaUI.gameObject.SetActive(true);
+                areaController.areaUI.compassSmall.gameObject.SetActive(true);
+
+                buildCam.gameObject.SetActive(false);                
+                createDungeon = false;
+                createDungeonMirror = false;
 
                 this.gameObject.SetActive(false);
             }
@@ -172,9 +228,8 @@ public class DunBuilder : MonoBehaviour
 
     private void Update()
     {        
-        //if (Input.GetKey(KeyCode.Space))
-        
-
+        if (createDungeonMirror == true)
+        {
             if (totalCubes == 0)
             {
                 createdCube.HallwayBuild();
@@ -190,23 +245,56 @@ public class DunBuilder : MonoBehaviour
                 return;
             }
             if (totalCubes >= 1000)
-            {                 
+            {
                 if (bossRoomCreated == false)
                 {
                     CloseDungeon();
                     Debug.Log("Closing Dungeon");
                 }
-            if (bossRoomCreated == true && startCubeCount != createdStartCubes.Count - 1)
-            {
-                if (closedDun == false)
+                if (bossRoomCreated == true && startCubeCount != createdStartCubes.Count - 1)
                 {
-                    CloseDungeon();
-                    Debug.Log("Closing Dead Ends");
+                    if (closedDun == false)
+                    {
+                        CloseDungeon();
+                        Debug.Log("Closing Dead Ends");
+                    }
+                }
+            }
+        }
+        if (createDungeonMirror == false)
+        {
+            if (totalCubes == 0)
+            {
+                createdCube.Rebuild();
+                return;
+            }
+            if (totalCubes < 1000 && totalCubes > 0)
+            {
+                int x = 0;
+                for (x = startCubeCount; x >= startCubeCount; startCubeCount++)
+                {
+                    createdStartCubes[startCubeCount].Rebuild();
+                }
+                return;
+            }
+            if (totalCubes >= 1000)
+            {
+                if (bossRoomRespawned == false && bossRoomCreated == false)
+                {
+                    CloseRespawn();
+                    Debug.Log("respawn boss room");
+                }
+                if (bossRoomRespawned == true && startCubeCount != createdStartCubes.Count - 1)
+                {
+                    if (closedRespawn == false)
+                    {
+                        CloseRespawn();
+                        Debug.Log("Respawning Ends");
+                    }
                 }
             }
         }
 
-        
     }
 
 }

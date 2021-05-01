@@ -38,7 +38,9 @@ public class AreaUIController : MonoBehaviour
     public List<Text> playerStats;
 
     public GameObject compassSmall;
+    public Compass compass1;
     public GameObject compassLarge;
+    public Compass compass2;
 
     public GameObject menuUI;
     public List<DunMenuBT> menuButtons;
