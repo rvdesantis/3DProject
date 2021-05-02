@@ -41,6 +41,9 @@ public class AreaUIController : MonoBehaviour
     public Compass compass1;
     public GameObject compassLarge;
     public Compass compass2;
+    public RawImage mapImage;
+    public GameObject mapFrame;
+    public Camera mapCam;
 
     public GameObject menuUI;
     public List<DunMenuBT> menuButtons;
@@ -358,6 +361,24 @@ public class AreaUIController : MonoBehaviour
         {
             compassSmall.gameObject.SetActive(true);
             compassLarge.gameObject.SetActive(false);
+            return;
+        }
+    }
+
+    public void ToggleMap()
+    {
+        if (menuUI.activeSelf == false && inventoryPanel.activeSelf == false && playerPanel.activeSelf == false && weaponPanel.activeSelf == false)
+        {
+            if (mapFrame.activeSelf)
+            {
+                mapFrame.gameObject.SetActive(false);                
+                return;
+            }
+        }
+        if (mapFrame.activeSelf == false)
+        {
+            mapCam.gameObject.SetActive(true);
+            mapFrame.gameObject.SetActive(true);
             return;
         }
     }

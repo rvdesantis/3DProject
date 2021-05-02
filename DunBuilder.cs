@@ -45,8 +45,8 @@ public class DunBuilder : MonoBehaviour
     public bool bossRoomRespawned;
     public bool closedRespawn;
 
-    public CinemachineVirtualCamera buildCam;
-    public CinemachineVirtualCamera firstPersonCam;
+
+
 
 
     private void Awake()
@@ -90,13 +90,7 @@ public class DunBuilder : MonoBehaviour
         start.dunBuilder = this;
         createdCube = start;
         start.targetCube = start;
-        start.Rebuild();
-
-        int tc = 0;
-        for (tc = 0; tc < PlayerPrefs.GetInt("TotalTurnCubes"); tc++)
-        {
-           
-        }    
+        start.Rebuild();        
     }
 
 
@@ -164,7 +158,7 @@ public class DunBuilder : MonoBehaviour
                 areaController.areaUI.gameObject.SetActive(true);
                 areaController.areaUI.compassSmall.gameObject.SetActive(true);
 
-                buildCam.gameObject.SetActive(false);
+
 
                 PlayerPrefs.SetInt("TotalStartCubes", createdStartCubes.Count);
                 PlayerPrefs.SetInt("TotalTurnCubes", turnCounter);
@@ -217,7 +211,7 @@ public class DunBuilder : MonoBehaviour
                 areaController.areaUI.gameObject.SetActive(true);
                 areaController.areaUI.compassSmall.gameObject.SetActive(true);
 
-                buildCam.gameObject.SetActive(false);                
+
                 createDungeon = false;
                 createDungeonMirror = false;
 

@@ -7,25 +7,17 @@ public class DunCube : MonoBehaviour
 {
     public int cubeIndex;
     public DunBuilder dunBuilder;
-
     public int extenderLength;
-
     public GameObject positive;
-    public GameObject negative;    
-    
+    public GameObject negative;      
     public int cubeCheck;
-    public List<GameObject> junctSpawners; // for intersections
-    public List<GameObject> junctRESPAWNer;
-
+    public List<GameObject> junctSpawners; // for intersections  
     public DunCube targetCube;
-
-
     public Vector3 posPosition;
     public Vector3 negPosition;
     public Vector3 nextSpawnPosition;
     public Vector3 respawnPosition;
     public Quaternion respawnQuat;
-
     public List<GameObject> cubeLights;
 
 
@@ -226,7 +218,7 @@ public class DunCube : MonoBehaviour
             targetCube = dunBuilder.bossHallStarter;    
             Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
             nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
-            DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);
+            DunCube nextCube = Instantiate(dunBuilder.bossHallPiece, nextSpawnPosition, targetCube.transform.rotation);
             nextCube.posPosition = nextCube.positive.gameObject.transform.position;
             nextCube.negPosition = nextCube.negative.gameObject.transform.position;
             targetCube = nextCube;

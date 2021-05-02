@@ -14,13 +14,14 @@ public class OriginCube : DunCube
     public Exit exitdoor;
 
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         dunBuilder = FindObjectOfType<DunBuilder>();
         areaController = FindObjectOfType<AreaController>();
-        CharacterController characterSpawn = Instantiate(characterController, spawnPlatform.transform.position, spawnPlatform.transform.rotation);        
-        areaController.moveController = characterSpawn;        
+        CharacterController characterSpawn = Instantiate(characterController, spawnPlatform.transform.position, spawnPlatform.transform.rotation);
+        areaController.moveController = characterSpawn;
         areaController.FPcontroller = characterSpawn.GetComponentInChildren<FirstPerson>();
+        areaController.playerBody = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().gameObject;
         areaController.areaUI.compass1.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().transform;
         areaController.areaUI.compass2.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().transform;
         characterSpawn.GetComponentInChildren<FirstPerson>().areaController = areaController;
@@ -31,6 +32,12 @@ public class OriginCube : DunCube
         exitdoor.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>();
         battleLauncher = FindObjectOfType<BattleLauncher>();
         battleLauncher.FPcontroller = characterSpawn.GetComponentInChildren<FirstPerson>();
+    }
+
+
+    void Start()
+    {
+        
 
     }
 

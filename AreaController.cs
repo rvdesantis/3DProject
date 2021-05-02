@@ -62,7 +62,7 @@ public class AreaController : MonoBehaviour
         if (battleReturn)
         {
             Debug.Log("battle return");
-            // Respawn();            
+            Respawn();            
         } 
 
         SetPlayerBank();
@@ -71,7 +71,7 @@ public class AreaController : MonoBehaviour
     }
 
     public void Respawn()
-    {
+    {        
         moveController.enabled = false;
         moveController.transform.rotation = respawnRotation;
         moveController.transform.position = respawnPoint;
@@ -298,6 +298,13 @@ public class AreaController : MonoBehaviour
             }                
         }
 
+        if (Input.GetKeyDown(KeyCode.M) || Input.GetKeyDown(KeyCode.JoystickButton3)) // x button
+        {
+            if (areaUI.inventoryPanel.activeSelf == false && areaUI.playerPanel.activeSelf == false && areaUI.weaponPanel.activeSelf == false && areaUI.homeUI.activeSelf == false)
+            {
+                areaUI.ToggleMap();
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.JoystickButton1)) // B button on Xbox Controller
         {
@@ -322,10 +329,7 @@ public class AreaController : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.JoystickButton3)) // X button Xbox Controller
-        {
-          
-        }
+
 
         if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.JoystickButton2))
         {
