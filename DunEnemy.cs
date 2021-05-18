@@ -47,7 +47,7 @@ public class DunEnemy : MonoBehaviour
                     bool owned = false;
 
 
-                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    foreach (Trinket trinket in areaController.activeTrinkets)
                     {
                         if (trinketName == trinket.trinketName)
                         {
@@ -58,17 +58,17 @@ public class DunEnemy : MonoBehaviour
                     }
                     if (!owned)
                     {
-                        foreach (Trinket masterTrinket in areaController.trinketMasterList)
+                        foreach (Trinket masterTrinket in areaController.dunTrinketMasterList)
                         {
                             if (trinketName == masterTrinket.trinketName)
                             {
-                                areaController.dungeonTrinkets.Add(masterTrinket);
+                                areaController.activeTrinkets.Add(masterTrinket);
                                 PlayerPrefs.SetInt(trinketName, 1);
                                 PlayerPrefs.Save();
                             }
                         }
                     }
-                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    foreach (Trinket trinket in areaController.activeTrinkets)
                     {
                         if (trinketName == trinket.trinketName)
                         {

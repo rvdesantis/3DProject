@@ -15,15 +15,16 @@ public class OriginCube : DunCube
 
     // Start is called before the first frame update
     private void Awake()
-    {
+    {        
         dunBuilder = FindObjectOfType<DunBuilder>();
         areaController = FindObjectOfType<AreaController>();
         CharacterController characterSpawn = Instantiate(characterController, spawnPlatform.transform.position, spawnPlatform.transform.rotation);
         areaController.moveController = characterSpawn;
         areaController.FPcontroller = characterSpawn.GetComponentInChildren<FirstPerson>();
         areaController.playerBody = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().gameObject;
-        areaController.areaUI.compass1.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().transform;
+        areaController.areaUI. compass1.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().transform;
         areaController.areaUI.compass2.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>().transform;
+
         characterSpawn.GetComponentInChildren<FirstPerson>().areaController = areaController;
         characterSpawn.GetComponentInChildren<FirstPerson>().rotator0 = dunBuilder.characterRotators[0];
         characterSpawn.GetComponentInChildren<FirstPerson>().rotator90 = dunBuilder.characterRotators[1];
@@ -32,6 +33,11 @@ public class OriginCube : DunCube
         exitdoor.player = characterSpawn.GetComponentInChildren<FirstPersonPlayer>();
         battleLauncher = FindObjectOfType<BattleLauncher>();
         battleLauncher.FPcontroller = characterSpawn.GetComponentInChildren<FirstPerson>();
+        if (AreaController.firstLoad == false)
+        {
+            characterController.enabled = false;
+            characterController.gameObject.SetActive(false);
+        }
     }
 
 

@@ -19,22 +19,19 @@ public class AreaController : MonoBehaviour
     public List<Items> areaInventory;
     public List<Items> potions;
 
-    public List<Trinket> dungeonTrinkets;
-    public List<Trinket> trinketMasterList;
+    public List<Trinket> activeTrinkets;
+    public List<Trinket> dunTrinketMasterList;
+    public List<Items> availableItems;
     
     public List<PlayableDirector> areaPlayables;
 
     public PlayerBank activeBank;
     public PlayerBank staticBank;
-    
+   
     public static Vector3 respawnPoint;
     public static Quaternion respawnRotation;
-    public Vector3 respawnPointMirror;
+    public Vector3 respawnPointMirror;   
 
-    public static int openedChests;
-    public static int mimicChests;
-    public static int bossBattles;
-    public static int foundWalls;
 
 
     public static bool firstLoad;
@@ -45,29 +42,28 @@ public class AreaController : MonoBehaviour
     public bool battleReturnmirror;
     public bool firstLoadMirror;
 
-    // Start is called before the first frame update
+    
     void Start()
     {
         if (firstLoad)
         {
-            Debug.Log("firstload");
+            Debug.Log("firstload");            
         }
         if (firstLoad == false)
         {
             Debug.Log("firstload false");
         }
-        //SetStartingTrinkets();
-        //SetChestsMimics();
-        //WallChecker(); // sets firstload to false when finished
-        if (battleReturn)
-        {
-            Debug.Log("battle return");
-            Respawn();            
-        } 
 
-        SetPlayerBank();
-        //SetStartingItems();
-        
+        IEnumerator LoadTimer()
+        {
+            yield return new WaitForSeconds(2);
+            SetStartingTrinkets();
+            SetChestsMimics();
+            WallChecker(); // sets firstload to false when finished
+
+            SetPlayerBank();
+            //SetStartingItems();
+        } StartCoroutine(LoadTimer());
     }
 
     public void Respawn()
@@ -114,22 +110,19 @@ public class AreaController : MonoBehaviour
                 PlayerPrefs.SetInt("chest" + chests.IndexOf(chest), 0);
                 PlayerPrefs.Save();
             }
-            foreach (MimicChest mimic in mimics)
+            /* foreach (MimicChest mimic in mimics)
             {
                 PlayerPrefs.SetInt("mimic" + mimics.IndexOf(mimic), 0);
                 PlayerPrefs.Save();
-            }
+            } */
             return;
         }
         if (!firstLoad)
         {
-            foreach (MimicChest mimic in mimics)
-            {
-                Debug.Log("Chest Checker");
-                mimic.ChestChecker();
-            }
+            
             foreach (Chest chest in chests)
             {
+                Debug.Log("Checking Chest " + chests.IndexOf(chest));
                 if (PlayerPrefs.GetInt("chest" + chests.IndexOf(chest)) == 0)
                 {
                     chest.opened = 0;
@@ -143,23 +136,29 @@ public class AreaController : MonoBehaviour
                     chest.GetComponent<Animator>().SetTrigger("openLid");
                 }
             }
+
+            /* foreach (MimicChest mimic in mimics)
+             {
+                 Debug.Log("Chest Checker");
+                 mimic.ChestChecker();
+             } */
         }
 
     }
 
-    /*public void SetStartingTrinkets()
+    public void SetStartingTrinkets()
     {
         if (firstLoad)
         {
             areaUI.topBarUI.gameObject.SetActive(false);
-            if (dungeonTrinkets.Count != 0)
+            if (activeTrinkets.Count != 0)
             {
-                foreach (Trinket trinket in dungeonTrinkets)
+                foreach (Trinket trinket in activeTrinkets)
                 {
-                    dungeonTrinkets.Remove(trinket);
+                    activeTrinkets.Remove(trinket);
                     Debug.Log("Trinkets Cleared");
                 }
-                foreach (Trinket masterTrinket in trinketMasterList)
+                foreach (Trinket masterTrinket in dunTrinketMasterList)
                 {
                     PlayerPrefs.SetInt(masterTrinket.trinketName, 0);
                     PlayerPrefs.Save();
@@ -168,28 +167,31 @@ public class AreaController : MonoBehaviour
         }
         if (!firstLoad)
         {
-            foreach (Trinket masterTrinket in trinketMasterList)
+            foreach (Trinket masterTrinket in dunTrinketMasterList)
             {
                 if (PlayerPrefs.GetInt(masterTrinket.trinketName) == 1)
                 {
-                    dungeonTrinkets.Add(masterTrinket);
+                    activeTrinkets.Add(masterTrinket);
                 }
             }
-            if (dungeonTrinkets.Count > 0)
+            if (activeTrinkets.Count > 0)
             {
+                foreach (Trinket trinket in activeTrinkets)
+                {
+                    trinket.active = true;
+                    Instantiate(trinket, playerBody.transform.position, Quaternion.identity);
+                    Debug.Log(trinket.trinketName + " set active");
+                }                
                 areaUI.topBarUI.gameObject.SetActive(true);
+                areaUI.SetTrinketImages();
             }
-            foreach (Trinket trinket in dungeonTrinkets)
-            {
-                trinket.active = true;
-                Instantiate(trinket, playerBody.transform.position, Quaternion.identity);
-                Debug.Log(trinket.trinketName + " set active");
-            }
+
         }
-    }*/
+    }
 
     public void WallChecker()
     {
+        Debug.Log("Checking " + secretWalls.Count + " walls");
         foreach (SecretWall wall in secretWalls)
         {
             wall.wallNumber = secretWalls.IndexOf(wall);
@@ -202,8 +204,7 @@ public class AreaController : MonoBehaviour
                 PlayerPrefs.SetInt("Door" + wall.wallNumber, 0);                
             }
             if (firstLoad == false || battleReturn == true)
-            {
-                Debug.Log("Checking Wall " + wall.wallNumber);
+            {                
                 if (PlayerPrefs.GetInt("Door" + wall.wallNumber) == 1)
                 {                    
                     wall.WallDisolver();
@@ -218,12 +219,8 @@ public class AreaController : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public void ChestChecker()
-    {
 
-    }
 
-    // Update is called once per frame
     void Update()
     {
         battleReturnmirror = battleReturn;
@@ -231,7 +228,7 @@ public class AreaController : MonoBehaviour
         firstLoadMirror = firstLoad;
 
         // for UI Navigation
-        if (areaUI.inventoryPanel.activeSelf || areaUI.playerPanel.activeSelf || areaUI.weaponPanel.activeSelf || areaUI.menuUI.activeSelf || areaUI.homeUI.activeSelf)
+        if (areaUI.inventoryPanel.activeSelf || areaUI.playerPanel.activeSelf || areaUI.weaponPanel.activeSelf || areaUI.menuUI.activeSelf || areaUI.homeUI.activeSelf || areaUI.mapFrame.activeSelf)
         {
             areaUI.uiNavigation = true;
         }
@@ -254,8 +251,7 @@ public class AreaController : MonoBehaviour
                                 wall.dunEnemy.launchable = true;
                                 wall.enemyTrigger = false;
                             }
-                            wall.WallDisolver();
-                            foundWalls++;
+                            wall.WallDisolver();                            
                             yield return new WaitForSeconds(2);
                             wall.disolver.gameObject.SetActive(false);
                         }
@@ -295,6 +291,7 @@ public class AreaController : MonoBehaviour
             if (areaUI.inventoryPanel.activeSelf == false && areaUI.playerPanel.activeSelf == false && areaUI.weaponPanel.activeSelf == false && areaUI.homeUI.activeSelf == false)
             {
                 areaUI.ToggleMenu();
+                areaUI.menuButtons[0].GetComponent<Button>().Select();
             }                
         }
 

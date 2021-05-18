@@ -6,6 +6,7 @@ using Cinemachine;
 
 public class DunBuilder : MonoBehaviour
 {
+    public int targetCubeCount;
     public static bool createDungeon;
     public bool createDungeonMirror;
     public AreaController areaController;
@@ -18,13 +19,15 @@ public class DunBuilder : MonoBehaviour
     public DunCube rightTurn;
     public DunCube tJunct;
     public DunCube fourWay;
-    public DunCube deadEnd;    
+    public DunCube deadEnd;
+    public DunCube secretCube;
     public DunCube bossRoom;
     public List<DunCube> createdStartCubes;
-    public List<DunCube> createdTurnCubes;
-    public List<DunCube> createdBossHallway;
+    public List<DunCube> createdTurnCubes;    
     public List<DunCube> createdBossRooms;
     public List<DunCube> createdDeadEnds;
+    public List<Chest> createdChests;
+    public List<Items> createdItems;
 
     public List<DunCube> turnBank;
     public List<GameObject> characterRotators;
@@ -32,7 +35,7 @@ public class DunBuilder : MonoBehaviour
     public int startCubeCount;
     public int turnCounter;
     public int cubeCounter;
-    public int totalCubes;
+    public int totalCubes;    
 
     public OriginCube firstCube;
     public DunCube createdCube;
@@ -45,7 +48,8 @@ public class DunBuilder : MonoBehaviour
     public bool bossRoomRespawned;
     public bool closedRespawn;
 
-
+    public Chest chestPrefab;
+    public MimicChest mimicChests;
 
 
 
@@ -54,10 +58,13 @@ public class DunBuilder : MonoBehaviour
         if (createDungeon)
         {
             createDungeonMirror = true;
+            targetCubeCount = StaticMenuItems.dungeonCubeTarget;
         }
         if (createDungeon == false)
         {
             createDungeonMirror = false;
+            targetCubeCount = StaticMenuItems.dungeonCubeTarget;
+            areaController.areaUI.messageText.text = "Rebuilding...";
             RebuildDungeon();
         }
 
@@ -68,7 +75,7 @@ public class DunBuilder : MonoBehaviour
         if (createDungeonMirror == true)
         {
             // sets starting cube and builds first hallway
-            DunCube start = Instantiate(originCube, transform.position, Quaternion.identity);
+            DunCube start = Instantiate(originCube, Vector3.zero, Quaternion.identity);
 
             start.posPosition = start.positive.gameObject.transform.position;
             start.negPosition = start.negative.gameObject.transform.position;
@@ -84,7 +91,6 @@ public class DunBuilder : MonoBehaviour
     public void RebuildDungeon()
     {
         DunCube start = Instantiate(originCube, transform.position, Quaternion.identity);
-
         start.posPosition = start.positive.gameObject.transform.position;
         start.negPosition = start.negative.gameObject.transform.position;
         start.dunBuilder = this;
@@ -93,7 +99,114 @@ public class DunBuilder : MonoBehaviour
         start.Rebuild();        
     }
 
+    public void SpawnChests()
+    {
+        int chestCount = 0;
+        // int targetChestCount = (int)Random.Range(4, Mathf.Round(createdDeadEnds.Count / 5)); will use once items are made
+        int targetChestCount = Random.Range(4, 7);
+        Debug.Log("Target Chest Count = " + targetChestCount);
+        PlayerPrefs.SetInt("ChestCount", targetChestCount);
+        for (chestCount = 0; chestCount < targetChestCount; chestCount++)
+        {
+            
+            if (chestCount == 0)
+            {
+                int x = Random.Range(0, createdDeadEnds.Count - 1);
+                PlayerPrefs.SetInt("Chest" + chestCount + "position", x); PlayerPrefs.Save();
+                Chest newChest = Instantiate(chestPrefab, createdDeadEnds[x].itemSpawnPoint.transform.position, createdDeadEnds[x].itemSpawnPoint.transform.rotation);
+                createdDeadEnds[x].cubeFilled = true;
+                newChest.areaController = areaController;
+                newChest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
+                createdChests.Add(newChest);
+            }
+            if (chestCount > 0)
+            {
+                int x = Random.Range(0, createdDeadEnds.Count - 1);
+                bool chestChecker = false;
+                foreach (Chest chest in createdChests)
+                {
+                    if (x != PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
+                    {
+                        chestChecker = false;
+                    }
+                    if (x == PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
+                    {
+                        chestChecker = true;
+                    }
+                }
+                if (chestChecker == false)
+                {
+                    PlayerPrefs.SetInt("Chest" + chestCount + "position", x); PlayerPrefs.Save();
+                    Chest newChest = Instantiate(chestPrefab, createdDeadEnds[x].itemSpawnPoint.transform.position, createdDeadEnds[x].itemSpawnPoint.transform.rotation);
+                    createdDeadEnds[x].cubeFilled = true;
+                    newChest.areaController = areaController;
+                    newChest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
+                    createdChests.Add(newChest);
+                }
+            }
 
+        }
+
+        foreach (Chest createdChest in createdChests)
+        {            
+            createdChest.treasure = areaController.availableItems[Random.Range(0, areaController.availableItems.Count - 1)];
+            bool treasureInUse = false;
+            foreach (Items activeItem in createdItems)
+            {
+                if (createdChest.treasure != activeItem)
+                {
+                    
+                }
+                if (createdChest.treasure == activeItem)
+                {
+                    treasureInUse = true;
+                }
+            }
+            if (treasureInUse == true)
+            {
+                List<int> numbersInUse = new List<int>();
+                foreach (Items usedItem in createdItems)
+                {
+                    int x = areaController.availableItems.IndexOf(usedItem);
+                    numbersInUse.Add(x);
+                }
+                foreach (Items item in areaController.availableItems)
+                {                    
+                    if (createdItems.Contains(item))
+                    {
+
+                    }
+                    if (createdItems.Contains(item) == false)
+                    {
+                        createdChest.treasure = item;
+                        break;
+                    }
+                }
+            }
+            createdItems.Add(createdChest.treasure);
+            areaController.chests = createdChests;
+            PlayerPrefs.SetInt("Chest" + createdChests.IndexOf(createdChest) + "Item", areaController.availableItems.IndexOf(createdChest.treasure));
+        }
+    }
+
+    public void RespawnChests()
+    {
+        int chestCount = PlayerPrefs.GetInt("ChestCount");
+        for (int i = 0; i < chestCount; i++)
+        {
+            int targetCube = PlayerPrefs.GetInt("Chest" + i + "position");
+            Chest newChest = Instantiate(chestPrefab, createdDeadEnds[targetCube].itemSpawnPoint.transform.position, createdDeadEnds[targetCube].itemSpawnPoint.transform.rotation);
+            createdDeadEnds[targetCube].cubeFilled = true;
+            newChest.areaController = areaController;
+            newChest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
+            createdChests.Add(newChest);
+
+            foreach (Chest respawnedChest in createdChests)
+            {
+                respawnedChest.treasure = areaController.availableItems[PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(respawnedChest) + "Item")];  
+            }
+        }
+    }
 
 
     public void AttachRoom()
@@ -129,7 +242,8 @@ public class DunBuilder : MonoBehaviour
             if (bossHallway.ColliderCheck() == true)
             {
                 DunCube deadEndCube = Instantiate(deadEnd, bossHallway.transform.position, bossHallway.transform.rotation);
-                totalCubes++;
+                createdDeadEnds.Add(deadEndCube);
+                               
                 startCubeCount++;
                 CloseDungeon();
                 return;
@@ -138,7 +252,7 @@ public class DunBuilder : MonoBehaviour
             {
                 bossHallStarter = bossHallway;
                 bossHallway.HallwayBuild();
-                totalCubes++;                
+                                
                 startCubeCount++;                
                 return;
             }
@@ -146,30 +260,43 @@ public class DunBuilder : MonoBehaviour
         }
         if (closedDun == false && bossRoomCreated == true)
         {
+            Debug.Log(createdStartCubes.Count - startCubeCount + " Leftover Starting Cubes.  Creating Dead Ends & Secret Walls");
             foreach (DunCube leftoverCube in createdStartCubes)
             {
                 if (createdStartCubes.IndexOf(leftoverCube) >= startCubeCount)
-                {
-                    DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);                    
+                {                    
+                    if (leftoverCube.SecretColliderCheck() == true)
+                    {
+                        DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        createdDeadEnds.Add(deadEndCube);
+                    }
+                    if (leftoverCube.SecretColliderCheck() == false)
+                    {
+                        DunCube deadEndCube = Instantiate(secretCube, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        areaController.secretWalls.Add(deadEndCube.GetComponentInChildren<SecretWall>());
+                        deadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(deadEndCube.GetComponentInChildren<SecretWall>());
+                        createdDeadEnds.Add(deadEndCube);
+                    }
                 }
-                closedDun = true;
-
-                areaController.moveController.gameObject.SetActive(true);
-                areaController.areaUI.gameObject.SetActive(true);
-                areaController.areaUI.compassSmall.gameObject.SetActive(true);
-
-
-
-                PlayerPrefs.SetInt("TotalStartCubes", createdStartCubes.Count);
-                PlayerPrefs.SetInt("TotalTurnCubes", turnCounter);
-                PlayerPrefs.SetInt("TotalBossCubes", createdBossRooms.Count);
-                PlayerPrefs.Save();
-                createDungeon = false;
-                createDungeonMirror = false;
-
-                this.gameObject.SetActive(false);
             }
+            SpawnChests();
+            areaController.chests = createdChests;
+            closedDun = true;
+            areaController.moveController.gameObject.SetActive(true);
+            areaController.moveController.enabled = true;
+            areaController.areaUI.gameObject.SetActive(true);
+            areaController.areaUI.compassSmall.gameObject.SetActive(true);
+
+            PlayerPrefs.SetInt("TotalStartCubes", createdStartCubes.Count);
+            PlayerPrefs.SetInt("TotalTurnCubes", turnCounter);
+            PlayerPrefs.SetInt("TotalBossCubes", createdBossRooms.Count);
+            PlayerPrefs.Save();
+            createDungeon = false;
+            createDungeonMirror = false;
+
+            this.gameObject.SetActive(false);
         }
+        
     }
 
 
@@ -182,7 +309,8 @@ public class DunBuilder : MonoBehaviour
             if (bossHallway.ColliderCheck() == true)
             {
                 DunCube deadEndCube = Instantiate(deadEnd, bossHallway.transform.position, bossHallway.transform.rotation);
-                totalCubes++;
+                createdDeadEnds.Add(deadEndCube);
+                
                 startCubeCount++;
                 CloseRespawn();
                 return;
@@ -191,7 +319,7 @@ public class DunBuilder : MonoBehaviour
             {
                 bossHallStarter = bossHallway;
                 bossHallway.Rebuild();
-                totalCubes++;
+                
                 startCubeCount++;
                 return;
             }
@@ -199,24 +327,39 @@ public class DunBuilder : MonoBehaviour
         }
         if (closedRespawn == false && bossRoomRespawned == true)
         {
+            Debug.Log(createdStartCubes.Count - startCubeCount + " Leftover Starting Cubes.  Creating Dead Ends & Secret Walls");
             foreach (DunCube leftoverCube in createdStartCubes)
             {
                 if (createdStartCubes.IndexOf(leftoverCube) >= startCubeCount)
                 {
-                    DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                    if (leftoverCube.SecretColliderCheck() == true)
+                    {
+                        DunCube respawnedDeadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        createdDeadEnds.Add(respawnedDeadEndCube);
+                    }
+                    if (leftoverCube.SecretColliderCheck() == false)
+                    {
+                        DunCube respawnedDeadEndCube = Instantiate(secretCube, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        areaController.secretWalls.Add(respawnedDeadEndCube.GetComponentInChildren<SecretWall>());
+                        respawnedDeadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(respawnedDeadEndCube.GetComponentInChildren<SecretWall>());
+                        createdDeadEnds.Add(respawnedDeadEndCube);
+                    }
                 }
-                closedRespawn = true;
-
-                areaController.moveController.gameObject.SetActive(true);
-                areaController.areaUI.gameObject.SetActive(true);
-                areaController.areaUI.compassSmall.gameObject.SetActive(true);
-
-
-                createDungeon = false;
-                createDungeonMirror = false;
-
-                this.gameObject.SetActive(false);
             }
+            RespawnChests();
+            areaController.chests = createdChests;
+            closedRespawn = true;
+
+            areaController.moveController.gameObject.SetActive(true);
+            areaController.areaUI.gameObject.SetActive(true);
+            areaController.areaUI.compassSmall.gameObject.SetActive(true);
+
+
+            createDungeon = false;
+            createDungeonMirror = false;
+            areaController.Respawn();               
+
+            this.gameObject.SetActive(false);            
         }
     }
 
@@ -229,7 +372,7 @@ public class DunBuilder : MonoBehaviour
                 createdCube.HallwayBuild();
                 return;
             }
-            if (totalCubes < 1000 && totalCubes > 0)
+            if (totalCubes < targetCubeCount && totalCubes > 0)
             {
                 int x = 0;
                 for (x = startCubeCount; x >= startCubeCount; startCubeCount++)
@@ -238,12 +381,11 @@ public class DunBuilder : MonoBehaviour
                 }
                 return;
             }
-            if (totalCubes >= 1000)
+            if (totalCubes >= targetCubeCount)
             {
                 if (bossRoomCreated == false)
                 {
-                    CloseDungeon();
-                    Debug.Log("Closing Dungeon");
+                    CloseDungeon();                    
                 }
                 if (bossRoomCreated == true && startCubeCount != createdStartCubes.Count - 1)
                 {
@@ -262,7 +404,7 @@ public class DunBuilder : MonoBehaviour
                 createdCube.Rebuild();
                 return;
             }
-            if (totalCubes < 1000 && totalCubes > 0)
+            if (totalCubes < targetCubeCount && totalCubes > 0)
             {
                 int x = 0;
                 for (x = startCubeCount; x >= startCubeCount; startCubeCount++)
@@ -271,12 +413,11 @@ public class DunBuilder : MonoBehaviour
                 }
                 return;
             }
-            if (totalCubes >= 1000)
+            if (totalCubes >= targetCubeCount)
             {
                 if (bossRoomRespawned == false && bossRoomCreated == false)
                 {
-                    CloseRespawn();
-                    Debug.Log("respawn boss room");
+                    CloseRespawn();                    
                 }
                 if (bossRoomRespawned == true && startCubeCount != createdStartCubes.Count - 1)
                 {

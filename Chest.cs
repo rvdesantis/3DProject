@@ -5,8 +5,8 @@ using UnityEngine;
 public class Chest : MonoBehaviour
 {
     public AreaController areaController;
-    public FirstPersonPlayer player;
-    public GameObject contents;
+    public Animator anim;
+    public FirstPersonPlayer player;    
     public int opened;
     public Items treasure;
     public bool inArea;
@@ -43,13 +43,12 @@ public class Chest : MonoBehaviour
         {
             if (Vector3.Distance(player.transform.position, this.transform.position) < 7 && opened == 0)
             {
-                PlayerPrefs.SetInt("chest" + areaController.chests.IndexOf(this), 1);
-                PlayerPrefs.Save();
+                PlayerPrefs.SetInt("chest" + areaController.chests.IndexOf(this), 1);                
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 opened = 1;
-                AreaController.openedChests++;
-                PlayerPrefs.SetInt("openedChests", AreaController.openedChests); PlayerPrefs.Save();
-                GetComponent<Animator>().SetTrigger("openLid");
+                            
+                PlayerPrefs.Save();
+                anim.SetTrigger("openLid");
                 audioSource.Play();
                 if (treasure.weapon)
                 {
@@ -73,7 +72,7 @@ public class Chest : MonoBehaviour
                     string trinketName = treasure.itemName;
                     bool owned = false;
 
-                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    foreach (Trinket trinket in areaController.activeTrinkets)
                     {
                         if (PlayerPrefs.GetInt(trinketName) == 1)
                         {
@@ -85,15 +84,15 @@ public class Chest : MonoBehaviour
 
                     if (!owned)
                     {
-                        foreach (Trinket masterTrinket in areaController.trinketMasterList)
+                        foreach (Trinket masterTrinket in areaController.dunTrinketMasterList)
                         {
                             if (trinketName == masterTrinket.trinketName)
                             {
-                                areaController.dungeonTrinkets.Add(masterTrinket);   
+                                areaController.activeTrinkets.Add(masterTrinket);   
                             }
                         }
                     }
-                    foreach (Trinket trinket in areaController.dungeonTrinkets)
+                    foreach (Trinket trinket in areaController.activeTrinkets)
                     {
                         if (trinketName == trinket.trinketName)
                         {
@@ -114,12 +113,6 @@ public class Chest : MonoBehaviour
                     areaController.areaUI.itemImage.sprite = treasure.itemSprite;    
                     areaController.areaUI.ItemImage();
                 }
-                else
-                {
-                    FindObjectOfType<AreaUIController>().itemImage.sprite = treasure.itemSprite;
-                    FindObjectOfType<AreaUIController>().ItemImage();
-                    areaController.areaInventory.Add(treasure);
-                }  
             }
         }
 

@@ -257,7 +257,7 @@ public class BattleUIController : MonoBehaviour
 
     public void ExitBattleUI()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Castle 1");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
     }
 
     private void Update()

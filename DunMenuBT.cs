@@ -13,13 +13,12 @@ public class DunMenuBT : MonoBehaviour
     public int btIndex;
     public bool mainMenu;
 
+    public bool selected;
 
 
-    private void Awake()
-    {
-        uiController = FindObjectOfType<AreaUIController>();
-        selfBT = GetComponent<Button>();
-        arrowAnim = arrow.GetComponent<Animator>();
+
+    private void Start()
+    {        
         if (mainMenu == false)
         {
             foreach (DunMenuBT button in uiController.homeButtons)
@@ -34,9 +33,8 @@ public class DunMenuBT : MonoBehaviour
                 button.btIndex = uiController.menuButtons.IndexOf(button);
             }
         }
-
     }
-
+    
     public void MenuBTIndex()
     {
         uiController.homeBTIndex = btIndex;
@@ -53,6 +51,7 @@ public class DunMenuBT : MonoBehaviour
         if (btIndex != uiController.homeBTIndex)
         {
             arrowAnim.SetBool("blink", false);
-        }        
+        }     
+        
     }
 }

@@ -66,6 +66,8 @@ public class HeroSelect : MonoBehaviour
 
     public GameObject dungeonInfoUI;
     public Text dungeonInfoTXT;
+    public GameObject doorButtonsUI;
+    public Button startRunBT;
 
     public GameObject trinketPanel;    
     public List<Image> trinketImages;
@@ -92,16 +94,13 @@ public class HeroSelect : MonoBehaviour
                 trinket.active = false;
                 PlayerPrefs.SetInt(trinket.trinketName, 0);
                 PlayerPrefs.Save();
-            }
-            PlayerPrefs.SetInt("openedChests", 0);
-            AreaController.openedChests = 0;
-
-    
+            }               
 
             yield return new WaitForSeconds(.25f);
             start = false;
             AreaController.firstLoad = true;
             DunBuilder.createDungeon = true;
+            StaticMenuItems.dungeonCubeTarget = 250; // sets default dungeon size to "small"
             cam1.m_LookAt = camAimers[0].transform;
             lights[0].gameObject.SetActive(true);
         }
@@ -109,19 +108,35 @@ public class HeroSelect : MonoBehaviour
         
     }
 
-    public void ResumeRun()
+    public void SmallButton()
     {
-        
+        StaticMenuItems.dungeonCubeTarget = 250;
+    }
+
+    public void MedButton()
+    {
+        StaticMenuItems.dungeonCubeTarget = 500;
+    }
+
+    public void LargeButton()
+    {
+        StaticMenuItems.dungeonCubeTarget = 750;
+    }
+
+    public void StartRunBT()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
+    }
+
+    public void ResumeRun()
+    {        
         IEnumerator StartTimer()
         {
-            AreaController.firstLoad = false;
-            DunBuilder.createDungeon = false; // should load last dungeon generated on DunBuilder Load.
-
+            AreaController.firstLoad = false;            
             foreach (Player hero in heroBank.bank)
             {
                 hero.SetBattleStats();
-            }
-            AreaController.openedChests = PlayerPrefs.GetInt("openedChests");
+            }            
             yield return new WaitForSeconds(.25f);
             start = false;
             cam1.m_LookAt = camAimers[0].transform;
@@ -410,7 +425,7 @@ public class HeroSelect : MonoBehaviour
         {
             if (door)
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");                
+                               
             }            
             if (!focused && start == false)
             {                
@@ -471,7 +486,7 @@ public class HeroSelect : MonoBehaviour
                         cam1.m_Priority = 0;
                         cam2.m_Priority = 1;
                         backgroundFollower.transform.position = Vector3.MoveTowards(transform.position, backgroundAimer.transform.position, .00025f);
-                                               
+                        startRunBT.Select();                       
                         door = true;
 
 
@@ -479,12 +494,11 @@ public class HeroSelect : MonoBehaviour
                         {
                             yield return new WaitForSeconds(1);                            
                             directionText.text = "Enter Random Dungeon";
-                            directionUI.gameObject.SetActive(true);
+                            directionUI.gameObject.SetActive(false);
+                            doorButtonsUI.gameObject.SetActive(true);
 
                             keys = 1;
-                            wallsFound = AreaController.foundWalls;
-                            chestsFound = AreaController.openedChests;
-                            BBattles = AreaController.bossBattles;
+
                             // values will need to be set                            
 
                             foreach (Image image in trinketImages)

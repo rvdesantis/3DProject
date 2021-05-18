@@ -268,10 +268,32 @@ public class SpellCombo : MonoBehaviour
 
     public void LeftOverAction()
     {
-        if (battleController.deadEnemies < battleController.enemies.Count)
-        {
-            if (leftover.actionType == Player.Action.melee && leftover.attackTarget.dead == false)
+        bool allDead = false;
+        int x = 0;
+        foreach (Enemy enemy in battleController.enemies)
+        {            
+            if (enemy.dead)
             {
+                x++;
+            }
+            if (x == battleController.enemies.Count)
+            {
+                Debug.Log("All enemies Dead");
+                allDead = true;
+                battleController.characterTurnIndex = 2;
+                battleController.NextPlayerAct();                
+            }
+        }
+        if (allDead == false)
+        {
+            battleController.characterTurnIndex = battleController.heroes.IndexOf(leftover);
+            if (leftover.actionType == Player.Action.melee)
+            {
+                if (leftover.attackTarget.dead)
+                {
+                    leftover.attackTarget = battleController.GetHighestEnemy();
+                }
+
                 battleController.meleeCam = leftover.attackTarget.selfMeleeCam;
                 battleController.meleeCam.Priority = 2;
                 leftover.Melee();
@@ -284,8 +306,12 @@ public class SpellCombo : MonoBehaviour
                 }
                 StartCoroutine(MeleeTimer());
             }
-            if (leftover.actionType == Player.Action.ranged && leftover.attackTarget.dead == false)
+            if (leftover.actionType == Player.Action.ranged)
             {
+                if (leftover.attackTarget.dead)
+                {
+                    leftover.attackTarget = battleController.GetHighestEnemy();
+                }
                 battleController.activeCam = battleController.virtualCams[0];
                 leftover.Melee();
                 IEnumerator MeleeTimer()
@@ -296,8 +322,12 @@ public class SpellCombo : MonoBehaviour
                 }
                 StartCoroutine(MeleeTimer());
             }
-            if (leftover.actionType == Player.Action.casting && leftover.attackTarget.dead == false)
+            if (leftover.actionType == Player.Action.casting)
             {
+                if (leftover.attackTarget.dead)
+                {
+                    leftover.attackTarget = battleController.GetHighestEnemy();
+                }
                 battleController.activeCam = battleController.virtualCams[0];
                 leftover.CastSpell();
                 IEnumerator CamTimer()
@@ -308,14 +338,6 @@ public class SpellCombo : MonoBehaviour
                 }
                 StartCoroutine(CamTimer());
             }
-        }
-        if (battleController.deadEnemies == battleController.enemies.Count)
-        {
-            battleController.NextPlayerAct();
-        }
-        else
-        {
-            battleController.NextPlayerAct();
         }
     }
 }

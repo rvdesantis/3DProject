@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 
 public class DunCube : MonoBehaviour
@@ -13,12 +14,19 @@ public class DunCube : MonoBehaviour
     public int cubeCheck;
     public List<GameObject> junctSpawners; // for intersections  
     public DunCube targetCube;
+
     public Vector3 posPosition;
     public Vector3 negPosition;
     public Vector3 nextSpawnPosition;
     public Vector3 respawnPosition;
     public Quaternion respawnQuat;
+
+    public GameObject itemSpawnPoint;
+    public bool cubeFilled;
+
     public List<GameObject> cubeLights;
+    public GameObject door;
+    public PlayableDirector playableDirector;
 
 
     private void Start()
@@ -63,7 +71,7 @@ public class DunCube : MonoBehaviour
             dunBuilder.AttachRoom();
             return;
         }
-        if (cubeCheck > 0 && cubeCheck < 1000)
+        if (cubeCheck > 0 && cubeCheck < StaticMenuItems.dungeonCubeTarget)
         {
             int cubeCounter = 0;
             int hallwayLength = Random.Range(5, 26);
@@ -95,6 +103,7 @@ public class DunCube : MonoBehaviour
                 int turnNumber = Random.Range(0, dunBuilder.turnBank.Count); // range does not include end, no need for - 1
                 DunCube randomTurn = dunBuilder.turnBank[turnNumber];
                 dunBuilder.createdTurn = Instantiate(randomTurn, nextSpawnPosition, targetCube.transform.rotation);
+                dunBuilder.createdTurnCubes.Add(randomTurn);
                 PlayerPrefs.SetInt("Turn" + dunBuilder.turnCounter, turnNumber);
                 PlayerPrefs.SetFloat("Turn" + dunBuilder.turnCounter + "X", nextSpawnPosition.x);
                 PlayerPrefs.SetFloat("Turn" + dunBuilder.turnCounter + "Y", nextSpawnPosition.y);
@@ -107,35 +116,43 @@ public class DunCube : MonoBehaviour
             }
             if (ColliderCheck() == true)
             {   
-                DunCube deadEndCube = Instantiate(dunBuilder.deadEnd, transform.position, transform.rotation);                
+                DunCube deadEndCube = Instantiate(dunBuilder.deadEnd, transform.position, transform.rotation);
+                dunBuilder.createdDeadEnds.Add(deadEndCube);
                 dunBuilder.totalCubes++;  
             }
         }
-        if (cubeCheck >= 1000 && dunBuilder.bossRoomCreated == true)
+        if (cubeCheck >= StaticMenuItems.dungeonCubeTarget && dunBuilder.bossRoomCreated == true)
         {
             Debug.Log("Dungeon Already Finished.  You shouldn't be seeing this message");
         }
-        if (cubeCheck >= 1000 && dunBuilder.bossRoomCreated == false)
+        if (cubeCheck >= StaticMenuItems.dungeonCubeTarget && dunBuilder.bossRoomCreated == false)
         {
             int cubeCounter = 0;
-            int hallwayLength = Random.Range(5, 26);
+            int hallwayLength = Random.Range(5, 16);
             extenderLength = hallwayLength;
             targetCube = dunBuilder.bossHallStarter;
             PlayerPrefs.SetInt("StartCube" + dunBuilder.createdStartCubes.IndexOf(targetCube) + "HallNum", hallwayLength);
             PlayerPrefs.Save();
 
-            Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
-            nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
-            DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);
-            nextCube.posPosition = nextCube.positive.gameObject.transform.position;
-            nextCube.negPosition = nextCube.negative.gameObject.transform.position;
-            targetCube = nextCube;
-            dunBuilder.totalCubes++;            
-            dunBuilder.bossRoomCreated = Instantiate(dunBuilder.bossRoom, nextSpawnPosition, targetCube.transform.rotation);
+            for (cubeCounter = 0; cubeCounter < hallwayLength; cubeCounter++)
+            {
+
+                Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
+                nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
+                DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);
+                nextCube.cubeLights[0].gameObject.SetActive(true); nextCube.cubeLights[1].gameObject.SetActive(true);
+                nextCube.posPosition = nextCube.positive.gameObject.transform.position;
+                nextCube.negPosition = nextCube.negative.gameObject.transform.position;
+                targetCube = nextCube;
+                dunBuilder.totalCubes++;
+
+            }
+            DunCube bossRoom = Instantiate(dunBuilder.bossRoom, nextSpawnPosition, targetCube.transform.rotation);
+            dunBuilder.areaController.bossDoor = bossRoom.door;
+            dunBuilder.areaController.areaPlayables.Add(bossRoom.playableDirector);
+            dunBuilder.createdBossRooms.Add(bossRoom);
             Debug.Log(dunBuilder.bossRoomCreated.ToString() + cubeCounter + " spawn position is " + nextSpawnPosition);
             dunBuilder.bossRoomCreated = true;
-            
-            return;
         }
 
     }
@@ -175,12 +192,18 @@ public class DunCube : MonoBehaviour
             return;
 
         }
-        if (cubeCheck != 0)
+        if (cubeCheck != 0 && cubeCheck < StaticMenuItems.dungeonCubeTarget)
         {
             int cubeCounter = 0;
             int hallwayLength = PlayerPrefs.GetInt("StartCube" + dunBuilder.createdStartCubes.IndexOf(targetCube) + "HallNum");
             extenderLength = hallwayLength;            
             int lightCounter = 0;
+            if (ColliderCheck() == true)
+            {
+                DunCube deadEndCube = Instantiate(dunBuilder.deadEnd, transform.position, transform.rotation);
+                dunBuilder.createdDeadEnds.Add(deadEndCube);
+                dunBuilder.totalCubes++;
+            }
             if (ColliderCheck() == false)
             {
                 for (cubeCounter = 0; cubeCounter < hallwayLength; cubeCounter++)
@@ -205,26 +228,35 @@ public class DunCube : MonoBehaviour
                 int respawnTurnNum = PlayerPrefs.GetInt("Turn" + dunBuilder.turnCounter);
                 DunCube respawnedTurn = dunBuilder.turnBank[respawnTurnNum];
                 dunBuilder.createdTurn = Instantiate(respawnedTurn, nextSpawnPosition, targetCube.transform.rotation);
+                dunBuilder.createdTurnCubes.Add(respawnedTurn);
                 dunBuilder.turnCounter++;
                 dunBuilder.AttachRoom();
                 return;
             }
         }
-        if (cubeCheck >= 1000 && dunBuilder.bossRoomRespawned == false)
+        if (cubeCheck >= StaticMenuItems.dungeonCubeTarget && dunBuilder.bossRoomRespawned == false)
         {
             int cubeCounter = 0;
             int hallwayLength = PlayerPrefs.GetInt("StartCube" + dunBuilder.createdStartCubes.IndexOf(targetCube) + "HallNum"); 
             extenderLength = hallwayLength;
-            targetCube = dunBuilder.bossHallStarter;    
-            Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
-            nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
-            DunCube nextCube = Instantiate(dunBuilder.bossHallPiece, nextSpawnPosition, targetCube.transform.rotation);
-            nextCube.posPosition = nextCube.positive.gameObject.transform.position;
-            nextCube.negPosition = nextCube.negative.gameObject.transform.position;
-            targetCube = nextCube;
-            dunBuilder.totalCubes++;
-            dunBuilder.bossRoomCreated = Instantiate(dunBuilder.bossRoom, nextSpawnPosition, targetCube.transform.rotation);
-            Debug.Log(dunBuilder.bossRoomCreated.ToString() + cubeCounter + " spawn position is " + nextSpawnPosition);
+            targetCube = dunBuilder.bossHallStarter;
+            for (cubeCounter = 0; cubeCounter < hallwayLength; cubeCounter++)
+            {
+
+                Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
+                nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
+                DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);
+                nextCube.cubeLights[0].gameObject.SetActive(true); nextCube.cubeLights[1].gameObject.SetActive(true);
+                nextCube.posPosition = nextCube.positive.gameObject.transform.position;
+                nextCube.negPosition = nextCube.negative.gameObject.transform.position;
+                targetCube = nextCube;
+                dunBuilder.totalCubes++;
+
+            }
+            DunCube bossRoom = Instantiate(dunBuilder.bossRoom, nextSpawnPosition, targetCube.transform.rotation);
+            dunBuilder.areaController.bossDoor = bossRoom.door;
+            dunBuilder.areaController.areaPlayables.Add(bossRoom.playableDirector);
+            dunBuilder.createdBossRooms.Add(bossRoom);
             dunBuilder.bossRoomRespawned = true;
             return;
         }
@@ -233,7 +265,7 @@ public class DunCube : MonoBehaviour
     public bool ColliderCheck()
     {
         RaycastHit hit;
-        if (Physics.SphereCast(positive.transform.position, 5, positive.transform.forward, out hit, (extenderLength * 6) + 150)) 
+        if (Physics.SphereCast(positive.transform.position, 7.5f, positive.transform.forward, out hit, (extenderLength * 6) + 150)) 
         {
             bool didHit = true;
             Debug.DrawRay(posPosition, posPosition * hit.distance, Color.red);
@@ -247,4 +279,23 @@ public class DunCube : MonoBehaviour
             return didHit;
         }
     }
+
+    public bool SecretColliderCheck()
+    {
+        RaycastHit hit;
+        if (Physics.SphereCast(positive.transform.position, 7.5f, positive.transform.forward, out hit, 25))
+        {
+            bool didHit = true;
+            Debug.DrawRay(posPosition, posPosition * hit.distance, Color.red);
+
+            return didHit;
+        }
+        else
+        {
+            bool didHit = false;
+            Debug.DrawRay(positive.transform.position, positive.transform.forward * 1000, Color.white);
+            return didHit;
+        }
+    }
+
 }

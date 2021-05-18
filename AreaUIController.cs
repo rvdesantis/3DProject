@@ -75,7 +75,8 @@ public class AreaUIController : MonoBehaviour
 
     public void ExitDungeon()
     {
-        AreaController.battleReturn = false;
+        AreaController.battleReturn = false;        
+        DunBuilder.createDungeon = true;        
         UnityEngine.SceneManagement.SceneManager.LoadScene("Character Select");
     }
 
@@ -98,12 +99,12 @@ public class AreaUIController : MonoBehaviour
 
     public void SetTrinketImages()
     {
-        foreach (Trinket trinket in areaController.dungeonTrinkets)
+        foreach (Trinket trinket in areaController.activeTrinkets)
         {
             if (trinket.active)
             {
-                trinketImages[areaController.dungeonTrinkets.IndexOf(trinket)].sprite = trinket.trinketSprite;
-                trinketImages[areaController.dungeonTrinkets.IndexOf(trinket)].gameObject.SetActive(true);
+                trinketImages[areaController.activeTrinkets.IndexOf(trinket)].sprite = trinket.trinketSprite;
+                trinketImages[areaController.activeTrinkets.IndexOf(trinket)].gameObject.SetActive(true);
             }
         }
     }
@@ -348,7 +349,7 @@ public class AreaUIController : MonoBehaviour
 
     public void ToggleCompass()
     {
-        if (menuUI.activeSelf == false && inventoryPanel.activeSelf == false && playerPanel.activeSelf == false && weaponPanel.activeSelf == false)
+        if (menuUI.activeSelf == false && inventoryPanel.activeSelf == false && playerPanel.activeSelf == false && weaponPanel.activeSelf == false && mapFrame.activeSelf == false)
         {
             if (compassSmall.activeSelf)
             {
@@ -370,13 +371,16 @@ public class AreaUIController : MonoBehaviour
         if (menuUI.activeSelf == false && inventoryPanel.activeSelf == false && playerPanel.activeSelf == false && weaponPanel.activeSelf == false)
         {
             if (mapFrame.activeSelf)
-            {
-                mapFrame.gameObject.SetActive(false);                
+            {                
+                mapFrame.gameObject.SetActive(false);
+                areaController.moveController.enabled = true;
+                uiNavigation = false;
                 return;
             }
         }
         if (mapFrame.activeSelf == false)
         {
+            areaController.moveController.enabled = false;
             mapCam.gameObject.SetActive(true);
             mapFrame.gameObject.SetActive(true);
             return;
@@ -398,7 +402,7 @@ public class AreaUIController : MonoBehaviour
         {
             areaController.moveController.enabled = false;
             menuUI.SetActive(true);
-            menuButtons[0].selfBT.Select();            
+            menuButtons[0].selfBT.Select();
             return;
         }
     }
