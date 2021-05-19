@@ -83,7 +83,7 @@ public class DunCube : MonoBehaviour
             {
                 for (cubeCounter = 0; cubeCounter < hallwayLength; cubeCounter++)
                 {
-                    
+                    targetCube.cubeFilled = true;
                     Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
                     nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
                     DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);
@@ -208,7 +208,7 @@ public class DunCube : MonoBehaviour
             {
                 for (cubeCounter = 0; cubeCounter < hallwayLength; cubeCounter++)
                 {
-
+                    targetCube.cubeFilled = true;
                     Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
                     nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
                     DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);

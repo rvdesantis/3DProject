@@ -110,11 +110,11 @@ public class AreaController : MonoBehaviour
                 PlayerPrefs.SetInt("chest" + chests.IndexOf(chest), 0);
                 PlayerPrefs.Save();
             }
-            /* foreach (MimicChest mimic in mimics)
+            foreach (MimicChest mimic in mimics)
             {
                 PlayerPrefs.SetInt("mimic" + mimics.IndexOf(mimic), 0);
                 PlayerPrefs.Save();
-            } */
+            } 
             return;
         }
         if (!firstLoad)
@@ -137,11 +137,11 @@ public class AreaController : MonoBehaviour
                 }
             }
 
-            /* foreach (MimicChest mimic in mimics)
+            foreach (MimicChest mimic in mimics)
              {
                  Debug.Log("Chest Checker");
                  mimic.ChestChecker();
-             } */
+             } 
         }
 
     }

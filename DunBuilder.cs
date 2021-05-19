@@ -27,6 +27,7 @@ public class DunBuilder : MonoBehaviour
     public List<DunCube> createdBossRooms;
     public List<DunCube> createdDeadEnds;
     public List<Chest> createdChests;
+    public List<MimicChest> createdMimics;
     public List<Items> createdItems;
 
     public List<DunCube> turnBank;
@@ -49,7 +50,7 @@ public class DunBuilder : MonoBehaviour
     public bool closedRespawn;
 
     public Chest chestPrefab;
-    public MimicChest mimicChests;
+    public MimicChest mimicChest;
 
 
 
@@ -99,7 +100,7 @@ public class DunBuilder : MonoBehaviour
         start.Rebuild();        
     }
 
-    public void SpawnChests()
+    public void SpawnChests() // spawns Chests & Mimics, and saves location to PlayerPrefs
     {
         int chestCount = 0;
         // int targetChestCount = (int)Random.Range(4, Mathf.Round(createdDeadEnds.Count / 5)); will use once items are made
@@ -147,6 +148,50 @@ public class DunBuilder : MonoBehaviour
 
         }
 
+        int mimicCount = (int)Mathf.Round(targetChestCount / 2);
+        for (int i = 0; i < mimicCount; i++)
+        {
+
+            int x = Random.Range(0, createdDeadEnds.Count - 1);
+            bool chestChecker = false;
+            foreach (Chest chest in createdChests)
+            {
+                if (x != PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
+                {
+                    chestChecker = false;
+                }
+                if (x == PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
+                {
+                    chestChecker = true;
+                }
+            }
+            foreach (MimicChest mimic in createdMimics)
+            {
+                if (i > 0)
+                {
+                    if (x != PlayerPrefs.GetInt("Mimic" + createdMimics.IndexOf(mimic) + "position"))
+                    {
+                        chestChecker = false;
+                    }
+                    if (x == PlayerPrefs.GetInt("Mimic" + createdMimics.IndexOf(mimic) + "position"))
+                    {
+                        chestChecker = true;
+                    }
+                }
+
+            }
+            if (chestChecker == false)
+            {
+                PlayerPrefs.SetInt("Mimic" + i + "position", x); PlayerPrefs.Save();
+                MimicChest newMimic = Instantiate(mimicChest, createdDeadEnds[x].itemSpawnPoint.transform.position, createdDeadEnds[x].itemSpawnPoint.transform.rotation);
+                createdDeadEnds[x].cubeFilled = true;
+                newMimic.areaController = areaController;
+                newMimic.battleLauncher = FindObjectOfType<BattleLauncher>();
+                areaController.mimics.Add(newMimic);
+                createdMimics.Add(newMimic);
+            }
+        }
+
         foreach (Chest createdChest in createdChests)
         {            
             createdChest.treasure = areaController.availableItems[Random.Range(0, areaController.availableItems.Count - 1)];
@@ -189,7 +234,8 @@ public class DunBuilder : MonoBehaviour
         }
     }
 
-    public void RespawnChests()
+    public void RespawnChests() // Respawns Chest & Mimics & assigned Treasures
+
     {
         int chestCount = PlayerPrefs.GetInt("ChestCount");
         for (int i = 0; i < chestCount; i++)
@@ -203,12 +249,27 @@ public class DunBuilder : MonoBehaviour
 
             foreach (Chest respawnedChest in createdChests)
             {
-                respawnedChest.treasure = areaController.availableItems[PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(respawnedChest) + "Item")];  
+                respawnedChest.treasure = areaController.availableItems[PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(respawnedChest) + "Item")];
             }
         }
+        int mimicCount = chestCount / 2;
+        for (int i = 0; i < mimicCount; i++)
+        {
+            int targetCube = PlayerPrefs.GetInt("Mimic" + i + "position");
+            MimicChest newMimic = Instantiate(mimicChest, createdDeadEnds[targetCube].itemSpawnPoint.transform.position, createdDeadEnds[targetCube].itemSpawnPoint.transform.rotation);
+            createdDeadEnds[targetCube].cubeFilled = true;
+            newMimic.areaController = areaController;
+            newMimic.battleLauncher = FindObjectOfType<BattleLauncher>();
+            areaController.mimics.Add(newMimic);
+            createdMimics.Add(newMimic);
+
+            foreach (Chest respawnedChest in createdChests)
+            {
+                respawnedChest.treasure = areaController.availableItems[PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(respawnedChest) + "Item")];
+            }
+        }
+
     }
-
-
     public void AttachRoom()
     {
         foreach (GameObject hallwaystarter in createdTurn.junctSpawners)
@@ -261,6 +322,8 @@ public class DunBuilder : MonoBehaviour
         if (closedDun == false && bossRoomCreated == true)
         {
             Debug.Log(createdStartCubes.Count - startCubeCount + " Leftover Starting Cubes.  Creating Dead Ends & Secret Walls");
+            int secretCubeCounter = 0;
+            int secretIndex = 0;
             foreach (DunCube leftoverCube in createdStartCubes)
             {
                 if (createdStartCubes.IndexOf(leftoverCube) >= startCubeCount)
@@ -269,12 +332,26 @@ public class DunBuilder : MonoBehaviour
                     {
                         DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
                         createdDeadEnds.Add(deadEndCube);
+                        secretIndex++;
                     }
-                    if (leftoverCube.SecretColliderCheck() == false)
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex > 1)
                     {
                         DunCube deadEndCube = Instantiate(secretCube, leftoverCube.transform.position, leftoverCube.transform.rotation);
                         areaController.secretWalls.Add(deadEndCube.GetComponentInChildren<SecretWall>());
                         deadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(deadEndCube.GetComponentInChildren<SecretWall>());
+                        createdDeadEnds.Add(deadEndCube);
+                        secretCubeCounter++;
+                        secretIndex = 0;
+                    }
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex <= 1)
+                    {
+                        DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        createdDeadEnds.Add(deadEndCube);
+                        secretIndex++;
+                    }
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter > 4)
+                    {
+                        DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
                         createdDeadEnds.Add(deadEndCube);
                     }
                 }
@@ -328,6 +405,8 @@ public class DunBuilder : MonoBehaviour
         if (closedRespawn == false && bossRoomRespawned == true)
         {
             Debug.Log(createdStartCubes.Count - startCubeCount + " Leftover Starting Cubes.  Creating Dead Ends & Secret Walls");
+            int secretCubeCounter = 0;
+            int secretIndex = 0;
             foreach (DunCube leftoverCube in createdStartCubes)
             {
                 if (createdStartCubes.IndexOf(leftoverCube) >= startCubeCount)
@@ -336,13 +415,27 @@ public class DunBuilder : MonoBehaviour
                     {
                         DunCube respawnedDeadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
                         createdDeadEnds.Add(respawnedDeadEndCube);
+                        secretIndex++;
                     }
-                    if (leftoverCube.SecretColliderCheck() == false)
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex > 1)
                     {
-                        DunCube respawnedDeadEndCube = Instantiate(secretCube, leftoverCube.transform.position, leftoverCube.transform.rotation);
-                        areaController.secretWalls.Add(respawnedDeadEndCube.GetComponentInChildren<SecretWall>());
-                        respawnedDeadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(respawnedDeadEndCube.GetComponentInChildren<SecretWall>());
+                        DunCube respawnedSecretCube = Instantiate(secretCube, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        areaController.secretWalls.Add(respawnedSecretCube.GetComponentInChildren<SecretWall>());
+                        respawnedSecretCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(respawnedSecretCube.GetComponentInChildren<SecretWall>());
+                        createdDeadEnds.Add(respawnedSecretCube);
+                        secretCubeCounter++;
+                        secretIndex = 0;
+                    }
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex <= 1)
+                    {
+                        DunCube respawnedDeadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
                         createdDeadEnds.Add(respawnedDeadEndCube);
+                        secretIndex++;
+                    }
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter > 4)
+                    {
+                        DunCube respawnedDeadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        createdDeadEnds.Add(respawnedDeadEndCube);                        
                     }
                 }
             }
