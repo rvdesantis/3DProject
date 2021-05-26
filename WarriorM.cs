@@ -22,7 +22,7 @@ public class WarriorM : Player
             PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(15, 21));
             PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(15, 21));
             PlayerPrefs.Save();
-            SetBattleStats();
+            SetBattleStats();            
         }
     }
 
@@ -44,7 +44,13 @@ public class WarriorM : Player
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
 
-
+        foreach (Spell spell in spells)
+        {
+            if (spells.IndexOf(spell) > 0)
+            {
+                spells.Remove(spell);
+            }
+        }
     }
 
     public override void SetBattleStats()
@@ -57,6 +63,14 @@ public class WarriorM : Player
         playerDEF = PlayerPrefs.GetInt("WarDef");
         XP = PlayerPrefs.GetInt("WarXP");
         playerLevel = PlayerPrefs.GetInt("WarLevel");
+
+        if (playerLevel == 2)
+        {
+            if (spells.Count == 1)
+            {
+                spells.Add(masterSpellList[1]);
+            }
+        }
     }
 
     public override void SaveStats()
@@ -88,8 +102,8 @@ public class WarriorM : Player
                 IEnumerator CastTimer()
                 {
                     yield return new WaitForSeconds(1.5f);
-                    Spell spellToCast = Instantiate<Spell>(selectedSpell, spellSpawnPoint.transform.position, Quaternion.identity);
-                    spellToCast.targetPosition = attackTarget.head.transform.position;
+                    Spell spellToCast = Instantiate<Spell>(selectedSpell, transform.position, Quaternion.identity);
+                    spellToCast.targetPosition = attackTarget.aimTargetGameObject.transform.position;
                 }
                 StartCoroutine(CastTimer());
 
@@ -124,7 +138,7 @@ public class WarriorM : Player
                     LookAtTarget();
                 }
                 StartCoroutine(SpellTimer());
-
+                return;
             }
             if (selectedSpell == spells[1])
             {

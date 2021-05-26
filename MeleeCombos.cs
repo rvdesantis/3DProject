@@ -14,6 +14,7 @@ public class MeleeCombos : MonoBehaviour
     public Player fMage;
 
     public Player target;
+    public bool comboFinished;
 
 
 
@@ -23,7 +24,7 @@ public class MeleeCombos : MonoBehaviour
         fMage = comboController.fMage;
         fArcher = comboController.fArcher;
         mWarrior = comboController.mWarrior;
-        
+        comboFinished = true;
 
 
         foreach (Enemy enemy in battleController.enemies)

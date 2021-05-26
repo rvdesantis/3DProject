@@ -19,6 +19,7 @@ public class BattleUIController : MonoBehaviour
     public BattleBTPanel buttonUIPanel;
 
     public List<Button> spellButtons;
+    public List<Text> spellBTtxt;
     public GameObject spellPanel;    
     public int spellIndex;
 
@@ -147,11 +148,12 @@ public class BattleUIController : MonoBehaviour
                     int spellCount = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count;
                     spellButtons[spellCount - 1].Select(); // to trick UI into reselecting 0 button after first use
                     if (spellButtons.IndexOf(button) > spellCount - 1)
-                    {
+                    {                        
                         button.gameObject.SetActive(false);
                     }
                     if (spellButtons.IndexOf(button) <= spellCount - 1)
                     {
+                        spellBTtxt[spellButtons.IndexOf(button)].text = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].spellName;
                         button.gameObject.SetActive(true);
                         button.image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].panelImage;
                     }

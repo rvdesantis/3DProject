@@ -22,7 +22,7 @@ public class Mage : Player
             PlayerPrefs.SetInt("MagStr", playerSTR + Random.Range(10, 16));
             PlayerPrefs.SetInt("MagDef", playerDEF + Random.Range(10, 16));
             PlayerPrefs.Save();
-            SetBattleStats();
+            SetBattleStats();            
         }
     }
 
@@ -44,7 +44,13 @@ public class Mage : Player
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
 
-
+        foreach (Spell spell in spells)
+        {
+            if (spells.IndexOf(spell) > 0)
+            {
+                spells.Remove(spell);
+            }
+        }
 
 
         SetBattleStats();
@@ -60,6 +66,14 @@ public class Mage : Player
         playerDEF = PlayerPrefs.GetInt("MagDef");
         XP = PlayerPrefs.GetInt("MagXP");
         playerLevel = PlayerPrefs.GetInt("MagLevel");
+
+        if (playerLevel == 2)
+        {
+            if (spells.Count == 1)
+            {
+                spells.Add(masterSpellList[1]);
+            }
+        }
     }
 
     public override void SaveStats()
@@ -101,11 +115,13 @@ public class Mage : Player
             {
                 GetComponent<Animator>().SetTrigger("castStart");
             }
-            if (selectedSpell == spells[1])
+            if (playerLevel > 1)
             {
-                GetComponent<Animator>().SetTrigger("castStart1");
+                if (selectedSpell == spells[1])
+                {
+                    GetComponent<Animator>().SetTrigger("castStart1");
+                }
             }
-
             LookAtTarget();
             if (selectedSpell.targetALL == false)
             {
@@ -114,7 +130,7 @@ public class Mage : Player
                     attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
                     yield return new WaitForSeconds(1.5f);
                     Spell spellToCast = Instantiate<Spell>(selectedSpell, transform.position, Quaternion.identity);
-                    spellToCast.targetPosition = attackTarget.head.transform.position;
+                    spellToCast.targetPosition = attackTarget.aimTargetGameObject.transform.position;
                 }
                 StartCoroutine(CastTimer());
 

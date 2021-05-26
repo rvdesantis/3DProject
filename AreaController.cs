@@ -62,7 +62,7 @@ public class AreaController : MonoBehaviour
             WallChecker(); // sets firstload to false when finished
 
             SetPlayerBank();
-            //SetStartingItems();
+            SetStartingItems();
         } StartCoroutine(LoadTimer());
     }
 
@@ -133,7 +133,7 @@ public class AreaController : MonoBehaviour
                 }
                 if (chest.opened == 1)
                 {
-                    chest.GetComponent<Animator>().SetTrigger("openLid");
+                    chest.anim.SetTrigger("openLid");
                 }
             }
 

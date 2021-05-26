@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     public CinemachineVirtualCamera selfMeleeCam;
 
     public GameObject highlighter;
-    public GameObject head;
+    public GameObject aimTargetGameObject;
     public Hitbox hitBox;
     public GameObject spellSpawnPoint;
     public CombatText combatTextPrefab;    
@@ -31,9 +31,7 @@ public class Player : MonoBehaviour
     public List<PlayableDirector> playables;
     public AudioSource audioSource;
     public List<AudioClip> audioClips;
-
-
-
+    // 0 = attack, 1 = spell, 2 = damage 3 = die
 
     // Player Info
     public bool warriorClass;
@@ -52,6 +50,7 @@ public class Player : MonoBehaviour
     public int playerDEF;
     public bool dead;
     public List<Spell> spells;
+    public List<Spell> masterSpellList;
     public Spell selectedSpell;
     public GameObject activeItem;
 
@@ -171,7 +170,7 @@ public class Player : MonoBehaviour
                 {
                     yield return new WaitForSeconds(1.5f);
                     Spell spellToCast = Instantiate<Spell>(selectedSpell, spellSpawnPoint.transform.position, Quaternion.identity);
-                    spellToCast.targetPosition = attackTarget.head.transform.position;                    
+                    spellToCast.targetPosition = attackTarget.aimTargetGameObject.transform.position;                    
                 } StartCoroutine(CastTimer());
 
             }
@@ -185,7 +184,7 @@ public class Player : MonoBehaviour
                         {
                             yield return new WaitForSeconds(1.5f);
                             Spell spellToCast = Instantiate<Spell>(selectedSpell, spellSpawnPoint.transform.position, Quaternion.identity);
-                            spellToCast.targetPosition = enemy.head.transform.position;
+                            spellToCast.targetPosition = enemy.aimTargetGameObject.transform.position;
                             enemy.combatTextPrefab.damageAmount = damage;                            
                         }
                         StartCoroutine(CastTimer());
@@ -280,7 +279,7 @@ public class Player : MonoBehaviour
         {
             Weapon.AttackSound();
         }        
-        attackTarget.anim.SetTrigger("gotHit");   
+        attackTarget.anim.SetTrigger("gotHit");
     }
 
     public void LookAtTarget()
@@ -306,6 +305,28 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+    public void PlayAudioAttack()
+    {
+        audioSource.clip = audioClips[0];
+        audioSource.Play();
+    }
+    public void PlayAudioSpell()
+    {
+        audioSource.clip = audioClips[1];
+        audioSource.Play();
+    }
+    public void PlayAudioDamage()
+    {
+        audioSource.clip = audioClips[2];
+        audioSource.Play();
+    }
+    public void PlayAudioDie()
+    {
+        audioSource.clip = audioClips[3];
+        audioSource.Play();
+    }
+
 
 
     public virtual void LevelUp()

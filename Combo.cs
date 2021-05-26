@@ -26,7 +26,7 @@ public class Combo : MonoBehaviour
     public Player fWarriorTimelineAsset;
     public Player fArcherTimelineAsset;
     public Player fMageTimelineAsset;
-    public Player demonTimelineAsset;
+
 
     public int mWarriorCount;
     public int fBerzerkerCount;
@@ -52,13 +52,14 @@ public class Combo : MonoBehaviour
                     {
                         if (battleController.heroes[0].attackTarget == battleController.heroes[1].attackTarget && battleController.heroes[0].attackTarget == battleController.heroes[2].attackTarget)
                         {
-                            battleController.combo = true;
-                            meleeCombos.MeleeCombo();
-                            Debug.Log("Melee Combo Trigger");
-                            return;
-                        }
-                        else
-                            Debug.Log("No Melee Combo Trigger");
+                            if (meleeCombos.comboFinished == false)
+                            {
+                                battleController.combo = true;
+                                meleeCombos.MeleeCombo();
+                                Debug.Log("Melee Combo Trigger");
+                                return;
+                            }
+                        }                       
                     }
                 }
             }
@@ -93,13 +94,16 @@ public class Combo : MonoBehaviour
         }
         if (fMageCount == 1 && fBerzerkerCount == 1)
         {
-            if (fMage.selectedSpell == fMage.spells[1] && fBerzerker.selectedSpell == fBerzerker.spells[1] && spellCombos.lavaStrikeFinish == false)
+            if (fMage.playerLevel > 1 && fBerzerker.playerLevel > 1)
             {
-                battleController.combo = true;
-                spellCombos.lavaStrike = true;
-                spellCombos.SpellComboTrigger();
-                Debug.Log("LavaStrike Combo Trigger");
-                return;
+                if (fMage.selectedSpell == fMage.spells[1] && fBerzerker.selectedSpell == fBerzerker.spells[1] && spellCombos.lavaStrikeFinish == false)
+                {
+                    battleController.combo = true;
+                    spellCombos.lavaStrike = true;
+                    spellCombos.SpellComboTrigger();
+                    Debug.Log("LavaStrike Combo Trigger");
+                    return;
+                }
             }
         }
         else

@@ -76,7 +76,7 @@ public class DunBuilder : MonoBehaviour
         if (createDungeonMirror == true)
         {
             // sets starting cube and builds first hallway
-            DunCube start = Instantiate(originCube, Vector3.zero, Quaternion.identity);
+            DunCube start = Instantiate(originCube, Vector3.zero, originCube.transform.rotation);
 
             start.posPosition = start.positive.gameObject.transform.position;
             start.negPosition = start.negative.gameObject.transform.position;
@@ -91,7 +91,7 @@ public class DunBuilder : MonoBehaviour
 
     public void RebuildDungeon()
     {
-        DunCube start = Instantiate(originCube, transform.position, Quaternion.identity);
+        DunCube start = Instantiate(originCube, Vector3.zero, originCube.transform.rotation);
         start.posPosition = start.positive.gameObject.transform.position;
         start.negPosition = start.negative.gameObject.transform.position;
         start.dunBuilder = this;
@@ -116,6 +116,7 @@ public class DunBuilder : MonoBehaviour
                 PlayerPrefs.SetInt("Chest" + chestCount + "position", x); PlayerPrefs.Save();
                 Chest newChest = Instantiate(chestPrefab, createdDeadEnds[x].itemSpawnPoint.transform.position, createdDeadEnds[x].itemSpawnPoint.transform.rotation);
                 createdDeadEnds[x].cubeFilled = true;
+                Debug.Log("Chest set to cube " + x);
                 newChest.areaController = areaController;
                 newChest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
                 createdChests.Add(newChest);
@@ -128,7 +129,7 @@ public class DunBuilder : MonoBehaviour
                 {
                     if (x != PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
                     {
-                        chestChecker = false;
+                        
                     }
                     if (x == PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
                     {
@@ -140,6 +141,7 @@ public class DunBuilder : MonoBehaviour
                     PlayerPrefs.SetInt("Chest" + chestCount + "position", x); PlayerPrefs.Save();
                     Chest newChest = Instantiate(chestPrefab, createdDeadEnds[x].itemSpawnPoint.transform.position, createdDeadEnds[x].itemSpawnPoint.transform.rotation);
                     createdDeadEnds[x].cubeFilled = true;
+                    Debug.Log("Chest set to cube " + x);
                     newChest.areaController = areaController;
                     newChest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
                     createdChests.Add(newChest);
@@ -158,7 +160,7 @@ public class DunBuilder : MonoBehaviour
             {
                 if (x != PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
                 {
-                    chestChecker = false;
+                    
                 }
                 if (x == PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
                 {
@@ -171,7 +173,7 @@ public class DunBuilder : MonoBehaviour
                 {
                     if (x != PlayerPrefs.GetInt("Mimic" + createdMimics.IndexOf(mimic) + "position"))
                     {
-                        chestChecker = false;
+                        
                     }
                     if (x == PlayerPrefs.GetInt("Mimic" + createdMimics.IndexOf(mimic) + "position"))
                     {
@@ -185,6 +187,7 @@ public class DunBuilder : MonoBehaviour
                 PlayerPrefs.SetInt("Mimic" + i + "position", x); PlayerPrefs.Save();
                 MimicChest newMimic = Instantiate(mimicChest, createdDeadEnds[x].itemSpawnPoint.transform.position, createdDeadEnds[x].itemSpawnPoint.transform.rotation);
                 createdDeadEnds[x].cubeFilled = true;
+                Debug.Log("Mimic set to cube " + x);
                 newMimic.areaController = areaController;
                 newMimic.battleLauncher = FindObjectOfType<BattleLauncher>();
                 areaController.mimics.Add(newMimic);
@@ -215,22 +218,29 @@ public class DunBuilder : MonoBehaviour
                     int x = areaController.availableItems.IndexOf(usedItem);
                     numbersInUse.Add(x);
                 }
-                foreach (Items item in areaController.availableItems)
-                {                    
-                    if (createdItems.Contains(item))
+                if (numbersInUse.Count < areaController.availableItems.Count)
+                {
+                    foreach (Items item in areaController.availableItems)
                     {
+                        if (createdItems.Contains(item))
+                        {
 
-                    }
-                    if (createdItems.Contains(item) == false)
-                    {
-                        createdChest.treasure = item;
-                        break;
+                        }
+                        if (createdItems.Contains(item) == false)
+                        {
+                            createdChest.treasure = item;
+                            break;
+                        }
                     }
                 }
+                if (numbersInUse.Count >= areaController.availableItems.Count) // adds gold when no available items left.
+                {
+                    createdChest.treasure = areaController.availableItems[0];
+                }
+                createdItems.Add(createdChest.treasure);
+                areaController.chests = createdChests;
+                PlayerPrefs.SetInt("Chest" + createdChests.IndexOf(createdChest) + "Item", areaController.availableItems.IndexOf(createdChest.treasure));
             }
-            createdItems.Add(createdChest.treasure);
-            areaController.chests = createdChests;
-            PlayerPrefs.SetInt("Chest" + createdChests.IndexOf(createdChest) + "Item", areaController.availableItems.IndexOf(createdChest.treasure));
         }
     }
 

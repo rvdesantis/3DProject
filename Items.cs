@@ -11,24 +11,15 @@ public class Items : MonoBehaviour
 
     public string itemName;
     public bool usable;
-    
-    
-    public bool key;
-    public bool trinket;
-    public bool potion;
-    public bool weapon;
-
-    public Door targetDoor;
 
     
+    public enum itemType { gold, trinket, potion, weapon, key, portal }
+    public itemType itemFunction;     
+
+    public Door targetDoor;    
     public Player potionTarget;
     public int potionQuantity;
 
-  
-
-      
-
-       
     public int weaponNum;
     public int weaponHero;
 
@@ -71,7 +62,7 @@ public class Items : MonoBehaviour
     {
         pickedUpMirror = pickedUp;
 
-        if (key)
+        if (itemFunction == itemType.key)
         {
             if (Vector3.Distance(player.transform.position, this.transform.position) < 5)
             {

@@ -101,6 +101,7 @@ public class HeroSelect : MonoBehaviour
             AreaController.firstLoad = true;
             DunBuilder.createDungeon = true;
             StaticMenuItems.dungeonCubeTarget = 250; // sets default dungeon size to "small"
+            StaticMenuItems.ResetSavedValues();
             cam1.m_LookAt = camAimers[0].transform;
             lights[0].gameObject.SetActive(true);
         }
@@ -492,9 +493,10 @@ public class HeroSelect : MonoBehaviour
 
                         IEnumerator Timer()
                         {
-                            yield return new WaitForSeconds(1);                            
                             directionText.text = "Enter Random Dungeon";
                             directionUI.gameObject.SetActive(false);
+                            
+                            yield return new WaitForSeconds(1);
                             doorButtonsUI.gameObject.SetActive(true);
 
                             keys = 1;
@@ -540,7 +542,7 @@ public class HeroSelect : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.JoystickButton3))
         {
-            if (focused)
+            if (focused && door == false)
             {
                 Debug.Log("weapon switched");
                 weaponBTs[heroIndex].NextWeapon();

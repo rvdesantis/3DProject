@@ -20,7 +20,7 @@ public class Berserker : Player
             PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
             PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
             PlayerPrefs.Save();
-            SetBattleStats();
+            SetBattleStats();            
         }
     }
 
@@ -41,6 +41,15 @@ public class Berserker : Player
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
+
+        
+        foreach (Spell spell in spells)
+        {
+            if (spells.IndexOf(spell) > 0)
+            {
+                spells.Remove(spell);
+            }
+        }
     }
 
     public override void SetBattleStats()
@@ -53,6 +62,14 @@ public class Berserker : Player
         playerDEF = PlayerPrefs.GetInt("BerDef");
         XP = PlayerPrefs.GetInt("BerXP");
         playerLevel = PlayerPrefs.GetInt("BerLevel");
+
+        if (playerLevel == 2)
+        {
+            if (spells.Count == 1)
+            {
+                spells.Add(masterSpellList[1]);
+            }
+        }
     }
     public override void SaveStats()
     {
@@ -117,6 +134,7 @@ public class Berserker : Player
                 }
                 StartCoroutine(CastTimer());
                 LookAtTarget();
+                return;
             }
         }
     }

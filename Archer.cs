@@ -52,6 +52,16 @@ public class Archer : Player
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
+
+        
+
+        foreach (Spell spell in spells)
+        {
+            if (spells.IndexOf(spell) > 0)
+            {
+                spells.Remove(spell);
+            }
+        }
     }
 
     public override void SetBattleStats()
@@ -64,6 +74,14 @@ public class Archer : Player
         playerDEF = PlayerPrefs.GetInt("ArDef");
         XP = PlayerPrefs.GetInt("ArXP");
         playerLevel = PlayerPrefs.GetInt("ArLevel");
+
+        if (playerLevel == 2)
+        {
+            if (spells.Count == 1)
+            {
+                spells.Add(masterSpellList[1]);
+            }
+        }
     }
 
     public override void SaveStats()

@@ -50,7 +50,7 @@ public class Chest : MonoBehaviour
                 PlayerPrefs.Save();
                 anim.SetTrigger("openLid");
                 audioSource.Play();
-                if (treasure.weapon)
+                if (treasure.itemFunction == Items.itemType.weapon)
                 {
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
                     areaController.areaUI.activeItem = treasure;
@@ -62,7 +62,21 @@ public class Chest : MonoBehaviour
                     equipHero.Weapon = equipHero.equipedWeapons[treasure.weaponNum];
                     equipHero.equipedWeapons[treasure.weaponNum].gameObject.SetActive(true);
                 }
-                if (treasure.trinket)
+                if (treasure.itemFunction == Items.itemType.gold)
+                {
+                    int goldAmount = Random.Range(25, 76);
+                    anim.SetTrigger("openLid");
+                    audioSource.Play();                    
+                    string trinketName = treasure.itemName;
+                    StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
+                    areaController.areaUI.messageText.text = "Gold +" + goldAmount;
+
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
+                    areaController.areaUI.itemImage.sprite = treasure.itemSprite;
+                    areaController.areaUI.ItemImage();
+
+                }
+                if (treasure.itemFunction == Items.itemType.trinket)
                 {
                     if (areaController.areaUI.topBarUI.activeSelf == false)
                     {

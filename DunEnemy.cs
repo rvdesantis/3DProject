@@ -30,13 +30,25 @@ public class DunEnemy : MonoBehaviour
                 finished = true;
                 gameObject.SetActive(false);
 
-                if (treasure.weapon)
+                if (treasure.itemFunction == Items.itemType.weapon)
                 {
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
                     areaController.areaUI.activeItem = treasure;
                     areaController.areaUI.WeaponImage();
                 }
-                if (treasure.trinket)
+                if (treasure.itemFunction == Items.itemType.gold)
+                {
+                    int goldAmount = Random.Range(25, 76);
+                    string trinketName = treasure.itemName;
+                    StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
+                    areaController.areaUI.messageText.text = "Gold +" + goldAmount;
+
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
+                    areaController.areaUI.itemImage.sprite = treasure.itemSprite;
+                    areaController.areaUI.ItemImage();
+
+                }
+                if (treasure.itemFunction == Items.itemType.trinket)
                 {
                     if (areaController.areaUI.topBarUI.activeSelf == false)
                     {

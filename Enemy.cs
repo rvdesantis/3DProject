@@ -295,7 +295,7 @@ public class Enemy : Player
     {
         BattleController bController = FindObjectOfType<BattleController>();
 
-        if (bController.heroes[bController.characterTurnIndex].actionType == Action.melee)
+        if (bController.heroes[bController.characterTurnIndex].berzerkerClass == true)
         {
             hitBox.Impacts[0].gameObject.SetActive(true);
             hitBox.Impacts[0].Play();
@@ -307,7 +307,20 @@ public class Enemy : Player
             } StartCoroutine(ImpactTimer());
             return;
         }
-        if (bController.heroes[bController.characterTurnIndex].actionType == Action.ranged)
+        if (bController.heroes[bController.characterTurnIndex].warriorClass == true)
+        {
+            hitBox.Impacts[0].gameObject.SetActive(true);
+            hitBox.Impacts[0].Play();
+            IEnumerator ImpactTimer()
+            {
+                yield return new WaitForSeconds(1);
+                hitBox.Impacts[0].Stop();
+                hitBox.Impacts[0].gameObject.SetActive(false);
+            }
+            StartCoroutine(ImpactTimer());
+            return;
+        }
+        if (bController.heroes[bController.characterTurnIndex].archerClass == true)
         {
             hitBox.Impacts[1].gameObject.SetActive(true);
             hitBox.Impacts[1].Play();
@@ -320,6 +333,20 @@ public class Enemy : Player
             StartCoroutine(ImpactTimer());
             return;
         }
+        if (bController.heroes[bController.characterTurnIndex].mageClass == true)
+        {
+            hitBox.Impacts[2].gameObject.SetActive(true);
+            hitBox.Impacts[2].Play();
+            IEnumerator ImpactTimer()
+            {
+                yield return new WaitForSeconds(1);
+                hitBox.Impacts[2].Stop();
+                hitBox.Impacts[2].gameObject.SetActive(false);
+            }
+            StartCoroutine(ImpactTimer());
+            return;
+        }
+
         if (bController.heroes[bController.characterTurnIndex].actionType == Action.casting)
         {
             if (bController.heroes[bController.characterTurnIndex].selectedSpell.damage == Spell.DamageType.Normal)
