@@ -14,7 +14,7 @@ public class DunBuilder : MonoBehaviour
     public OriginCube originCube;
     public DunCube startingCube;
     public DunCube hallPiece;
-    public DunCube bossHallPiece;
+    public BossHallwayCube bossHallPiece;
     public DunCube leftTurn;
     public DunCube rightTurn;
     public DunCube tJunct;

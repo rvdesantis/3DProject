@@ -44,13 +44,7 @@ public class Mage : Player
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
 
-        foreach (Spell spell in spells)
-        {
-            if (spells.IndexOf(spell) > 0)
-            {
-                spells.Remove(spell);
-            }
-        }
+
 
 
         SetBattleStats();

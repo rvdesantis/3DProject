@@ -52,16 +52,8 @@ public class Archer : Player
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
-
         
 
-        foreach (Spell spell in spells)
-        {
-            if (spells.IndexOf(spell) > 0)
-            {
-                spells.Remove(spell);
-            }
-        }
     }
 
     public override void SetBattleStats()

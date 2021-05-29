@@ -139,7 +139,12 @@ public class DunCube : MonoBehaviour
 
                 Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
                 nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
-                DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);
+                BossHallwayCube nextCube = Instantiate(dunBuilder.bossHallPiece, nextSpawnPosition, targetCube.transform.rotation);
+                if (cubeCounter == 0)
+                {
+                    dunBuilder.areaController.bossHallwaySpawnPoint = nextCube.spawnPlatform.transform.position;
+                    dunBuilder.areaController.bossHallwaySPRotation = nextCube.spawnPlatform.transform.rotation;
+                }
                 nextCube.cubeLights[0].gameObject.SetActive(true); nextCube.cubeLights[1].gameObject.SetActive(true);
                 nextCube.posPosition = nextCube.positive.gameObject.transform.position;
                 nextCube.negPosition = nextCube.negative.gameObject.transform.position;
@@ -245,7 +250,12 @@ public class DunCube : MonoBehaviour
 
                 Vector3 thisSpawnPosition = new Vector3(targetCube.posPosition.x - targetCube.negPosition.x, 0, targetCube.posPosition.z - targetCube.negPosition.z) + (Vector3.zero * cubeCounter);
                 nextSpawnPosition = targetCube.transform.position + thisSpawnPosition;
-                DunCube nextCube = Instantiate(dunBuilder.hallPiece, nextSpawnPosition, targetCube.transform.rotation);
+                BossHallwayCube nextCube = Instantiate(dunBuilder.bossHallPiece, nextSpawnPosition, targetCube.transform.rotation);
+                if (cubeCounter == 0)
+                {
+                    dunBuilder.areaController.bossHallwaySpawnPoint = nextCube.spawnPlatform.transform.position;
+                    dunBuilder.areaController.bossHallwaySPRotation = nextCube.spawnPlatform.transform.rotation;
+                }
                 nextCube.cubeLights[0].gameObject.SetActive(true); nextCube.cubeLights[1].gameObject.SetActive(true);
                 nextCube.posPosition = nextCube.positive.gameObject.transform.position;
                 nextCube.negPosition = nextCube.negative.gameObject.transform.position;

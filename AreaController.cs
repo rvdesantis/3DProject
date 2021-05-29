@@ -30,8 +30,10 @@ public class AreaController : MonoBehaviour
    
     public static Vector3 respawnPoint;
     public static Quaternion respawnRotation;
-    public Vector3 respawnPointMirror;   
+    public Vector3 respawnPointMirror;
 
+    public Vector3 bossHallwaySpawnPoint;
+    public Quaternion bossHallwaySPRotation;
 
 
     public static bool firstLoad;

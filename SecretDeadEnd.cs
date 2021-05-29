@@ -8,9 +8,11 @@ public class SecretDeadEnd : DunCube
     public Animator anim;
 
     public bool portalCube;
-    public GameObject returnOrb;
-    public GameObject returnParticles;
+    public GameObject orb;
+    public GameObject portalParticles;
     public Chest portalChest;
+
+
 
 
     private void Start()
@@ -27,7 +29,7 @@ public class SecretDeadEnd : DunCube
     public void PortalChest()
     {
         portalChest.areaController.moveController.enabled = false;
-        returnOrb.gameObject.SetActive(true);        
+        orb.gameObject.SetActive(true);        
         
         IEnumerator ChestTimer()
         {
@@ -36,8 +38,8 @@ public class SecretDeadEnd : DunCube
             portalChest.areaController.moveController.enabled = true;
             portalChest.gameObject.SetActive(false);
             yield return new WaitForSeconds(.95f);
-            returnOrb.gameObject.SetActive(false);
-            returnParticles.gameObject.SetActive(true);
+            orb.gameObject.SetActive(false);
+            portalParticles.gameObject.SetActive(true);
             anim.SetBool("portalActive", true);
         } StartCoroutine(ChestTimer());
     }
