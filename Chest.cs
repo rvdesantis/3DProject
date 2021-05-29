@@ -11,6 +11,10 @@ public class Chest : MonoBehaviour
     public Items treasure;
     public bool inArea;
 
+    public bool portalChest;
+    public SecretDeadEnd secretDeadEnd;
+
+
     public AudioSource audioSource;
 
 
@@ -48,8 +52,22 @@ public class Chest : MonoBehaviour
                 opened = 1;
                             
                 PlayerPrefs.Save();
+                if (portalChest)
+                {
+                    anim.SetBool("portalChest", true);
+                }
                 anim.SetTrigger("openLid");
                 audioSource.Play();
+             
+                if (treasure.itemFunction == Items.itemType.portal)
+                {
+                    secretDeadEnd.PortalChest();
+                    areaController.areaUI.messageText.text = treasure.itemName;
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
+                    areaController.areaUI.itemImage.sprite = treasure.itemSprite;
+                    areaController.areaUI.ItemImage();
+
+                }
                 if (treasure.itemFunction == Items.itemType.weapon)
                 {
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
@@ -64,9 +82,7 @@ public class Chest : MonoBehaviour
                 }
                 if (treasure.itemFunction == Items.itemType.gold)
                 {
-                    int goldAmount = Random.Range(25, 76);
-                    anim.SetTrigger("openLid");
-                    audioSource.Play();                    
+                    int goldAmount = Random.Range(25, 76);                   
                     string trinketName = treasure.itemName;
                     StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
                     areaController.areaUI.messageText.text = "Gold +" + goldAmount;

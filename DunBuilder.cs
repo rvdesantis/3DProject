@@ -20,7 +20,8 @@ public class DunBuilder : MonoBehaviour
     public DunCube tJunct;
     public DunCube fourWay;
     public DunCube deadEnd;
-    public DunCube secretCube;
+    public List<DunCube> secretCubes;
+
     public DunCube bossRoom;
     public List<DunCube> createdStartCubes;
     public List<DunCube> createdTurnCubes;    
@@ -109,10 +110,9 @@ public class DunBuilder : MonoBehaviour
         PlayerPrefs.SetInt("ChestCount", targetChestCount);
         for (chestCount = 0; chestCount < targetChestCount; chestCount++)
         {
-            
+            int x = Random.Range(0, createdDeadEnds.Count - 1);        
             if (chestCount == 0)
-            {
-                int x = Random.Range(0, createdDeadEnds.Count - 1);
+            {                
                 PlayerPrefs.SetInt("Chest" + chestCount + "position", x); PlayerPrefs.Save();
                 Chest newChest = Instantiate(chestPrefab, createdDeadEnds[x].itemSpawnPoint.transform.position, createdDeadEnds[x].itemSpawnPoint.transform.rotation);
                 createdDeadEnds[x].cubeFilled = true;
@@ -122,8 +122,7 @@ public class DunBuilder : MonoBehaviour
                 createdChests.Add(newChest);
             }
             if (chestCount > 0)
-            {
-                int x = Random.Range(0, createdDeadEnds.Count - 1);
+            {                
                 bool chestChecker = false;
                 foreach (Chest chest in createdChests)
                 {
@@ -132,6 +131,10 @@ public class DunBuilder : MonoBehaviour
                         
                     }
                     if (x == PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
+                    {
+                        chestChecker = true;
+                    }
+                    if (createdDeadEnds[x].cubeFilled == true)
                     {
                         chestChecker = true;
                     }
@@ -146,11 +149,16 @@ public class DunBuilder : MonoBehaviour
                     newChest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
                     createdChests.Add(newChest);
                 }
+                if (chestChecker == true)
+                {
+                    chestCount--;
+                }
             }
 
         }
 
         int mimicCount = (int)Mathf.Round(targetChestCount / 2);
+        PlayerPrefs.SetInt("MimicCount", mimicCount);
         for (int i = 0; i < mimicCount; i++)
         {
 
@@ -165,7 +173,7 @@ public class DunBuilder : MonoBehaviour
                 if (x == PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(chest) + "position"))
                 {
                     chestChecker = true;
-                }
+                }                
             }
             foreach (MimicChest mimic in createdMimics)
             {
@@ -182,6 +190,10 @@ public class DunBuilder : MonoBehaviour
                 }
 
             }
+            if (createdDeadEnds[x].cubeFilled)
+            {
+                chestChecker = true;
+            }
             if (chestChecker == false)
             {
                 PlayerPrefs.SetInt("Mimic" + i + "position", x); PlayerPrefs.Save();
@@ -192,6 +204,10 @@ public class DunBuilder : MonoBehaviour
                 newMimic.battleLauncher = FindObjectOfType<BattleLauncher>();
                 areaController.mimics.Add(newMimic);
                 createdMimics.Add(newMimic);
+            }
+            if (chestChecker == true)
+            {
+                mimicCount--;
             }
         }
 
@@ -235,7 +251,7 @@ public class DunBuilder : MonoBehaviour
                 }
                 if (numbersInUse.Count >= areaController.availableItems.Count) // adds gold when no available items left.
                 {
-                    createdChest.treasure = areaController.availableItems[0];
+                    createdChest.treasure = areaController.availableItems[0]; 
                 }
                 createdItems.Add(createdChest.treasure);
                 areaController.chests = createdChests;
@@ -262,7 +278,7 @@ public class DunBuilder : MonoBehaviour
                 respawnedChest.treasure = areaController.availableItems[PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(respawnedChest) + "Item")];
             }
         }
-        int mimicCount = chestCount / 2;
+        int mimicCount = PlayerPrefs.GetInt("MimicCount");
         for (int i = 0; i < mimicCount; i++)
         {
             int targetCube = PlayerPrefs.GetInt("Mimic" + i + "position");
@@ -346,10 +362,13 @@ public class DunBuilder : MonoBehaviour
                     }
                     if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex > 1)
                     {
-                        DunCube deadEndCube = Instantiate(secretCube, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        int x = Random.Range(0, secretCubes.Count);
+                        PlayerPrefs.SetInt("secretCubeNumber", x);                        
+                        DunCube deadEndCube = Instantiate(secretCubes[x], leftoverCube.transform.position, leftoverCube.transform.rotation);
                         areaController.secretWalls.Add(deadEndCube.GetComponentInChildren<SecretWall>());
                         deadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(deadEndCube.GetComponentInChildren<SecretWall>());
                         createdDeadEnds.Add(deadEndCube);
+                        PlayerPrefs.SetInt("SecretCube" + secretCubeCounter, x); PlayerPrefs.Save();
                         secretCubeCounter++;
                         secretIndex = 0;
                     }
@@ -429,7 +448,8 @@ public class DunBuilder : MonoBehaviour
                     }
                     if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex > 1)
                     {
-                        DunCube respawnedSecretCube = Instantiate(secretCube, leftoverCube.transform.position, leftoverCube.transform.rotation);
+                        int x = PlayerPrefs.GetInt("SecretCube" + secretCubeCounter); 
+                        DunCube respawnedSecretCube = Instantiate(secretCubes[x], leftoverCube.transform.position, leftoverCube.transform.rotation);
                         areaController.secretWalls.Add(respawnedSecretCube.GetComponentInChildren<SecretWall>());
                         respawnedSecretCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(respawnedSecretCube.GetComponentInChildren<SecretWall>());
                         createdDeadEnds.Add(respawnedSecretCube);
