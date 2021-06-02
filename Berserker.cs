@@ -41,8 +41,14 @@ public class Berserker : Player
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
-        
 
+        for (int i = 0; i < spells.Count; i++)
+        {
+            if (i != 0)
+            {
+                spells.Remove(spells[i]);
+            }
+        }
     }
 
     public override void SetBattleStats()

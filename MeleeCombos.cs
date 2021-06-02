@@ -89,11 +89,12 @@ public class MeleeCombos : MonoBehaviour
 
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
                 battleController.heroes[0].EnemyHitTrigger();
+
+                yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
                 {
                     battleController.heroes[0].attackTarget.Die();
                 }
-                yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)
@@ -156,11 +157,12 @@ public class MeleeCombos : MonoBehaviour
 
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
                 battleController.heroes[0].EnemyHitTrigger();
+
+                yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
                 {
                     battleController.heroes[0].attackTarget.Die();
                 }
-                yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)
@@ -225,11 +227,12 @@ public class MeleeCombos : MonoBehaviour
 
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
                 battleController.heroes[0].EnemyHitTrigger();
+
+                yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
                 {
                     battleController.heroes[0].attackTarget.Die();
                 }
-                yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)
@@ -292,12 +295,12 @@ public class MeleeCombos : MonoBehaviour
 
                 battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
                 battleController.heroes[0].EnemyHitTrigger();
+                battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
+                yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
                 {
                     battleController.heroes[0].attackTarget.Die();
                 }
-                battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
-                yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)

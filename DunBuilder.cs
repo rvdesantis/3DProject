@@ -367,7 +367,10 @@ public class DunBuilder : MonoBehaviour
                         DunCube deadEndCube = Instantiate(secretCubes[x], leftoverCube.transform.position, leftoverCube.transform.rotation);
                         areaController.secretWalls.Add(deadEndCube.GetComponentInChildren<SecretWall>());
                         deadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(deadEndCube.GetComponentInChildren<SecretWall>());
-                        createdDeadEnds.Add(deadEndCube);
+                        if (x == 0) // will not add dead end if filled
+                        {
+                            createdDeadEnds.Add(deadEndCube);
+                        }                        
                         PlayerPrefs.SetInt("SecretCube" + secretCubeCounter, x); PlayerPrefs.Save();
                         secretCubeCounter++;
                         secretIndex = 0;
@@ -452,7 +455,10 @@ public class DunBuilder : MonoBehaviour
                         DunCube respawnedSecretCube = Instantiate(secretCubes[x], leftoverCube.transform.position, leftoverCube.transform.rotation);
                         areaController.secretWalls.Add(respawnedSecretCube.GetComponentInChildren<SecretWall>());
                         respawnedSecretCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(respawnedSecretCube.GetComponentInChildren<SecretWall>());
-                        createdDeadEnds.Add(respawnedSecretCube);
+                        if (x == 0) // will not add dead end if filled
+                        {
+                            createdDeadEnds.Add(respawnedSecretCube);
+                        }                        
                         secretCubeCounter++;
                         secretIndex = 0;
                     }

@@ -295,7 +295,7 @@ public class Enemy : Player
     {
         BattleController bController = FindObjectOfType<BattleController>();
 
-        if (bController.heroes[bController.characterTurnIndex].berzerkerClass == true)
+        if (bController.heroes[bController.characterTurnIndex].playerClass == Player.PlayerClass.berzerker)
         {
             hitBox.Impacts[0].gameObject.SetActive(true);
             hitBox.Impacts[0].Play();
@@ -307,7 +307,7 @@ public class Enemy : Player
             } StartCoroutine(ImpactTimer());
             return;
         }
-        if (bController.heroes[bController.characterTurnIndex].warriorClass == true)
+        if (bController.heroes[bController.characterTurnIndex].playerClass == Player.PlayerClass.warrior)
         {
             hitBox.Impacts[0].gameObject.SetActive(true);
             hitBox.Impacts[0].Play();
@@ -320,7 +320,7 @@ public class Enemy : Player
             StartCoroutine(ImpactTimer());
             return;
         }
-        if (bController.heroes[bController.characterTurnIndex].archerClass == true)
+        if (bController.heroes[bController.characterTurnIndex].playerClass == Player.PlayerClass.archer)
         {
             hitBox.Impacts[1].gameObject.SetActive(true);
             hitBox.Impacts[1].Play();
@@ -333,7 +333,20 @@ public class Enemy : Player
             StartCoroutine(ImpactTimer());
             return;
         }
-        if (bController.heroes[bController.characterTurnIndex].mageClass == true)
+        if (bController.heroes[bController.characterTurnIndex].playerClass == Player.PlayerClass.fireMage)
+        {
+            hitBox.Impacts[2].gameObject.SetActive(true);
+            hitBox.Impacts[2].Play();
+            IEnumerator ImpactTimer()
+            {
+                yield return new WaitForSeconds(1);
+                hitBox.Impacts[2].Stop();
+                hitBox.Impacts[2].gameObject.SetActive(false);
+            }
+            StartCoroutine(ImpactTimer());
+            return;
+        }
+        if (bController.heroes[bController.characterTurnIndex].playerClass == Player.PlayerClass.darkMage)
         {
             hitBox.Impacts[2].gameObject.SetActive(true);
             hitBox.Impacts[2].Play();

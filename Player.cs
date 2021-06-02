@@ -34,10 +34,9 @@ public class Player : MonoBehaviour
     // 0 = attack, 1 = spell, 2 = damage 3 = die
 
     // Player Info
-    public bool warriorClass;
-    public bool mageClass;
-    public bool archerClass;
-    public bool berzerkerClass;
+    public enum PlayerClass { warrior, fireMage, archer, berzerker, darkMage}
+    public PlayerClass playerClass;
+
 
     public string playerName;
     public int playerHealth;

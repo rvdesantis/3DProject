@@ -58,6 +58,7 @@ public class HeroSelect : MonoBehaviour
     public Image redButton;
     public Image escButton;
     public Image blueButton;
+    public Image xButton;
 
     public Animator directionUIanim;
 
@@ -190,8 +191,18 @@ public class HeroSelect : MonoBehaviour
                 if (partyIndex > 0)
                 {
                     directionText.text = "Remove " + staticHeroList.bank[heroIndex].playerName;
-                    greenButton.gameObject.SetActive(false);
-                    blueButton.gameObject.SetActive(true);
+                    if (joystick)
+                    {
+                        greenButton.gameObject.SetActive(false);
+                        blueButton.gameObject.SetActive(true);
+                    }
+                    if (!joystick)
+                    {
+                        greenButton.gameObject.SetActive(false);
+                        spaceBar.gameObject.SetActive(false);
+                        xButton.gameObject.SetActive(true);
+                    }
+
                 }                               
             }
 
@@ -374,6 +385,12 @@ public class HeroSelect : MonoBehaviour
                 heroUI[heroIndex].gameObject.SetActive(false);
                 staticHeroList.bank[heroIndex].GetComponent<Animator>().SetTrigger("sit");                
                 iconPanel.gameObject.SetActive(true);
+                if (!joystick)
+                {
+                    spaceBar.gameObject.SetActive(true);
+                    xButton.gameObject.SetActive(false);
+                }
+                
             }
             if (door)
             {
@@ -416,6 +433,11 @@ public class HeroSelect : MonoBehaviour
                 
                 partyCounter.text = "CHOOSE PARTY (" + partyIndex + " out of 3)";
                 iconPanel.gameObject.SetActive(true);
+                if (!joystick)
+                {
+                    spaceBar.gameObject.SetActive(true);
+                    xButton.gameObject.SetActive(false);
+                }
 
 
             }

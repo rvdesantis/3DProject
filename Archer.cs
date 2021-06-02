@@ -52,7 +52,14 @@ public class Archer : Player
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
-        
+
+        for (int i = 0; i < spells.Count; i++)
+        {
+            if (i != 0)
+            {
+                spells.Remove(spells[i]);
+            }
+        }
 
     }
 
@@ -113,7 +120,7 @@ public class Archer : Player
 
     public void TriggerBowDraw()
     {
-        Weapon.GetComponent<Animator>().SetTrigger("setup2L");
+        Weapon.GetComponent<Animator>().SetTrigger("setup2R");
     }
 
     public void TriggerBowShoot()
@@ -121,7 +128,7 @@ public class Archer : Player
         quiver[0].targetPosition = attackTarget.hitBox.transform.position;
         Instantiate<Ammo>(quiver[0], ammoModel.transform.position, Quaternion.identity);
         ammoModel.gameObject.SetActive(false);                
-        Weapon.GetComponent<Animator>().SetTrigger("shoot2L");
+        Weapon.GetComponent<Animator>().SetTrigger("shoot2R");
     }
 
     public void Reload()

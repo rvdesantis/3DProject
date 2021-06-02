@@ -37,22 +37,27 @@ public class Items : MonoBehaviour
             Debug.Log(potionTarget.playerName + " is at Max health");
         }
 
-        if (potionTarget.berzerkerClass)
+        if (potionTarget.playerClass == Player.PlayerClass.berzerker)
         {
             PlayerPrefs.SetInt("BerHealth", potionTarget.playerHealth);
         }
-        if (potionTarget.archerClass)
+        if (potionTarget.playerClass == Player.PlayerClass.archer)
         {
             PlayerPrefs.SetInt("ArHealth", potionTarget.playerHealth);
         }
-        if (potionTarget.warriorClass)
+        if (potionTarget.playerClass == Player.PlayerClass.warrior)
         {
             PlayerPrefs.SetInt("WarHealth", potionTarget.playerHealth);
         }
-        if (potionTarget.mageClass)
+        if (potionTarget.playerClass == Player.PlayerClass.fireMage)
         {
             PlayerPrefs.SetInt("MagHealth", potionTarget.playerHealth);
-        }        
+        }
+        if (potionTarget.playerClass == Player.PlayerClass.darkMage)
+        {
+            // PlayerPrefs.SetInt("MagHealth", potionTarget.playerHealth);
+        }
+        PlayerPrefs.Save();
     }
 
 

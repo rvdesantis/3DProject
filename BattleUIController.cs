@@ -29,7 +29,9 @@ public class BattleUIController : MonoBehaviour
     public Sprite itemImage;
     public int itemIndex;
 
+
     public GameObject levelUpUI;
+    public lvlupUIController lvlController;
     public Button exitBT;
     public Image lvlHeroFace;
     public Text levelText;
@@ -38,6 +40,9 @@ public class BattleUIController : MonoBehaviour
 
     public bool activeUI;
     public GameObject currentUI;
+
+    public AudioSource uiAudio;
+    public List<AudioClip> uiSounds;
 
     private void Start()
     {
@@ -252,8 +257,15 @@ public class BattleUIController : MonoBehaviour
 
     public void LevelUpUI()
     {
+        lvlController.LoadLevelUPStats();
+        levelUpUI.gameObject.SetActive(true);
         activeUI = true;
-        currentUI = levelUpUI;        
+        foreach(FacePanel facepanel in facePanels)
+        {
+            facepanel.gameObject.SetActive(false);
+        }
+        currentUI = levelUpUI;
+        exitBT.gameObject.SetActive(true);
         exitBT.Select();
     }
 

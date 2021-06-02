@@ -645,8 +645,8 @@ public class BattleController : MonoBehaviour
                 foreach (Player character in enemies) // check to see if all enemies are dead to send battle.
                 {                    
                     if (deadEnemies == enemies.Count)
-                    {
-                        // calculate experience.
+                    {                       
+                        virtualCams[0].m_LookAt = enemies[0].transform;
                         keyboard = false;
                         AreaController.battleReturn = true;
                         AfterBattle();
@@ -662,65 +662,68 @@ public class BattleController : MonoBehaviour
 
     public void AfterBattle()
     {
+        Debug.Log("Start After Battle");
         int totalXP = enemies[0].XP + enemies[1].XP + enemies[2].XP;
-
-        foreach (Player character in heroes)
+        bool lvlUP = false;
+        foreach (Player character in heroes) 
         {
+            character.anim.SetBool("idle", true);
             if (character.playerName == "Archer")
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("ArXP", character.XP);
                 PlayerPrefs.SetInt("ArHealth", character.playerHealth);
-                if (character.playerLevel == 1 && character.XP >= 500)
-                {
-                    character.LevelUp();
-                    uiController.levelUpUI.gameObject.SetActive(true);
-                }
+
             }
             if (character.playerName == "Berserker")
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("BerXP", character.XP);
                 PlayerPrefs.SetInt("BerHealth", character.playerHealth);
-                if (character.playerLevel == 1 && character.XP >= 500)
-                {
-                    character.LevelUp();
-                    uiController.levelUpUI.gameObject.SetActive(true);
-                }
+
             }
             if (character.playerName == "Warrior")
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("WarXP", character.XP);
                 PlayerPrefs.SetInt("WarHealth", character.playerHealth);
-                if (character.playerLevel == 1 && character.XP >= 500)
-                {
-                    character.LevelUp();
-                    uiController.levelUpUI.gameObject.SetActive(true);
-                }
+
             }
             if (character.playerName == "Mage")
             {
                 character.XP = character.XP + totalXP;
                 PlayerPrefs.SetInt("MagXP", character.XP);
                 PlayerPrefs.SetInt("MagHealth", character.playerHealth);
-                if (character.playerLevel == 1 && character.XP >= 500)
-                {
-                    character.LevelUp();
-                    uiController.levelUpUI.gameObject.SetActive(true);
-                }
+
             }
             PlayerPrefs.Save();
+
+            
+            if (character.playerLevel == 1 && character.XP >= 500)
+            {
+                Debug.Log(character.playerName + " level up!");
+                lvlUP = true;
+            }
+            if (lvlUP == true)
+            {
+                uiController.LevelUpUI();
+            }
+
         }
 
-        if (uiController.levelUpUI.activeSelf == false)
+        if (lvlUP == false)
         {
-            DunBuilder.createDungeon = false;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
+            IEnumerator ExitTimer()
+            {
+                yield return new WaitForSeconds(2);
+                DunBuilder.createDungeon = false;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
+            } StartCoroutine(ExitTimer());
+
         }
         if (uiController.levelUpUI.activeSelf)
         {
-            uiController.LevelUpUI();
+            // battle exits through button on Level UP UI Screen
         }
 
     }
@@ -767,13 +770,44 @@ public class BattleController : MonoBehaviour
                 uiController.ToggleSpellPanel();
                 uiController.ToggleButtonIcons();
             }
+            if (uiController.spellPanel.activeSelf == false && uiController.itemPanel.activeSelf == true) // sets mana potion to B
+            {
+                if (battleItems.potions[1].quantity > 0)
+                {
+                    heroes[characterTurnIndex].activeItem = battleItems.potions[0].gameObject;
+                    heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
+                    heroes[characterTurnIndex].actionType = Player.Action.item;
+                    uiController.itemPanel.gameObject.SetActive(false);
+                    uiController.ToggleButtonIcons();
+                    if (enemies[0].dead == false)
+                    {
+                        focusIndex = 0;
+                        enemies[0].ToggleHighlighter();
+                    }
+                    if (enemies[0].dead == true && enemies[1].dead == false)
+                    {
+                        enemies[1].ToggleHighlighter();
+                        focusIndex = 1;
+                    }
+                    if (enemies[0].dead == true && enemies[1].dead == true)
+                    {
+                        enemies[2].ToggleHighlighter();
+                        focusIndex = 2;
+                    }
+                    if (characterTurnIndex <= 2)
+                    {
+                        NextPlayerTurn();
+                    }
+                }
+            }
         }
         if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.JoystickButton3)) // Y on XBOX Controller
         {
             if (uiController.itemPanel.activeSelf == false && uiController.spellPanel.activeSelf == false)
             {
-                uiController.ToggleItemPanel();
+                uiController.activeUI = uiController.itemPanel;
                 uiController.ToggleButtonIcons();
+                uiController.ToggleItemPanel();                
             }
         }
         if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton1)) // B on XBOX Controller
@@ -976,15 +1010,15 @@ public class BattleController : MonoBehaviour
                     }
                 }
             }
-            if (Input.GetKeyDown(KeyCode.JoystickButton1) || Input.GetKeyDown(KeyCode.Backspace))
+            if (Input.GetKeyDown(KeyCode.JoystickButton1) || Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.X))
             {
                 if (uiController.spellPanel.activeSelf)
                 {
-                    uiController.ToggleSpellPanel();
+                    uiController.ToggleSpellPanel();                    
                 }
                 if (uiController.itemPanel.activeSelf)
                 {
-                    uiController.ToggleItemPanel();
+                    uiController.ToggleItemPanel();                    
                 }
             }
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
@@ -995,7 +1029,7 @@ public class BattleController : MonoBehaviour
                     enemies[focusIndex].ToggleHighlighter();
                     
 
-                    if (heroes[characterTurnIndex].warriorClass || heroes[characterTurnIndex].berzerkerClass)
+                    if (heroes[characterTurnIndex].playerClass == Player.PlayerClass.warrior || heroes[characterTurnIndex].playerClass == Player.PlayerClass.berzerker)
                     {
                         heroes[characterTurnIndex].actionType = Player.Action.melee;
                         if (characterTurnIndex <= 2)
@@ -1006,7 +1040,7 @@ public class BattleController : MonoBehaviour
                         }
                         return;
                     }
-                    if (heroes[characterTurnIndex].archerClass || heroes[characterTurnIndex].mageClass)
+                    if (heroes[characterTurnIndex].playerClass == Player.PlayerClass.archer || heroes[characterTurnIndex].playerClass == Player.PlayerClass.fireMage || heroes[characterTurnIndex].playerClass == Player.PlayerClass.darkMage)
                     {                        
                         heroes[characterTurnIndex].actionType = Player.Action.ranged;
                         if (characterTurnIndex <= 2)
@@ -1020,14 +1054,43 @@ public class BattleController : MonoBehaviour
                 }
                 if (uiController.activeUI == true)
                 {
-                    if (uiController.activeUI == uiController.spellPanel)
+                    if (uiController.currentUI == uiController.spellPanel)
                     {
                         // handled in BattleUIController since Space Key would only select active spell menu button
                         uiController.activeUI = false;
                     }
-
+                    if (uiController.currentUI == uiController.itemPanel)
+                    {
+                        heroes[characterTurnIndex].activeItem = battleItems.potions[0].gameObject;
+                        heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
+                        heroes[characterTurnIndex].actionType = Player.Action.item;
+                        uiController.itemPanel.gameObject.SetActive(false);
+                        uiController.ToggleButtonIcons();
+                        if (enemies[0].dead == false)
+                        {
+                            focusIndex = 0;
+                            enemies[0].ToggleHighlighter();
+                        }
+                        if (enemies[0].dead == true && enemies[1].dead == false)
+                        {
+                            enemies[1].ToggleHighlighter();
+                            focusIndex = 1;
+                        }
+                        if (enemies[0].dead == true && enemies[1].dead == true)
+                        {
+                            enemies[2].ToggleHighlighter();
+                            focusIndex = 2;
+                        }
+                        if (characterTurnIndex <= 2)
+                        {
+                            NextPlayerTurn();
+                        }
+                        
+                    }
                 }
+
             }
+               
         }
 
     }

@@ -10,6 +10,8 @@ public class portal : MonoBehaviour
     public enum PortalType { bossPortal, returnPortal, }
     public PortalType portalType;
 
+    public GameObject portalFX;
+
 
 
     private void Start()
@@ -44,6 +46,9 @@ public class portal : MonoBehaviour
                     areaController.moveController.transform.rotation = origionCube.spawnPlatform.transform.rotation;
                     areaController.moveController.enabled = true;
                     AreaController.respawnPoint = origionCube.spawnPoint;
+                    portalFX.gameObject.SetActive(false);
+                    gameObject.SetActive(false);
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 }
                 if (portalType == PortalType.bossPortal)
                 {
@@ -51,6 +56,9 @@ public class portal : MonoBehaviour
                     areaController.moveController.transform.rotation = areaController.bossHallwaySPRotation;
                     areaController.moveController.enabled = true;
                     AreaController.respawnPoint = areaController.bossHallwaySpawnPoint;
+                    portalFX.gameObject.SetActive(false);
+                    gameObject.SetActive(false);
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 }
             }
 

@@ -103,14 +103,11 @@ public class SpellCombo : MonoBehaviour
 
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
-                {
-                    if (enemy != battleController.heroes[0].attackTarget)
+                { 
+                    if (enemy.playerHealth > 0)
                     {
-                        if (enemy.playerHealth > 0)
-                        {
-                            enemy.gameObject.SetActive(true);
-                        }
-                    }
+                        enemy.gameObject.SetActive(true);
+                    }                    
                 }                
                 battleController.combo = false;
                 LeftOverAction(); // will set end turn to true and go to next action ending turn

@@ -18,6 +18,8 @@ public class Combo : MonoBehaviour
     public Player fBerzerker;
     public Player fArcher;
     public Player fMage;
+    public Player darkMage;
+
     public Player target; // for use with a single enemy target
     public List<Player> targets; // for use with multiple enemy targets
 
@@ -26,12 +28,14 @@ public class Combo : MonoBehaviour
     public Player fWarriorTimelineAsset;
     public Player fArcherTimelineAsset;
     public Player fMageTimelineAsset;
+    public Player darkMageTimelineAsset;
 
 
     public int mWarriorCount;
     public int fBerzerkerCount;
     public int fMageCount;
     public int fArcherCount;
+    public int darkMageCount;
 
     public int enemyCount;
 
@@ -121,25 +125,30 @@ public class Combo : MonoBehaviour
     {
         foreach (Player character in battleController.heroes)
         {
-            if (character.archerClass)
+            if (character.playerClass == Player.PlayerClass.archer)
             {
                 fArcher = character;
                 fArcherCount++;
             }
-            if (character.warriorClass)
+            if (character.playerClass == Player.PlayerClass.warrior)
             {
                 mWarrior = character;
                 mWarriorCount++;
             }
-            if (character.mageClass)
+            if (character.playerClass == Player.PlayerClass.fireMage)
             {
                 fMage = character;
                 fMageCount++;
             }
-            if (character.berzerkerClass)
+            if (character.playerClass == Player.PlayerClass.berzerker)
             {
                 fBerzerker = character;
                 fBerzerkerCount++;
+            }
+            if (character.playerClass == Player.PlayerClass.darkMage)
+            {
+                darkMage = character;
+                darkMageCount++;
             }
         }
     }
