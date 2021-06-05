@@ -14,6 +14,7 @@ public class Weapons : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip attackSound;
 
+    public List<Spell> weaponSpells;
 
 
     public void AttackSound()

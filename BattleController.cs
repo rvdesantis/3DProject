@@ -456,45 +456,28 @@ public class BattleController : MonoBehaviour
                     }
                     if (heroes[characterTurnIndex].actionType == Player.Action.item)
                     {    
-                        if (characterTurnIndex == 0)
+                        IEnumerator CamTimer()
                         {
-                            castingCams[0].Priority = 2;                            
-                            IEnumerator CamTimer()
+                            if (characterTurnIndex == 0)
                             {
-                                yield return new WaitForSeconds(.25f);
-                                castingCams[1].Priority = 2;
-                                castingCams[0].Priority = 0;
-                                yield return new WaitForSeconds(1);
-                                castingCams[1].Priority = 0;        
+                                castingCams[1].Priority = 2;                                
+                                yield return new WaitForSeconds(2);
+                                castingCams[1].Priority = 0; 
                             }
-                            StartCoroutine(CamTimer());
-                        }
-                        if (characterTurnIndex == 1)
-                        {
-                            castingCams[2].Priority = 2;
-                            IEnumerator CamTimer()
+                            if (characterTurnIndex == 1)
                             {
-                                yield return new WaitForSeconds(.25f);
-                                castingCams[3].Priority = 2;
-                                castingCams[2].Priority = 0;
-                                yield return new WaitForSeconds(1);
-                                castingCams[3].Priority = 0;
+                                castingCams[3].Priority = 2;                                
+                                yield return new WaitForSeconds(2);
+                                castingCams[3].Priority = 0;    
                             }
-                            StartCoroutine(CamTimer());
-                        }
-                        if (characterTurnIndex == 2)
-                        {
-                            castingCams[4].Priority = 2;
-                            IEnumerator CamTimer()
+                            if (characterTurnIndex == 2)
                             {
-                                yield return new WaitForSeconds(.25f);
-                                castingCams[5].Priority = 2;
-                                castingCams[4].Priority = 0;
-                                yield return new WaitForSeconds(1);
-                                castingCams[5].Priority = 0;
+                                castingCams[5].Priority = 2;                                
+                                yield return new WaitForSeconds(2);
+                                castingCams[5].Priority = 0;     
                             }
-                            StartCoroutine(CamTimer());
                         }
+                        StartCoroutine(CamTimer());
 
                         if (heroes[characterTurnIndex].activeItem == battleItems.potions[0].gameObject)
                         {
@@ -504,6 +487,7 @@ public class BattleController : MonoBehaviour
                                 Debug.Log(heroes[characterTurnIndex].playerName + " has " + battleItems.potions[0].quantity + " health potions");
                                 IEnumerator ItemTimer()
                                 {
+                                    yield return new WaitForSeconds(1); // to allow for camera to get into place.
                                     heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
                                     heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
                                     battleItems.potions[0].target = heroes[characterTurnIndex].attackTarget;
@@ -520,23 +504,22 @@ public class BattleController : MonoBehaviour
                         }
                         if (heroes[characterTurnIndex].activeItem == battleItems.potions[1].gameObject)
                         {
-                            if (battleItems.potions[1].quantity > 0)
+                            Debug.Log(heroes[characterTurnIndex].playerName + " has " + battleItems.potions[1].quantity + " mana potions");
+                            IEnumerator ItemTimer()
                             {
-                                IEnumerator ItemTimer()
-                                {
-                                    heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
-                                    heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
-                                    battleItems.potions[1].target = heroes[characterTurnIndex].attackTarget;
-                                    battleItems.potions[1].target.combatTextPrefab.floatingText.color = Color.blue;
-                                    battleItems.potions[1].target.combatTextPrefab.damageAmount = battleItems.potions[0].health;
-                                    battleItems.potions[1].target.combatTextPrefab.ToggleCombatText();
-                                    battleItems.potions[1].ManaPotion();
-                                    battleItems.potions[1].quantity--;
-                                    yield return new WaitForSeconds(2);
-                                    NextPlayerAct();
-                                }
-                                StartCoroutine(ItemTimer());
+                                yield return new WaitForSeconds(1); // to allow for camera to get into place.
+                                heroes[characterTurnIndex].GetComponent<Animator>().SetTrigger("item");
+                                heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
+                                battleItems.potions[1].target = heroes[characterTurnIndex].attackTarget;
+                                battleItems.potions[1].target.combatTextPrefab.floatingText.color = Color.blue;
+                                battleItems.potions[1].target.combatTextPrefab.damageAmount = battleItems.potions[1].health;
+                                battleItems.potions[1].target.combatTextPrefab.ToggleCombatText();
+                                battleItems.potions[1].HealthPotion();
+                                battleItems.potions[1].quantity--;
+                                yield return new WaitForSeconds(2);
+                                NextPlayerAct();
                             }
+                            StartCoroutine(ItemTimer());
                         }
                         if (heroes[characterTurnIndex].activeItem == battleItems.potions[2].gameObject)
                         {
@@ -765,20 +748,21 @@ public class BattleController : MonoBehaviour
         CamTracker();
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.JoystickButton2)) // X on XBOX Controller
         {
-            if (uiController.spellPanel.activeSelf == false && uiController.itemPanel.activeSelf == false)
+            if (uiController.spellPanel.activeSelf == false && uiController.itemPanel.activeSelf == false && uiController.battleMenuUI.activeSelf == false)
             {
                 uiController.ToggleSpellPanel();
                 uiController.ToggleButtonIcons();
+                return;
             }
-            if (uiController.spellPanel.activeSelf == false && uiController.itemPanel.activeSelf == true) // sets mana potion to B
+            if (uiController.spellPanel.activeSelf == false && uiController.itemPanel.activeSelf == true && uiController.battleMenuUI.activeSelf == false) // sets mana potion to B
             {
                 if (battleItems.potions[1].quantity > 0)
                 {
-                    heroes[characterTurnIndex].activeItem = battleItems.potions[0].gameObject;
+                    enemies[focusIndex].ToggleHighlighter();
+                    heroes[characterTurnIndex].activeItem = battleItems.potions[1].gameObject;
                     heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
                     heroes[characterTurnIndex].actionType = Player.Action.item;
-                    uiController.itemPanel.gameObject.SetActive(false);
-                    uiController.ToggleButtonIcons();
+                    uiController.ToggleItemPanel();
                     if (enemies[0].dead == false)
                     {
                         focusIndex = 0;
@@ -798,12 +782,13 @@ public class BattleController : MonoBehaviour
                     {
                         NextPlayerTurn();
                     }
+                    uiController.activeUI = false;
                 }
             }
         }
         if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.JoystickButton3)) // Y on XBOX Controller
         {
-            if (uiController.itemPanel.activeSelf == false && uiController.spellPanel.activeSelf == false)
+            if (uiController.itemPanel.activeSelf == false && uiController.spellPanel.activeSelf == false && uiController.battleMenuUI.activeSelf == false)
             {
                 uiController.activeUI = uiController.itemPanel;
                 uiController.ToggleButtonIcons();
@@ -893,7 +878,7 @@ public class BattleController : MonoBehaviour
                         }
                     }
 
-                    // for Spell Menu
+                    
                     if (uiController.activeUI == true)
                     {
                         if (uiController.activeUI = uiController.spellPanel)
@@ -907,26 +892,13 @@ public class BattleController : MonoBehaviour
                                 uiController.spellIndex++;
                             }
                         }
-                    }
 
-                    if (uiController.activeUI == true)
-                    {
                         if (uiController.currentUI = uiController.itemPanel)
                         {
-                            if (uiController.itemIndex == 0)
-                            {
-                                uiController.itemIndex = battleItems.potions.Count;
-
-                            }
-                            if (uiController.itemIndex > 0)
-                            {
-                                uiController.itemIndex--;
-
-                            }
+                            
                         }
                     }
                 }
-
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
@@ -1007,6 +979,10 @@ public class BattleController : MonoBehaviour
                                 }
                             }
                         }
+                        if (uiController.currentUI = uiController.itemPanel)
+                        {
+
+                        }
                     }
                 }
             }
@@ -1021,10 +997,16 @@ public class BattleController : MonoBehaviour
                     uiController.ToggleItemPanel();                    
                 }
             }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                uiController.ToggleMenuUI();
+            }
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
             {
                 if (uiController.activeUI == false)
                 {
+                    uiController.uiAudio.clip = uiController.uiSounds[0];
+                    uiController.uiAudio.Play();
                     heroes[characterTurnIndex].attackTarget = enemies[focusIndex];
                     enemies[focusIndex].ToggleHighlighter();
                     
@@ -1060,12 +1042,12 @@ public class BattleController : MonoBehaviour
                         uiController.activeUI = false;
                     }
                     if (uiController.currentUI == uiController.itemPanel)
-                    {
+                    {  
+                        enemies[focusIndex].ToggleHighlighter();
                         heroes[characterTurnIndex].activeItem = battleItems.potions[0].gameObject;
                         heroes[characterTurnIndex].attackTarget = heroes[characterTurnIndex];
-                        heroes[characterTurnIndex].actionType = Player.Action.item;
-                        uiController.itemPanel.gameObject.SetActive(false);
-                        uiController.ToggleButtonIcons();
+                        heroes[characterTurnIndex].actionType = Player.Action.item;                        
+                        uiController.ToggleItemPanel();                        
                         if (enemies[0].dead == false)
                         {
                             focusIndex = 0;
@@ -1085,7 +1067,7 @@ public class BattleController : MonoBehaviour
                         {
                             NextPlayerTurn();
                         }
-                        
+                        uiController.activeUI = false;
                     }
                 }
 

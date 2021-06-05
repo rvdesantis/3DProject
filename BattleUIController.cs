@@ -18,6 +18,8 @@ public class BattleUIController : MonoBehaviour
 
     public BattleBTPanel buttonUIPanel;
 
+    public GameObject battleMenuUI;
+
     public List<Button> spellButtons;
     public List<Text> spellBTtxt;
     public GameObject spellPanel;    
@@ -43,6 +45,7 @@ public class BattleUIController : MonoBehaviour
 
     public AudioSource uiAudio;
     public List<AudioClip> uiSounds;
+    // 0 - select enemy, 1 - open menu, 2 - close menu, 3- victory
 
     private void Start()
     {
@@ -130,6 +133,8 @@ public class BattleUIController : MonoBehaviour
 
     public void ToggleSpellPanel()
     {
+        uiAudio.clip = uiSounds[1];
+        uiAudio.Play();
         if (spellPanel.gameObject.activeSelf)
         {
             spellPanel.gameObject.SetActive(false);
@@ -171,10 +176,13 @@ public class BattleUIController : MonoBehaviour
 
     public void ToggleItemPanel()
     {
+        uiAudio.clip = uiSounds[1];
+        uiAudio.Play();
         if (itemPanel.activeSelf)
         {
             itemPanel.gameObject.SetActive(false);
             ToggleButtonIcons();
+            activeUI = false;
             return;
         }
         if (itemPanel.activeSelf == false)
@@ -182,58 +190,24 @@ public class BattleUIController : MonoBehaviour
             itemPanel.gameObject.SetActive(true);
             activeUI = true;
             currentUI = itemPanel;
-            
-            foreach (Button button in itembuttons)
-            {
-                int itemIndex = itembuttons.IndexOf(button);
-                if (itemIndex < battlecontroller.battleItems.potions.Count)
-                {
-                    button.GetComponent<Image>().sprite = battlecontroller.battleItems.potions[itemIndex].itemImage;
-                    if (battlecontroller.battleItems.potions[itemIndex].quantity > 0)
-                    {
-                        itembuttons[itemIndex].gameObject.SetActive(true);
-                    }
-                }
-                if (itemIndex >= battlecontroller.battleItems.potions.Count)
-                {
-                    button.gameObject.SetActive(false);
-                }
-
-            }
-            itembuttons[0].Select();
-            itemIndex = 0;
         }
+
     }
 
-    public void ItemButtonDown()
+    public void ToggleMenuUI()
     {
-        battlecontroller.heroes[battlecontroller.characterTurnIndex].activeItem = battlecontroller.battleItems.potions[itemIndex].gameObject;
-        //
-        battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.heroes[battlecontroller.characterTurnIndex];
-        battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.item;
-        itemPanel.gameObject.SetActive(false);
-        ToggleButtonIcons();
-
-        if (battlecontroller.enemies[0].dead == false)
+        if (battleMenuUI.activeSelf)
         {
-            battlecontroller.focusIndex = 0;
-            battlecontroller.enemies[0].ToggleHighlighter();
+            battleMenuUI.gameObject.SetActive(false);
+            activeUI = false;
+            currentUI = null;
+            return;
         }
-        if (battlecontroller.enemies[0].dead == true && battlecontroller.enemies[1].dead == false)
+        if (itemPanel.activeSelf == false && spellPanel.activeSelf == false && battleMenuUI.activeSelf == false)
         {
-            battlecontroller.enemies[1].ToggleHighlighter();
-            battlecontroller.focusIndex = 1;
-        }
-        if (battlecontroller.enemies[0].dead == true && battlecontroller.enemies[1].dead == true)
-        {
-            battlecontroller.enemies[2].ToggleHighlighter();
-            battlecontroller.focusIndex = 2;
-        }
-
-
-        if (battlecontroller.characterTurnIndex <= 2)
-        {
-            battlecontroller.NextPlayerTurn();
+            battleMenuUI.gameObject.SetActive(true);
+            activeUI = true;
+            currentUI = battleMenuUI;
         }
     }
 
@@ -241,6 +215,8 @@ public class BattleUIController : MonoBehaviour
 
     public void SpellBTDown()
     {
+        uiAudio.clip = uiSounds[0];
+        uiAudio.Play();
         battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.enemies[battlecontroller.focusIndex];
         battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget.ToggleHighlighter();
         battlecontroller.TargetChecker();
@@ -257,6 +233,8 @@ public class BattleUIController : MonoBehaviour
 
     public void LevelUpUI()
     {
+        uiAudio.clip = uiSounds[3];
+        uiAudio.Play();
         lvlController.LoadLevelUPStats();
         levelUpUI.gameObject.SetActive(true);
         activeUI = true;
@@ -272,6 +250,11 @@ public class BattleUIController : MonoBehaviour
     public void ExitBattleUI()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 
     private void Update()
