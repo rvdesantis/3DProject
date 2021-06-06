@@ -10,6 +10,7 @@ public class Items : MonoBehaviour
     public AudioClip activatedSound;
 
     public string itemName;
+    public int goldCost;
     public bool usable;
 
     
@@ -22,6 +23,9 @@ public class Items : MonoBehaviour
 
     public int weaponNum;
     public int weaponHero;
+    public int weaponPower;
+    public int weaponDef;
+    public int weaponSpell;
 
     public Sprite itemSprite;
 
@@ -102,7 +106,6 @@ public class Items : MonoBehaviour
                 gameObject.SetActive(false);                
             }
         }
-
 
     }
 

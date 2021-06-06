@@ -264,7 +264,9 @@ public class SpellCombo : MonoBehaviour
 
 
     public void LeftOverAction()
-    {
+    {        
+        battleController.activeCam.m_Priority = 0;
+        battleController.mainCam.m_Priority = 2;
         bool allDead = false;
         int x = 0;
         foreach (Enemy enemy in battleController.enemies)
@@ -335,6 +337,69 @@ public class SpellCombo : MonoBehaviour
                 }
                 StartCoroutine(CamTimer());
             }
+            if (leftover.actionType == Player.Action.item)
+            {  
+                if (leftover.activeItem == battleController.battleItems.potions[0].gameObject)
+                {                    
+                    if (battleController.battleItems.potions[0].quantity > 0)
+                    {                        
+                        IEnumerator ItemTimer()
+                        {
+                            yield return new WaitForSeconds(1); // to allow for camera to get into place.
+                            leftover.GetComponent<Animator>().SetTrigger("item");
+                            leftover.attackTarget = leftover;
+                            battleController.battleItems.potions[0].target = leftover.attackTarget;
+                            battleController.battleItems.potions[0].target.combatTextPrefab.floatingText.color = Color.green;
+                            battleController.battleItems.potions[0].target.combatTextPrefab.damageAmount = battleController.battleItems.potions[0].health;
+                            battleController.battleItems.potions[0].target.combatTextPrefab.ToggleCombatText();
+                            battleController.battleItems.potions[0].HealthPotion();
+                            battleController.battleItems.potions[0].quantity--;
+                            yield return new WaitForSeconds(2);
+                            battleController.endTurn = true;
+                            battleController.NextPlayerAct();
+                        }
+                        StartCoroutine(ItemTimer());
+                    }
+                }
+                if (leftover.activeItem == battleController.battleItems.potions[1].gameObject)
+                {                    
+                    IEnumerator ItemTimer()
+                    {
+                        yield return new WaitForSeconds(1); // to allow for camera to get into place.
+                        leftover.GetComponent<Animator>().SetTrigger("item");
+                        leftover.attackTarget = leftover;
+                        battleController.battleItems.potions[1].target = leftover.attackTarget;
+                        battleController.battleItems.potions[1].target.combatTextPrefab.floatingText.color = Color.blue;
+                        battleController.battleItems.potions[1].target.combatTextPrefab.damageAmount = battleController.battleItems.potions[1].health;
+                        battleController.battleItems.potions[1].target.combatTextPrefab.ToggleCombatText();
+                        battleController.battleItems.potions[1].HealthPotion();
+                        battleController.battleItems.potions[1].quantity--;
+                        yield return new WaitForSeconds(2);
+                        battleController.endTurn = true;
+                        battleController.NextPlayerAct();
+                    }
+                    StartCoroutine(ItemTimer());
+                }
+                if (leftover.activeItem == battleController.battleItems.potions[2].gameObject)
+                {
+                    if (battleController.battleItems.potions[2].quantity > 0)
+                    {
+                        IEnumerator ItemTimer()
+                        {
+                            leftover.GetComponent<Animator>().SetTrigger("item");
+                            battleController.battleItems.potions[2].target = leftover.attackTarget;
+                            battleController.battleItems.potions[2].ManaPotion();
+                            battleController.battleItems.potions[2].quantity--;
+                            yield return new WaitForSeconds(2);
+                            battleController.endTurn = true;
+                            battleController.NextPlayerAct();
+                        }
+                        StartCoroutine(ItemTimer());
+                    }
+                }
+                
+            }
         }
+        
     }
 }

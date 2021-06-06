@@ -82,8 +82,7 @@ public class Chest : MonoBehaviour
                 }
                 if (treasure.itemFunction == Items.itemType.gold)
                 {
-                    int goldAmount = Random.Range(25, 76);                   
-                    string trinketName = treasure.itemName;
+                    int goldAmount = Random.Range(25, 76);  
                     StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
                     areaController.areaUI.messageText.text = "Gold +" + goldAmount;
 

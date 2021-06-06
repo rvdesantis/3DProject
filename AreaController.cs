@@ -39,6 +39,7 @@ public class AreaController : MonoBehaviour
     public static bool firstLoad;
     
     public static bool battleReturn;
+    public static int battleGold;
     public int respawnAttempt;
 
     public bool battleReturnmirror;
@@ -65,6 +66,14 @@ public class AreaController : MonoBehaviour
 
             SetPlayerBank();
             SetStartingItems();
+            yield return new WaitForSeconds(2);
+            if (battleReturn)
+            {                
+                areaUI.messageText.text = "+ " + battleGold + " Gold";
+                areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
+                areaUI.itemImage.sprite = availableItems[0].itemSprite;
+                areaUI.ItemImage();
+            }
         } StartCoroutine(LoadTimer());
     }
 

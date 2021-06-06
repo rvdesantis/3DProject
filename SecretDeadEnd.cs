@@ -12,6 +12,7 @@ public class SecretDeadEnd : DunCube
     public GameObject portalParticles;
     public Chest portalChest;
 
+    public bool shop;
 
 
 

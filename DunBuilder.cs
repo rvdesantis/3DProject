@@ -67,6 +67,7 @@ public class DunBuilder : MonoBehaviour
             createDungeonMirror = false;
             targetCubeCount = StaticMenuItems.dungeonCubeTarget;
             areaController.areaUI.messageText.text = "Rebuilding...";
+            areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
             RebuildDungeon();
         }
 

@@ -113,7 +113,8 @@ public class AreaUIController : MonoBehaviour
     {
         areaController.moveController.enabled = false;
         weaponPanel.gameObject.SetActive(true);
-        equipText.text = "Discovered " + activeItem.itemName + "!\n" + areaController.staticBank.bank[activeItem.weaponHero].playerName + " Weapon\nEquip Now?";
+        equipText.text = "Aquired " + activeItem.itemName + "!\n" + areaController.staticBank.bank[activeItem.weaponHero].playerName + " Weapon\nEquip Now?";
+        noBT.Select();
         yesBT.Select();
     }
 

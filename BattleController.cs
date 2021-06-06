@@ -648,6 +648,9 @@ public class BattleController : MonoBehaviour
         Debug.Log("Start After Battle");
         int totalXP = enemies[0].XP + enemies[1].XP + enemies[2].XP;
         bool lvlUP = false;
+        int gold = Random.Range(25, 51);
+        StaticMenuItems.goldCount = StaticMenuItems.goldCount + gold;
+        AreaController.battleGold = gold;
         foreach (Player character in heroes) 
         {
             character.anim.SetBool("idle", true);
@@ -893,7 +896,7 @@ public class BattleController : MonoBehaviour
                             }
                         }
 
-                        if (uiController.currentUI = uiController.itemPanel)
+                        if (uiController.currentUI == uiController.itemPanel)
                         {
                             
                         }
@@ -979,7 +982,7 @@ public class BattleController : MonoBehaviour
                                 }
                             }
                         }
-                        if (uiController.currentUI = uiController.itemPanel)
+                        if (uiController.currentUI == uiController.itemPanel)
                         {
 
                         }
@@ -1040,6 +1043,7 @@ public class BattleController : MonoBehaviour
                     {
                         // handled in BattleUIController since Space Key would only select active spell menu button
                         uiController.activeUI = false;
+                        return;
                     }
                     if (uiController.currentUI == uiController.itemPanel)
                     {  
@@ -1068,6 +1072,7 @@ public class BattleController : MonoBehaviour
                             NextPlayerTurn();
                         }
                         uiController.activeUI = false;
+                        return;
                     }
                 }
 
@@ -1236,36 +1241,7 @@ public class BattleController : MonoBehaviour
                     }
                 }               
             }
-        }
-
-        if (Input.GetAxis("Vertical") < -.5f)
-        {
-            if (uiController.currentUI == uiController.itemPanel)
-            {
-                if (uiController.itemIndex < battleItems.potions.Count - 1)
-                {
-                    uiController.itemIndex++;                    
-                }
-                if (uiController.itemIndex == battleItems.potions.Count - 1)
-                {
-                    
-                }
-            }
-        }
-        if (Input.GetAxis("Vertical") > .5f)
-        {
-            if (uiController.currentUI == uiController.itemPanel)
-            {
-                if (uiController.itemIndex == 0)
-                {
-                    
-                }
-                if (uiController.itemIndex > 0)
-                {
-                    uiController.itemIndex--;
-                }
-            }
-        }
+        }        
     }
 
 }
