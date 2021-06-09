@@ -74,7 +74,8 @@ public class HeroSelect : MonoBehaviour
     public List<Image> trinketImages;
     public List<Trinket> masterTrinketList;
 
-
+    public AudioSource audioSource;
+    public List<AudioClip> enterDunAudio;
 
     private void Start()
     {
@@ -517,7 +518,9 @@ public class HeroSelect : MonoBehaviour
                         {
                             directionText.text = "Enter Random Dungeon";
                             directionUI.gameObject.SetActive(false);
-                            
+                            audioSource.clip = enterDunAudio[Random.Range(0, enterDunAudio.Count)];
+                            audioSource.Play();
+
                             yield return new WaitForSeconds(1);
                             doorButtonsUI.gameObject.SetActive(true);
 

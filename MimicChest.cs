@@ -55,6 +55,11 @@ public class MimicChest : MonoBehaviour
         if (this.gameObject.activeSelf)
         {
             gameObject.SetActive(false);
+            if (treasure.itemFunction == Items.itemType.placeholder)
+            {                
+                PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 100);
+                PlayerPrefs.Save();
+            }
             if (treasure.itemFunction == Items.itemType.weapon)
             {
                 areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
@@ -144,7 +149,7 @@ public class MimicChest : MonoBehaviour
         {
             opened = true;
         }
-        if (Vector3.Distance(areaController.moveController.transform.position, this.transform.position) < 7)
+        if (Vector3.Distance(areaController.moveController.transform.position, this.transform.position) < 5.5f)
         {
             if (opened == false)
             {
@@ -167,7 +172,7 @@ public class MimicChest : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
-            if (Vector3.Distance(areaController.moveController.transform.position, this.transform.position) < 7)
+            if (Vector3.Distance(areaController.moveController.transform.position, this.transform.position) < 5)
             {
                 PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 1);
                 PlayerPrefs.Save();

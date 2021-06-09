@@ -26,7 +26,11 @@ public class StaticMenuItems : MonoBehaviour
             PlayerPrefs.SetInt("Chest" + x + "position", 0);
             PlayerPrefs.SetInt("Mimic" + x + "position", 0);            
             PlayerPrefs.SetInt("Chest" + x + "Item", 0);
-        }        
+        }
+
+        // reset dun shops
+        PlayerPrefs.SetInt("SecretStoreWeapon", 0);
+        PlayerPrefs.SetInt("StoreWeaponSold", 0);
 
         PlayerPrefs.Save();
     }

@@ -111,7 +111,7 @@ public class DunBuilder : MonoBehaviour
         PlayerPrefs.SetInt("ChestCount", targetChestCount);
         for (chestCount = 0; chestCount < targetChestCount; chestCount++)
         {
-            int x = Random.Range(0, createdDeadEnds.Count - 1);        
+            int x = Random.Range(0, createdDeadEnds.Count);        
             if (chestCount == 0)
             {                
                 PlayerPrefs.SetInt("Chest" + chestCount + "position", x); PlayerPrefs.Save();

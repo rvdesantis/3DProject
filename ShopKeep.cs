@@ -12,6 +12,7 @@ public class ShopKeep : MonoBehaviour
     public GameObject weapnSpawnPlatform;
     public Vector3 storeWeaponSpawnPoint;
     public Vector3 storeItem0;
+    public float weapDistance;
     public bool wInRange;
 
     public List<Items> availWeapons;
@@ -19,10 +20,16 @@ public class ShopKeep : MonoBehaviour
 
     public List<Trinket> availTrinkets;
 
+    public AudioSource audioSource;
+    public List<AudioClip> shopKeepAudio;
+    public GameObject secretDoor;
+    public bool opened;
+
     private void Start()
     {
         areaController = FindObjectOfType<AreaController>();
         SpawnWeapon();
+        weapDistance = 10;
     }
 
     public void SpawnWeapon()
@@ -33,24 +40,41 @@ public class ShopKeep : MonoBehaviour
             x = Random.Range(0, availWeapons.Count);
             Debug.Log(availWeapons[x].itemName + " available in Shop");
             PlayerPrefs.SetInt("SecretStoreWeapon", x);
+            PlayerPrefs.SetInt("StoreWeaponSold", 0);
             PlayerPrefs.Save();
-        }
+
+            storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
+            weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
+        }        
         if (AreaController.firstLoad == false)
         {
-            x = PlayerPrefs.GetInt("SecretStoreWeapon");
+            if (PlayerPrefs.GetInt("StoreWeaponSold") == 0)
+            {
+                x = PlayerPrefs.GetInt("SecretStoreWeapon");
+                storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
+                weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
+            }
+            
         }
-        storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
-        weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
+        
 
     }
 
 
     private void Update()
-    {
-        float w = Vector3.Distance(weapon.transform.position, areaController.moveController.transform.position);
-        if (w <= 2)
+    {        
+        if (PlayerPrefs.GetInt("StoreWeaponSold") == 0)
+        {
+            weapDistance = Vector3.Distance(weapon.transform.position, areaController.moveController.transform.position);
+        }            
+        if (weapDistance <= 5)
         {
             wInRange = true;
+            if (opened == false)
+            {
+                opened = true;
+                audioSource.PlayOneShot(shopKeepAudio[Random.Range(0, shopKeepAudio.Count)], 1);
+            }
         }
         if (wInRange && weapon.gameObject.activeSelf)
         {
@@ -66,6 +90,7 @@ public class ShopKeep : MonoBehaviour
                         areaController.areaUI.activeItem = weapon;
                         areaController.areaUI.WeaponImage();
                         weapon.gameObject.SetActive(false);
+                        PlayerPrefs.SetInt("StoreWeaponSold", 1); PlayerPrefs.Save();
                     }
                 }
             }
@@ -76,7 +101,7 @@ public class ShopKeep : MonoBehaviour
             }
             
         }
-        if (wInRange && w > 3)
+        if (wInRange && weapDistance > 5)
         {
             areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
         }

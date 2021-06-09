@@ -139,6 +139,7 @@ public class BattleController : MonoBehaviour
         }
         if (BattleLauncher.mimic == true)
         {
+            enemyNumber = 3; // set to 3 for gold rewards
             enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[0], enemySpawnPoint0, Quaternion.identity);
             enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
             enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
@@ -416,6 +417,10 @@ public class BattleController : MonoBehaviour
                                 castingCams[0].Priority = 0;
                                 yield return new WaitForSeconds(heroes[0].selectedSpell.castingTime);
                                 castingCams[1].Priority = 0;
+                                if (heroes[characterTurnIndex].selectedSpell.targetALL)
+                                {
+                                    mainCam.m_Priority = 2;
+                                }
                                 yield return new WaitForSeconds(1f);
                                 NextPlayerAct();
                             }
@@ -432,6 +437,10 @@ public class BattleController : MonoBehaviour
                                 castingCams[2].Priority = 0;
                                 yield return new WaitForSeconds(heroes[1].selectedSpell.castingTime);
                                 castingCams[3].Priority = 0;
+                                if (heroes[characterTurnIndex].selectedSpell.targetALL)
+                                {
+                                    mainCam.m_Priority = 2;
+                                }
                                 yield return new WaitForSeconds(1f);
                                 NextPlayerAct();
                             }
@@ -448,6 +457,10 @@ public class BattleController : MonoBehaviour
                                 castingCams[4].Priority = 0;
                                 yield return new WaitForSeconds(heroes[2].selectedSpell.castingTime);
                                 castingCams[5].Priority = 0;
+                                if (heroes[characterTurnIndex].selectedSpell.targetALL)
+                                {
+                                    mainCam.m_Priority = 2;
+                                }
                                 yield return new WaitForSeconds(1f);
                                 NextPlayerAct();
                             }
@@ -648,7 +661,7 @@ public class BattleController : MonoBehaviour
         Debug.Log("Start After Battle");
         int totalXP = enemies[0].XP + enemies[1].XP + enemies[2].XP;
         bool lvlUP = false;
-        int gold = Random.Range(25, 51);
+        int gold = (Random.Range(5, 11) * enemyNumber);
         StaticMenuItems.goldCount = StaticMenuItems.goldCount + gold;
         AreaController.battleGold = gold;
         foreach (Player character in heroes) 

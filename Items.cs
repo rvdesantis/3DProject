@@ -14,7 +14,7 @@ public class Items : MonoBehaviour
     public bool usable;
 
     
-    public enum itemType { gold, trinket, potion, weapon, key, portal }
+    public enum itemType { gold, trinket, potion, weapon, key, portal, placeholder }
     public itemType itemFunction;     
 
     public Door targetDoor;    

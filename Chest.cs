@@ -21,7 +21,7 @@ public class Chest : MonoBehaviour
 
     void Update()
     {
-        if (Vector3.Distance(player.transform.position, transform.position) < 8)
+        if (Vector3.Distance(player.transform.position, transform.position) < 5.5f)
         {
             if (opened == 0)
             {
@@ -45,7 +45,7 @@ public class Chest : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
         {
-            if (Vector3.Distance(player.transform.position, this.transform.position) < 7 && opened == 0)
+            if (Vector3.Distance(player.transform.position, this.transform.position) < 5 && opened == 0)
             {
                 PlayerPrefs.SetInt("chest" + areaController.chests.IndexOf(this), 1);                
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
@@ -62,11 +62,6 @@ public class Chest : MonoBehaviour
                 if (treasure.itemFunction == Items.itemType.portal)
                 {
                     secretDeadEnd.PortalChest();
-                    areaController.areaUI.messageText.text = treasure.itemName;
-                    areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
-                    areaController.areaUI.itemImage.sprite = treasure.itemSprite;
-                    areaController.areaUI.ItemImage();
-
                 }
                 if (treasure.itemFunction == Items.itemType.weapon)
                 {
