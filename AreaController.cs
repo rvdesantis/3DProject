@@ -15,6 +15,8 @@ public class AreaController : MonoBehaviour
     public List<SecretWall> secretWalls;
     public List<Chest> chests;
     public List<MimicChest> mimics;
+    public List<DunEnemyAgent> agents;
+
     public GameObject bossDoor;
     public List<Items> areaInventory;
     public List<Items> potions;
@@ -45,9 +47,15 @@ public class AreaController : MonoBehaviour
     public bool battleReturnmirror;
     public bool firstLoadMirror;
 
-    
+
+
+
     void Start()
     {
+        if (firstLoad == false && battleReturn == false)
+        {
+            respawnPoint = FindObjectOfType<OriginCube>().spawnPlatform.transform.position;
+        }
         if (firstLoad)
         {
             Debug.Log("firstload");            

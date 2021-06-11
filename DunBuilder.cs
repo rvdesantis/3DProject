@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Cinemachine;
 
 
@@ -53,6 +54,9 @@ public class DunBuilder : MonoBehaviour
     public Chest chestPrefab;
     public MimicChest mimicChest;
 
+    public DunEnemyAgent[] agents;
+
+    public Animator loadScreenAnim;
 
 
     private void Awake()
@@ -397,13 +401,27 @@ public class DunBuilder : MonoBehaviour
             areaController.areaUI.gameObject.SetActive(true);
             areaController.areaUI.compassSmall.gameObject.SetActive(true);
 
+            foreach (NavMeshSurface floor in createdTurnCubes[0].navMeshSurfaces)
+            {
+                floor.BuildNavMesh();
+            }           
+
             PlayerPrefs.SetInt("TotalStartCubes", createdStartCubes.Count);
             PlayerPrefs.SetInt("TotalTurnCubes", turnCounter);
             PlayerPrefs.SetInt("TotalBossCubes", createdBossRooms.Count);
+            
+
+            int ag = Random.Range(0, agents.Length);
+            DunEnemyAgent spawnedAgent = Instantiate(agents[ag], createdTurnCubes[0].itemSpawnPoint.transform.position, createdTurnCubes[0].itemSpawnPoint.transform.rotation);
+            areaController.agents.Add(spawnedAgent);
+            PlayerPrefs.SetInt("Agent" + 0, ag);
             PlayerPrefs.Save();
+
+            spawnedAgent.targetLocation = areaController.bossHallwaySpawnPoint;       
+
             createDungeon = false;
             createDungeonMirror = false;
-
+            loadScreenAnim.SetTrigger("fadeOut");
             this.gameObject.SetActive(false);
         }
         
@@ -480,6 +498,18 @@ public class DunBuilder : MonoBehaviour
             areaController.chests = createdChests;
             closedRespawn = true;
 
+            foreach (NavMeshSurface floor in createdTurnCubes[0].navMeshSurfaces)
+            {
+                floor.BuildNavMesh();
+            }
+
+
+            int ag = PlayerPrefs.GetInt("Agent" + 0);
+            DunEnemyAgent spawnedAgent = Instantiate(agents[ag], originCube.spawnPlatform.transform.position, originCube.spawnPlatform.transform.rotation);
+            areaController.agents.Add(spawnedAgent);
+            spawnedAgent.LoadPosition();
+            spawnedAgent.targetLocation = areaController.bossHallwaySpawnPoint;
+
             areaController.moveController.gameObject.SetActive(true);
             areaController.areaUI.gameObject.SetActive(true);
             areaController.areaUI.compassSmall.gameObject.SetActive(true);
@@ -487,8 +517,8 @@ public class DunBuilder : MonoBehaviour
 
             createDungeon = false;
             createDungeonMirror = false;
-            areaController.Respawn();               
-
+            areaController.Respawn();
+            loadScreenAnim.SetTrigger("fadeOut");
             this.gameObject.SetActive(false);            
         }
     }

@@ -10,6 +10,7 @@ public class HeroSelect : MonoBehaviour
     public Button newGameBT;
     public Button resumeBT;
 
+    public static bool dunReturn;
     public bool start;
 
     public PlayerBank staticHeroList;
@@ -69,6 +70,7 @@ public class HeroSelect : MonoBehaviour
     public Text dungeonInfoTXT;
     public GameObject doorButtonsUI;
     public Button startRunBT;
+    
 
     public GameObject trinketPanel;    
     public List<Image> trinketImages;
@@ -77,10 +79,26 @@ public class HeroSelect : MonoBehaviour
     public AudioSource audioSource;
     public List<AudioClip> enterDunAudio;
 
+
+
+    private void Awake()
+    {
+        if (dunReturn == true)
+        {
+            newGameBT.gameObject.SetActive(false);
+            resumeBT.gameObject.SetActive(false);
+            ResumeRun();
+            directionUI.gameObject.SetActive(true);
+            iconPanel.gameObject.SetActive(true);
+        }
+    }
     private void Start()
     {
-        newGameBT.Select();
-        directionUIanim = directionUI.GetComponent<Animator>();
+        if (dunReturn == false)
+        {
+            newGameBT.Select();
+        }        
+        directionUIanim = directionUI.GetComponent<Animator>();        
     }
 
     public void NewRun()
@@ -144,6 +162,8 @@ public class HeroSelect : MonoBehaviour
             start = false;
             cam1.m_LookAt = camAimers[0].transform;
             lights[0].gameObject.SetActive(true);
+            StaticMenuItems.dungeonCubeTarget = 250; // sets default dungeon size to "small"
+            StaticMenuItems.ResetDungeonValues();
         }
         StartCoroutine(StartTimer());
     }
@@ -496,7 +516,7 @@ public class HeroSelect : MonoBehaviour
 
                     return;
                 }
-                if (partyIndex == 2)
+                if (partyIndex == 2 && !door)
                 {
 
                     if (hero0 != heroIndex && hero1 != heroIndex)

@@ -45,6 +45,11 @@ public class BattleLauncher : MonoBehaviour
                 respawnPoint = areaController.moveController.transform.position;
                 rotationPoint = areaController.moveController.transform.rotation;                
                 areaController.areaUI.fadeOutPanel.gameObject.SetActive(true);
+                areaController.moveController.enabled = false;
+                foreach(DunEnemyAgent agent in areaController.agents)
+                {
+                    agent.SavePosition();
+                }
 
                 AreaController.respawnPoint = respawnPoint;
                 AreaController.respawnRotation = rotationPoint;
@@ -54,7 +59,7 @@ public class BattleLauncher : MonoBehaviour
                     UnityEngine.SceneManagement.SceneManager.LoadScene("Battle");
                 } StartCoroutine(LoadTimer());               
             }
-            if (battleChance < 74)
+            if (battleChance < 66)
             {
                 FPcontroller.steps = 0;
             }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Playables;
 
 
@@ -28,6 +29,8 @@ public class DunCube : MonoBehaviour
     public GameObject door;
     public PlayableDirector playableDirector;
 
+    public NavMeshSurface[] navMeshSurfaces;
+
 
     private void Start()
     {
@@ -52,7 +55,7 @@ public class DunCube : MonoBehaviour
                 nextCube.posPosition = nextCube.positive.gameObject.transform.position;
                 nextCube.negPosition = nextCube.negative.gameObject.transform.position;
                 dunBuilder.createdCube = nextCube;
-                dunBuilder.totalCubes++;
+                dunBuilder.totalCubes++;                
 
                 lightCounter++;
                 if (lightCounter == 3)
@@ -65,6 +68,7 @@ public class DunCube : MonoBehaviour
             }
 
             dunBuilder.createdTurn = Instantiate(dunBuilder.fourWay, nextSpawnPosition, dunBuilder.createdCube.transform.rotation);
+            dunBuilder.createdTurnCubes.Add(dunBuilder.createdTurn);
             PlayerPrefs.SetInt("Turn" + dunBuilder.turnCounter, dunBuilder.turnBank.IndexOf(dunBuilder.fourWay));
             PlayerPrefs.Save();
             dunBuilder.turnCounter++;
@@ -103,7 +107,7 @@ public class DunCube : MonoBehaviour
                 int turnNumber = Random.Range(0, dunBuilder.turnBank.Count); // range does not include end, no need for - 1
                 DunCube randomTurn = dunBuilder.turnBank[turnNumber];
                 dunBuilder.createdTurn = Instantiate(randomTurn, nextSpawnPosition, targetCube.transform.rotation);
-                dunBuilder.createdTurnCubes.Add(randomTurn);
+                dunBuilder.createdTurnCubes.Add(dunBuilder.createdTurn);
                 PlayerPrefs.SetInt("Turn" + dunBuilder.turnCounter, turnNumber);
                 PlayerPrefs.SetFloat("Turn" + dunBuilder.turnCounter + "X", nextSpawnPosition.x);
                 PlayerPrefs.SetFloat("Turn" + dunBuilder.turnCounter + "Y", nextSpawnPosition.y);
@@ -191,8 +195,10 @@ public class DunCube : MonoBehaviour
                 nextSpawnPosition = new Vector3(createdCube.posPosition.x - createdCube.negPosition.x, 0, createdCube.posPosition.z - createdCube.negPosition.z) * (cubeCounter + 1);
             }
 
-            dunBuilder.createdTurn = Instantiate(dunBuilder.fourWay, nextSpawnPosition, dunBuilder.createdCube.transform.rotation);           
+            dunBuilder.createdTurn = Instantiate(dunBuilder.fourWay, nextSpawnPosition, dunBuilder.createdCube.transform.rotation);
+            dunBuilder.createdTurnCubes.Add(dunBuilder.createdTurn);
             dunBuilder.turnCounter++;
+
             dunBuilder.AttachRoom();
             return;
 

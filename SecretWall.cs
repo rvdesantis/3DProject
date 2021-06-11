@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class SecretWall : MonoBehaviour
 {
     public AreaController areaController;
     public int wallNumber;
-
+   
     
     
     
@@ -21,9 +22,9 @@ public class SecretWall : MonoBehaviour
 
     private void Start()
     {
-       
 
         
+
     }
 
     public void WallDisolver()
