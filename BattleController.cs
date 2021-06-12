@@ -14,6 +14,7 @@ public class BattleController : MonoBehaviour
     public BattleItems battleItems;
 
     public List<CinemachineVirtualCamera> virtualCams;
+    public List<CinemachineVirtualCamera> exitCams;
     // 0-2 Hero Player Back cams, 3-5, Hero Player Front Cams
     public List<CinemachineVirtualCamera> castingCams;
     public CinemachineVirtualCamera mainCam;
@@ -513,6 +514,7 @@ public class BattleController : MonoBehaviour
                                     NextPlayerAct();
                                 }
                                 StartCoroutine(ItemTimer());
+                                return;
                             }
                         }
                         if (heroes[characterTurnIndex].activeItem == battleItems.potions[1].gameObject)
@@ -533,6 +535,7 @@ public class BattleController : MonoBehaviour
                                 NextPlayerAct();
                             }
                             StartCoroutine(ItemTimer());
+                            return;
                         }
                         if (heroes[characterTurnIndex].activeItem == battleItems.potions[2].gameObject)
                         {
@@ -548,6 +551,7 @@ public class BattleController : MonoBehaviour
                                     NextPlayerAct();
                                 }
                                 StartCoroutine(ItemTimer());
+                                return;
                             }
                         }
                     }
@@ -637,20 +641,12 @@ public class BattleController : MonoBehaviour
                 keyboard = true;
 
 
-
-                foreach (Player character in enemies) // check to see if all enemies are dead to send battle.
+                if (deadEnemies == enemies.Count)
                 {                    
-                    if (deadEnemies == enemies.Count)
-                    {                       
-                        virtualCams[0].m_LookAt = enemies[0].transform;
-                        keyboard = false;
-                        AreaController.battleReturn = true;
-                        AfterBattle();
-                        
-                    }
-                    return;
-                }                
-                
+                    keyboard = false;
+                    AreaController.battleReturn = true;
+                    AfterBattle();
+                }                 
             }           
             
         }        
@@ -659,71 +655,83 @@ public class BattleController : MonoBehaviour
     public void AfterBattle()
     {
         Debug.Log("Start After Battle");
-        int totalXP = enemies[0].XP + enemies[1].XP + enemies[2].XP;
-        bool lvlUP = false;
-        int gold = (Random.Range(5, 11) * enemyNumber);
-        StaticMenuItems.goldCount = StaticMenuItems.goldCount + gold;
-        AreaController.battleGold = gold;
-        foreach (Player character in heroes) 
+        activeCam.m_Priority = 0;
+        exitCams[0].Priority = 5;
+        
+
+        IEnumerator CamTimer()
         {
-            character.anim.SetBool("idle", true);
-            if (character.playerName == "Archer")
+            yield return new WaitForSeconds(1);
+            exitCams[1].Priority = 6;
+            int totalXP = enemies[0].XP + enemies[1].XP + enemies[2].XP;
+            bool lvlUP = false;
+            int gold = (Random.Range(5, 11) * enemyNumber);
+            StaticMenuItems.goldCount = StaticMenuItems.goldCount + gold;
+            AreaController.battleGold = gold;
+            foreach (Player character in heroes)
             {
-                character.XP = character.XP + totalXP;
-                PlayerPrefs.SetInt("ArXP", character.XP);
-                PlayerPrefs.SetInt("ArHealth", character.playerHealth);
+                character.anim.SetBool("idle", true);
+                if (character.playerName == "Archer")
+                {
+                    character.XP = character.XP + totalXP;
+                    PlayerPrefs.SetInt("ArXP", character.XP);
+                    PlayerPrefs.SetInt("ArHealth", character.playerHealth);
+
+                }
+                if (character.playerName == "Berserker")
+                {
+                    character.XP = character.XP + totalXP;
+                    PlayerPrefs.SetInt("BerXP", character.XP);
+                    PlayerPrefs.SetInt("BerHealth", character.playerHealth);
+
+                }
+                if (character.playerName == "Warrior")
+                {
+                    character.XP = character.XP + totalXP;
+                    PlayerPrefs.SetInt("WarXP", character.XP);
+                    PlayerPrefs.SetInt("WarHealth", character.playerHealth);
+
+                }
+                if (character.playerName == "Mage")
+                {
+                    character.XP = character.XP + totalXP;
+                    PlayerPrefs.SetInt("MagXP", character.XP);
+                    PlayerPrefs.SetInt("MagHealth", character.playerHealth);
+
+                }
+                PlayerPrefs.Save();
+
+
+                if (character.playerLevel == 1 && character.XP >= 500)
+                {
+                    Debug.Log(character.playerName + " level up!");
+                    lvlUP = true;
+                }
+                if (lvlUP == true)
+                {
+                    uiController.LevelUpUI();
+                }
 
             }
-            if (character.playerName == "Berserker")
+
+            if (lvlUP == false)
             {
-                character.XP = character.XP + totalXP;
-                PlayerPrefs.SetInt("BerXP", character.XP);
-                PlayerPrefs.SetInt("BerHealth", character.playerHealth);
+                IEnumerator ExitTimer()
+                {
+                    yield return new WaitForSeconds(2);
+                    uiController.loadScreen.gameObject.SetActive(true);
+                    yield return new WaitForSeconds(1);
+                    DunBuilder.createDungeon = false;
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
+                }
+                StartCoroutine(ExitTimer());
 
             }
-            if (character.playerName == "Warrior")
+            if (uiController.levelUpUI.activeSelf)
             {
-                character.XP = character.XP + totalXP;
-                PlayerPrefs.SetInt("WarXP", character.XP);
-                PlayerPrefs.SetInt("WarHealth", character.playerHealth);
-
+                // battle exits through button on Level UP UI Screen
             }
-            if (character.playerName == "Mage")
-            {
-                character.XP = character.XP + totalXP;
-                PlayerPrefs.SetInt("MagXP", character.XP);
-                PlayerPrefs.SetInt("MagHealth", character.playerHealth);
-
-            }
-            PlayerPrefs.Save();
-
-            
-            if (character.playerLevel == 1 && character.XP >= 500)
-            {
-                Debug.Log(character.playerName + " level up!");
-                lvlUP = true;
-            }
-            if (lvlUP == true)
-            {
-                uiController.LevelUpUI();
-            }
-
-        }
-
-        if (lvlUP == false)
-        {
-            IEnumerator ExitTimer()
-            {
-                yield return new WaitForSeconds(2);
-                DunBuilder.createDungeon = false;
-                UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
-            } StartCoroutine(ExitTimer());
-
-        }
-        if (uiController.levelUpUI.activeSelf)
-        {
-            // battle exits through button on Level UP UI Screen
-        }
+        } StartCoroutine(CamTimer());       
 
     }
 

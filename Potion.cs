@@ -45,7 +45,7 @@ public class Potion : MonoBehaviour
         IEnumerator PotionTimer()
         {
             yield return new WaitForSeconds(3);
-            castingPotion.gameObject.SetActive(false);
+            Destroy(castingPotion);
         }
         StartCoroutine(PotionTimer());
     }

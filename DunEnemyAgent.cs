@@ -2,17 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Experimental.AI;
 
 public class DunEnemyAgent : MonoBehaviour
 {
     public string agentName;
     public bool forHire;
+    public int hireCost;
+
+
     public AreaController areaController;
     public NavMeshAgent agent;
+    public NavMeshQuery agentQuery;
     public GameObject agentBodyTransform;
     public AgentLinkMover mover;
     public Vector3 targetLocation;
+    public Vector3 nextLocation;
     public Vector3 savedPosition;
+    public LineRenderer lineRenderer;
 
     public Animator bodyAnim;
     public BoxCollider boxCollider;
@@ -31,11 +38,11 @@ public class DunEnemyAgent : MonoBehaviour
     bool intro = false;
     bool goodBye = false;
     bool negative = false;
-
+    bool agentMessage = false;
 
     private void Start()
     {
-        areaController = FindObjectOfType<AreaController>();
+        areaController = FindObjectOfType<AreaController>(); 
     }
 
     public void SavePosition()
@@ -84,10 +91,10 @@ public class DunEnemyAgent : MonoBehaviour
     }
 
     private void Update()
-    {
+    {        
 
         if (move)
-        {
+        {            
             bodyAnim.SetBool("walk", true);
             agent.SetDestination(targetLocation);
         }
@@ -97,20 +104,44 @@ public class DunEnemyAgent : MonoBehaviour
         }
         if (Vector3.Distance(transform.position, targetLocation) < 1)
         {
-            move = false;
-            finished = true;
+            if (targetLocation == nextLocation)
+            {
+                move = false;
+                finished = true;
+            }
+            if (targetLocation != nextLocation)
+            {
+                targetLocation = nextLocation;
+            }
+
+        }
+        if (Vector3.Distance(transform.position, areaController.moveController.transform.position) >= 5)
+        {
+            if (agentMessage == true)
+            {
+                if (areaController.areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)
+                {
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                }
+            }
         }
         if (Vector3.Distance(transform.position, areaController.moveController.transform.position) < 5)
         {
+            agentMessage = true;
             if (intro == false && active == false)
             {
                 bodyAnim.SetTrigger("idleBreak");
                 audioSource.clip = introClips[Random.Range(0, introClips.Count)];
-                audioSource.Play();
-                areaController.areaUI.messageText.text = "Hire " + agentName + " (Free)";
-                areaController.areaUI.TriggerMessage();
-                intro = true;
-                
+                audioSource.Play();               
+                intro = true;                
+            }
+            if (active == false)
+            {
+                if (forHire)
+                {
+                    areaController.areaUI.messageText.text = "Hire " + agentName + " (" + hireCost + " Gold)";
+                    areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", true);
+                }
             }
             if (!move)
             {
@@ -119,13 +150,29 @@ public class DunEnemyAgent : MonoBehaviour
 
                 }
                 if (Input.GetKeyDown(KeyCode.Space))
-                {                    
-                    areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);                    
-                    move = true;
-                    active = true;
-                    audioSource.clip = activatedClips[0];
-                    audioSource.Play();
-                    PlayerPrefs.SetInt("Agent" + 0 + "Active", 1); PlayerPrefs.Save();
+                {
+                    if (forHire)
+                    {
+                        if (StaticMenuItems.goldCount >= hireCost)
+                        {
+                            StaticMenuItems.goldCount = StaticMenuItems.goldCount - hireCost;
+                            areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                            move = true;
+                            active = true;
+                            audioSource.clip = activatedClips[0];
+                            audioSource.Play();
+                            PlayerPrefs.SetInt("Agent" + 0 + "Active", 1); PlayerPrefs.Save();
+                        }
+                    }
+                    if (!forHire)
+                    {
+                        areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                        move = true;
+                        active = true;
+                        audioSource.clip = activatedClips[0];
+                        audioSource.Play();
+                        PlayerPrefs.SetInt("Agent" + 0 + "Active", 1); PlayerPrefs.Save();
+                    }
                 }
             }            
         }

@@ -30,6 +30,7 @@ public class DunCube : MonoBehaviour
     public PlayableDirector playableDirector;
 
     public NavMeshSurface[] navMeshSurfaces;
+    public NavMeshAgent navAgent;
 
 
     private void Start()

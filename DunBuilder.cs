@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Experimental.AI;
 using Cinemachine;
 
 
@@ -55,6 +56,7 @@ public class DunBuilder : MonoBehaviour
     public MimicChest mimicChest;
 
     public DunEnemyAgent[] agents;
+   
 
     public Animator loadScreenAnim;
 
@@ -326,6 +328,72 @@ public class DunBuilder : MonoBehaviour
         }
     }
 
+    public void SpawnAgents()
+    {
+        int ag = Random.Range(0, agents.Length);
+        DunEnemyAgent spawnedAgent = Instantiate(agents[ag], createdTurnCubes[0].itemSpawnPoint.transform.position, createdTurnCubes[0].itemSpawnPoint.transform.rotation);
+        areaController.agents.Add(spawnedAgent);
+
+        NavMeshPath path = new NavMeshPath();
+        spawnedAgent.agent.CalculatePath(areaController.bossHallwaySpawnPoint, path);
+
+        if (path.status == NavMeshPathStatus.PathComplete)
+        {
+            Debug.Log(spawnedAgent.agentName + " Path Complete");
+            spawnedAgent.targetLocation = areaController.bossHallwaySpawnPoint;
+        }
+
+
+        if (path.status == NavMeshPathStatus.PathPartial)
+        {   
+            Debug.Log(spawnedAgent.agentName + " Path Partial, Checking Turn Agents");
+            bool foundPath = false;
+            foreach (DunCube turn in createdTurnCubes)
+            {
+                NavMeshPath path1 = new NavMeshPath();
+                NavMeshPath path2 = new NavMeshPath();
+                bool pathToAgent = false;
+                bool pathToTarget = false;
+
+                spawnedAgent.agent.CalculatePath(turn.itemSpawnPoint.transform.position, path1);
+                if (path1.status == NavMeshPathStatus.PathComplete)
+                {
+                    Debug.Log("Path to Turn " + createdTurnCubes.IndexOf(turn) + " from " + spawnedAgent.agentName + " clear");
+                    pathToAgent = true;
+                }
+                turn.navAgent.CalculatePath(areaController.bossHallwaySpawnPoint, path2);
+                if (path2.status == NavMeshPathStatus.PathComplete)
+                {
+                    Debug.Log("Path from Turn " + createdTurnCubes.IndexOf(turn) + " to boss hallway clear");
+                    pathToTarget = true;
+                }
+                if (pathToAgent && pathToTarget)
+                {
+                    Debug.Log(createdTurnCubes.IndexOf(turn) + " agent target set");
+                    foundPath = true;
+                    spawnedAgent.nextLocation = areaController.bossHallwaySpawnPoint;
+                    spawnedAgent.targetLocation = turn.itemSpawnPoint.transform.position;
+                    break;
+                }
+            }
+            
+            if (foundPath == false)
+            {
+                spawnedAgent.gameObject.SetActive(false);
+                Debug.Log(spawnedAgent.agentName + " path not found.  deactivating");
+            }
+        }
+        if (path.status == NavMeshPathStatus.PathInvalid)
+        {
+            Debug.Log(spawnedAgent.agentName + " Path Invalid");
+        }
+
+
+
+        PlayerPrefs.SetInt("Agent" + 0, ag);
+        PlayerPrefs.Save();
+    }
+
     public void CloseDungeon()
     {
         if (closedDun == false && bossRoomCreated == false)
@@ -404,20 +472,17 @@ public class DunBuilder : MonoBehaviour
             foreach (NavMeshSurface floor in createdTurnCubes[0].navMeshSurfaces)
             {
                 floor.BuildNavMesh();
-            }           
+            }
 
             PlayerPrefs.SetInt("TotalStartCubes", createdStartCubes.Count);
             PlayerPrefs.SetInt("TotalTurnCubes", turnCounter);
             PlayerPrefs.SetInt("TotalBossCubes", createdBossRooms.Count);
-            
 
-            int ag = Random.Range(0, agents.Length);
-            DunEnemyAgent spawnedAgent = Instantiate(agents[ag], createdTurnCubes[0].itemSpawnPoint.transform.position, createdTurnCubes[0].itemSpawnPoint.transform.rotation);
-            areaController.agents.Add(spawnedAgent);
-            PlayerPrefs.SetInt("Agent" + 0, ag);
-            PlayerPrefs.Save();
+            SpawnAgents();
 
-            spawnedAgent.targetLocation = areaController.bossHallwaySpawnPoint;       
+           
+
+                
 
             createDungeon = false;
             createDungeonMirror = false;

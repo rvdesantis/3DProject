@@ -38,6 +38,8 @@ public class BattleUIController : MonoBehaviour
     public Image lvlHeroFace;
     public Text levelText;
 
+    public GameObject loadScreen;
+
     public List<Image> trinketIcons;
 
     public bool activeUI;
@@ -249,7 +251,15 @@ public class BattleUIController : MonoBehaviour
 
     public void ExitBattleUI()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
+        IEnumerator ExitTimer()
+        {
+            yield return new WaitForSeconds(2);
+            loadScreen.gameObject.SetActive(true);
+            yield return new WaitForSeconds(1);
+            DunBuilder.createDungeon = false;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
+        }
+        StartCoroutine(ExitTimer());
     }
 
     public void ExitGame()
