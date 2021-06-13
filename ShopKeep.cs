@@ -25,6 +25,9 @@ public class ShopKeep : MonoBehaviour
     public GameObject secretDoor;
     public bool opened;
 
+    // used in Update
+ 
+
     private void Start()
     {
         areaController = FindObjectOfType<AreaController>();
@@ -68,7 +71,7 @@ public class ShopKeep : MonoBehaviour
             weapDistance = Vector3.Distance(weapon.transform.position, areaController.moveController.transform.position);
         }            
         if (weapDistance <= 5)
-        {
+        {            
             wInRange = true;
             if (opened == false)
             {
@@ -90,6 +93,7 @@ public class ShopKeep : MonoBehaviour
                         areaController.areaUI.activeItem = weapon;
                         areaController.areaUI.WeaponImage();
                         weapon.gameObject.SetActive(false);
+                        areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                         PlayerPrefs.SetInt("StoreWeaponSold", 1); PlayerPrefs.Save();
                     }
                 }
@@ -101,9 +105,13 @@ public class ShopKeep : MonoBehaviour
             }
             
         }
-        if (wInRange && weapDistance > 5)
+        if (weapDistance > 5 && wInRange)
         {
-            areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+            wInRange = false;
+            if (areaController.areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)
+            {
+                areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+            }            
         }
     }
 }

@@ -419,12 +419,18 @@ public class DunBuilder : MonoBehaviour
           
         }
         if (closedDun == false && bossRoomCreated == true)
-        {
-            Debug.Log(createdStartCubes.Count - startCubeCount + " Leftover Starting Cubes.  Creating Dead Ends & Secret Walls");
+        {            
             int secretCubeCounter = 0;
             int secretIndex = 0;
+
+            
+            List<DunCube> createdSecretCubes = new List<DunCube>();
+            bool cubeUsed = false;
+            int x = 0;
+
             foreach (DunCube leftoverCube in createdStartCubes)
             {
+                
                 if (createdStartCubes.IndexOf(leftoverCube) >= startCubeCount)
                 {                    
                     if (leftoverCube.SecretColliderCheck() == true)
@@ -434,19 +440,41 @@ public class DunBuilder : MonoBehaviour
                         secretIndex++;
                     }
                     if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex > 1)
-                    {
-                        int x = Random.Range(0, secretCubes.Count);
-                        PlayerPrefs.SetInt("secretCubeNumber", x);                        
-                        DunCube deadEndCube = Instantiate(secretCubes[x], leftoverCube.transform.position, leftoverCube.transform.rotation);
-                        areaController.secretWalls.Add(deadEndCube.GetComponentInChildren<SecretWall>());
-                        deadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(deadEndCube.GetComponentInChildren<SecretWall>());
-                        if (x == 0) // will not add dead end if filled
+                    {                        
+                        for (int i = 0; i < 100; i++)
                         {
-                            createdDeadEnds.Add(deadEndCube);
-                        }                        
-                        PlayerPrefs.SetInt("SecretCube" + secretCubeCounter, x); PlayerPrefs.Save();
-                        secretCubeCounter++;
-                        secretIndex = 0;
+                            cubeUsed = false;
+                            x = Random.Range(0, secretCubes.Count);
+
+                            if (createdSecretCubes.Count > 0)
+                            {
+                                foreach (DunCube secretCube in createdSecretCubes)
+                                {
+                                    if (secretCube == secretCubes[x])
+                                    {
+                                        cubeUsed = true;
+                                        Debug.Log("Secret Cube " + x + " already in Dungeon.  Rerolling");
+                                    }
+                                }
+                            }
+                            if (cubeUsed == false)
+                            {
+                                createdSecretCubes.Add(secretCubes[x]);
+                                PlayerPrefs.SetInt("secretCubeNumber", x);
+                                DunCube deadEndCube = Instantiate(secretCubes[x], leftoverCube.transform.position, leftoverCube.transform.rotation);
+                                Debug.Log("Secret Cube " + x + " Added to Dungeon");
+                                areaController.secretWalls.Add(deadEndCube.GetComponentInChildren<SecretWall>());
+                                deadEndCube.GetComponentInChildren<SecretWall>().wallNumber = areaController.secretWalls.IndexOf(deadEndCube.GetComponentInChildren<SecretWall>());
+                                if (x == 0) // will not add dead end if filled
+                                {
+                                    createdDeadEnds.Add(deadEndCube);
+                                }
+                                PlayerPrefs.SetInt("SecretCube" + secretCubeCounter, x); PlayerPrefs.Save();
+                                secretCubeCounter++;
+                                secretIndex = 0;
+                                break;
+                            }
+                        }                      
                     }
                     if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex <= 1)
                     {

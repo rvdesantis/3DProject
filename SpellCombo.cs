@@ -359,6 +359,7 @@ public class SpellCombo : MonoBehaviour
                             battleController.NextPlayerAct();
                         }
                         StartCoroutine(ItemTimer());
+                        return;
                     }
                 }
                 if (leftover.activeItem == battleController.battleItems.potions[1].gameObject)
@@ -379,6 +380,7 @@ public class SpellCombo : MonoBehaviour
                         battleController.NextPlayerAct();
                     }
                     StartCoroutine(ItemTimer());
+                    return;
                 }
                 if (leftover.activeItem == battleController.battleItems.potions[2].gameObject)
                 {
@@ -395,6 +397,7 @@ public class SpellCombo : MonoBehaviour
                             battleController.NextPlayerAct();
                         }
                         StartCoroutine(ItemTimer());
+                        return;
                     }
                 }
                 
