@@ -239,6 +239,7 @@ public class BattleController : MonoBehaviour
         }
         if (characterTurnIndex == 2)
         {
+            keyboard = false;
             foreach (Enemy enemy in enemies)
             {
                 if (enemy.dead == false)
@@ -246,8 +247,7 @@ public class BattleController : MonoBehaviour
                     enemy.highlighter.gameObject.SetActive(false);
                 }                
             }
-            Debug.Log("Start Hero Action Cycle");
-            keyboard = false;
+            Debug.Log("Start Hero Action Cycle");           
             uiController.activeUI = false;
             virtualCams[0].Priority = 1;
             virtualCams[2].Priority = 0;
@@ -665,9 +665,9 @@ public class BattleController : MonoBehaviour
             exitCams[1].Priority = 6;
             int totalXP = enemies[0].XP + enemies[1].XP + enemies[2].XP;
             bool lvlUP = false;
-            int gold = (Random.Range(5, 11) * enemyNumber);
+            int gold = Random.Range(5, 11) * enemyNumber;
             StaticMenuItems.goldCount = StaticMenuItems.goldCount + gold;
-            PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount);
+            PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount); PlayerPrefs.Save();
             AreaController.battleGold = gold;
             foreach (Player character in heroes)
             {

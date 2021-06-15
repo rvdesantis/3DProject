@@ -184,15 +184,16 @@ public class MimicChest : MonoBehaviour
                 opened = true;
                 IEnumerator LaunchTimer()
                 {
-                    yield return new WaitForSeconds(2f);
+                    
                     BattleLauncher.mimic = true;
                     battleLauncher.launching = true;
-                    areaController.moveController.enabled = false;
-                    areaController.areaUI.fadeOutPanel.gameObject.SetActive(true);
                     battleLauncher.respawnPoint = areaController.moveController.transform.position;
                     battleLauncher.rotationPoint = areaController.moveController.transform.rotation;
                     AreaController.respawnPoint = battleLauncher.respawnPoint;
                     AreaController.respawnRotation = battleLauncher.rotationPoint;
+                    areaController.moveController.enabled = false;
+                    areaController.areaUI.fadeOutPanel.gameObject.SetActive(true);
+                    yield return new WaitForSeconds(2f);      
                     UnityEngine.SceneManagement.SceneManager.LoadScene("Battle");
                 } StartCoroutine(LaunchTimer());
             }

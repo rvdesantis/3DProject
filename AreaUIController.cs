@@ -48,6 +48,8 @@ public class AreaUIController : MonoBehaviour
     public GameObject menuUI;
     public List<DunMenuBT> menuButtons;
 
+    public GameObject goldUI;
+
     public GameObject fadeOutPanel;
 
     public GameObject messageUI;
@@ -165,6 +167,10 @@ public class AreaUIController : MonoBehaviour
         if (inventoryPanel.activeSelf)
         {
             inventoryPanel.gameObject.SetActive(false);
+            if (goldUI.gameObject.activeSelf)
+            {
+                ToggleGold();
+            }
             areaController.moveController.enabled = true;
             uiNavigation = false;
             return;
@@ -175,10 +181,28 @@ public class AreaUIController : MonoBehaviour
             {
                 areaController.moveController.enabled = false;
                 inventoryPanel.gameObject.SetActive(true);
+                if (goldUI.gameObject.activeSelf == false)
+                {
+                    ToggleGold();
+                }
                 return;
             }
         }
 
+    }
+
+    public void ToggleGold()
+    {
+        if (goldUI.gameObject.activeSelf)
+        {
+            goldUI.gameObject.SetActive(false);
+            return;
+        }
+        if (goldUI.gameObject.activeSelf == false)
+        {
+            goldUI.gameObject.SetActive(true);
+            return;
+        }
     }
 
     public void TogglePartyMenu()

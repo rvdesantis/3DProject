@@ -262,26 +262,27 @@ public class AreaController : MonoBehaviour
             {
                 foreach (SecretWall wall in secretWalls)
                 {
-                    if (Vector3.Distance(moveController.transform.position, wall.transform.position) < 5f && wall.open == false)
+                    if (wall.isActiveAndEnabled)
                     {
-                        IEnumerator WallTimer()
+                        if (Vector3.Distance(moveController.transform.position, wall.transform.position) < 5f && wall.open == false)
                         {
-                            if (wall.enemyTrigger)
+                            IEnumerator WallTimer()
                             {
-                                wall.dunEnemy.anim.SetTrigger("turn");
-                                wall.dunEnemy.launchable = true;
-                                wall.enemyTrigger = false;
+                                if (wall.enemyTrigger)
+                                {
+                                    wall.dunEnemy.anim.SetTrigger("turn");
+                                    wall.dunEnemy.launchable = true;
+                                    wall.enemyTrigger = false;
+                                }
+                                wall.WallDisolver();
+                                yield return new WaitForSeconds(2);
+                                wall.disolver.gameObject.SetActive(false);
                             }
-                            wall.WallDisolver();                            
-                            yield return new WaitForSeconds(2);
-                            wall.disolver.gameObject.SetActive(false);
+                            StartCoroutine(WallTimer());
                         }
-                        StartCoroutine(WallTimer());
                     }
+                    
                 }
-
-
-
                 if (Vector3.Distance(moveController.transform.position, bossDoor.transform.position) < 5f)
                 {
                     areaPlayables[0].Play();

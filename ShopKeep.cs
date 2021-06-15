@@ -32,7 +32,7 @@ public class ShopKeep : MonoBehaviour
     {
         areaController = FindObjectOfType<AreaController>();
         SpawnWeapon();
-        weapDistance = 10;
+        weapDistance = 6;
     }
 
     public void SpawnWeapon()
@@ -85,6 +85,10 @@ public class ShopKeep : MonoBehaviour
             {
                 areaController.areaUI.messageText.text = "Buy " + weapon.itemName + "? (" + areaController.staticBank.bank[weapon.weaponHero].name + ")\n" + weapon.goldCost + " Gold";
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", true);
+                if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf == false)
+                {
+                    FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                }
                 if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Joystick1Button0))
                 {
                     if (weapon.gameObject.activeSelf)
@@ -94,6 +98,10 @@ public class ShopKeep : MonoBehaviour
                         areaController.areaUI.WeaponImage();
                         weapon.gameObject.SetActive(false);
                         areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                        if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)
+                        {
+                            FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                        }
                         PlayerPrefs.SetInt("StoreWeaponSold", 1); PlayerPrefs.Save();
                     }
                 }
@@ -102,6 +110,10 @@ public class ShopKeep : MonoBehaviour
             {
                 areaController.areaUI.messageText.text = "Buy " + weapon.itemName + "? (" + areaController.staticBank.bank[weapon.weaponHero].name + ")\n" + weapon.goldCost + " Gold (Not Enough Gold)";
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", true);
+                if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf == false)
+                {
+                    FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                }
             }
             
         }
@@ -111,6 +123,10 @@ public class ShopKeep : MonoBehaviour
             if (areaController.areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)
             {
                 areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)
+                {
+                    FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                }
             }            
         }
     }

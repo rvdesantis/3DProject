@@ -65,10 +65,16 @@ public class GoblinGuide : DunEnemyAgent
         {
             if (agentMessage == true)
             {
+                if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)
+                {
+                    FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                    agentMessage = false;
+                }
                 if (areaController.areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)
                 {
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                 }
+
             }
         }
         if (Vector3.Distance(transform.position, areaController.moveController.transform.position) < 5)
@@ -87,6 +93,10 @@ public class GoblinGuide : DunEnemyAgent
                 {
                     areaController.areaUI.messageText.text = "Hire " + agentName + " (" + hireCost + " Gold)";
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", true);
+                    if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf == false)
+                    {
+                        FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                    }
                 }
             }
             if (!move)
@@ -104,17 +114,22 @@ public class GoblinGuide : DunEnemyAgent
                             StaticMenuItems.goldCount = StaticMenuItems.goldCount - hireCost;
                             PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount);
                             areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                            if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)
+                            {
+                                FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                            }
                             move = true;
                             active = true;
                             audioSource.clip = activatedClips[0];
                             audioSource.Play();
                             PlayerPrefs.SetInt("Agent" + 0 + "Active", 1); PlayerPrefs.Save();
                         }
-                        if (StaticMenuItems.goldCount >= hireCost)
+                        if (StaticMenuItems.goldCount < hireCost)
                         {
                             audioSource.clip = activatedClips[3];
                             audioSource.Play();                            
                         }
+                        return;
                     }
                     if (!forHire)
                     {
@@ -128,13 +143,17 @@ public class GoblinGuide : DunEnemyAgent
                 }
             }
         }
-        if (intro && Vector3.Distance(transform.position, areaController.moveController.transform.position) > 15 && move == false)
+        if (intro && Vector3.Distance(transform.position, areaController.moveController.transform.position) > 12 && move == false)
         {
             if (!negative)
             {
                 negative = true;
                 audioSource.clip = activatedClips[2];
                 audioSource.Play();
+                if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)
+                {
+                    FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                }
             }
         }
         if (Vector3.Distance(transform.position, areaController.moveController.transform.position) < 5 && finished == true)
@@ -145,6 +164,10 @@ public class GoblinGuide : DunEnemyAgent
                 audioSource.clip = activatedClips[1];
                 audioSource.Play();
                 goodBye = true;
+                if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)
+                {
+                    FindObjectOfType<AreaController>().areaUI.ToggleGold();
+                }
             }
         }
 

@@ -7,10 +7,14 @@ public class SecretDeadEnd : DunCube
     public SecretWall secretWall;
     public Animator anim;
 
-    public bool portalCube;
+    public enum SecretCubeType { portal, weapon, shop, empty}
+    public SecretCubeType secretCubeType;
+
+    
     public GameObject orb;
     public GameObject portalParticles;
     public Chest portalChest;
+    public List<Chest> chestBank;
 
     public enum SecretType { returnP, bossP, treasure, empty, enemy, shop }
     public SecretType secretType;
@@ -20,11 +24,35 @@ public class SecretDeadEnd : DunCube
     {
         dunBuilder = FindObjectOfType<DunBuilder>();
         secretWall.areaController = FindObjectOfType<AreaController>();
-        if (portalCube)
+        if (secretCubeType == SecretCubeType.portal)
         {
             portalChest.areaController = FindObjectOfType<AreaController>();             
             portalChest.player = portalChest.areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();            
         }
+        if (secretCubeType == SecretCubeType.weapon)
+        {
+            AreaController areaController = FindObjectOfType<AreaController>();
+            Chest chest = Instantiate(chestBank[1], itemSpawnPoint.transform.position, itemSpawnPoint.transform.rotation);
+            chest.areaController = FindObjectOfType<AreaController>();
+            chest.player = FindObjectOfType<AreaController>().moveController.GetComponentInChildren<FirstPersonPlayer>();
+            areaController.chests.Add(chest);
+
+            ArmorStand armorStand = chest.GetComponent<ArmorStand>();
+            int w = Random.Range(0, armorStand.weaponBank.Count);
+            if (AreaController.firstLoad)
+            {
+                PlayerPrefs.SetInt("SecretArmorStand", w);
+            }
+            if (AreaController.firstLoad == false)
+            {
+                w = PlayerPrefs.GetInt("SecretArmorStand");
+            }
+
+            Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, Quaternion.identity);
+            chest.treasure = spawnedWeapon;
+            Debug.Log("Armor Stand Spawned");
+        }
+
     }
 
     public void PortalChest()
@@ -44,4 +72,6 @@ public class SecretDeadEnd : DunCube
             anim.SetBool("portalActive", true);
         } StartCoroutine(ChestTimer());
     }
+
+
 }
