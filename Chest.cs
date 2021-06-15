@@ -68,17 +68,12 @@ public class Chest : MonoBehaviour
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
                     areaController.areaUI.activeItem = treasure;
                     areaController.areaUI.WeaponImage();
-
-                    Player equipHero = areaController.staticBank.bank[treasure.weaponHero];
-
-                    equipHero.Weapon.gameObject.SetActive(false);
-                    equipHero.Weapon = equipHero.equipedWeapons[treasure.weaponNum];
-                    equipHero.equipedWeapons[treasure.weaponNum].gameObject.SetActive(true);
                 }
                 if (treasure.itemFunction == Items.itemType.gold)
                 {
-                    int goldAmount = Random.Range(25, 76);  
+                    int goldAmount = Random.Range(25, 50);  
                     StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
+                    PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount); PlayerPrefs.Save();
                     areaController.areaUI.messageText.text = "Gold +" + goldAmount;
 
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");

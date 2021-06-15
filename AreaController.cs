@@ -58,7 +58,9 @@ public class AreaController : MonoBehaviour
         }
         if (firstLoad)
         {
-            Debug.Log("firstload");            
+            Debug.Log("firstload");
+            areaUI.messageText.text = " Building Dungeon";
+            areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
         }
         if (firstLoad == false)
         {

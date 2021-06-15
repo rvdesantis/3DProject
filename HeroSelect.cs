@@ -164,6 +164,7 @@ public class HeroSelect : MonoBehaviour
             lights[0].gameObject.SetActive(true);
             StaticMenuItems.dungeonCubeTarget = 250; // sets default dungeon size to "small"
             StaticMenuItems.ResetDungeonValues();
+            StaticMenuItems.goldCount = PlayerPrefs.GetInt("Gold");
         }
         StartCoroutine(StartTimer());
     }

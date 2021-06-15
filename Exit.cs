@@ -14,7 +14,7 @@ public class Exit : MonoBehaviour
 
     public virtual void Update()
     {
-        if (Vector3.Distance(player.transform.position, transform.position) < 2.5f)
+        if (Vector3.Distance(player.transform.position, transform.position) < 2.75f)
         {
             inRange = true;
             areaController.areaUI.messageText.text = "Leave Dungeon?\nYou will keep all found items, gold, and XP";
@@ -24,10 +24,11 @@ public class Exit : MonoBehaviour
             {
                 AreaController.respawnPoint = transform.position;                
                 HeroSelect.dunReturn = true;
+                PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount); PlayerPrefs.Save();
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Character Select");
             }
         }
-        if (Vector3.Distance(player.transform.position, transform.position) >= 2.5f)
+        if (Vector3.Distance(player.transform.position, transform.position) >= 2.75f)
         {
             if (inRange == true)
             {

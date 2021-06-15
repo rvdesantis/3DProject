@@ -1,49 +1,12 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Experimental.AI;
 
-public class DunEnemyAgent : MonoBehaviour
+public class GoblinGuide : DunEnemyAgent
 {
-    public string agentName;
-    public bool forHire;
-    public int hireCost;
 
 
-    public AreaController areaController;
-    public NavMeshAgent agent;
-    public NavMeshQuery agentQuery;
-    public GameObject agentBodyTransform;
-    public AgentLinkMover mover;
-    public Vector3 targetLocation;
-    public Vector3 nextLocation;
-    public Vector3 savedPosition;   
-    public Animator bodyAnim;   
-
-    public AudioSource audioSource;
-    public List<AudioClip> introClips;
-    public List<AudioClip> activatedClips;
-    public List<AudioClip> returnClips;
-
-    
-    public bool move;
-    public bool active;
-    public bool finished;
-
-
-    // below used in updates
-    public bool intro = false;
-    public bool goodBye = false;
-    public bool negative = false;
-    public bool agentMessage = false;
-
-    private void Start()
-    {
-        areaController = FindObjectOfType<AreaController>(); 
-    }
-
-    public virtual void SavePosition()
+    public override void SavePosition()
     {
         savedPosition = transform.position;
         PlayerPrefs.SetFloat("Agent" + 0 + "X", savedPosition.x);
@@ -51,7 +14,7 @@ public class DunEnemyAgent : MonoBehaviour
         PlayerPrefs.SetFloat("Agent" + 0 + "Z", savedPosition.z);
         PlayerPrefs.Save();
     }
-    public virtual void LoadPosition()
+    public override void LoadPosition()
     {
         agent.gameObject.SetActive(false);
         if (AreaController.battleReturn == true)
@@ -65,47 +28,38 @@ public class DunEnemyAgent : MonoBehaviour
         if (AreaController.battleReturn == false)
         {
             transform.position = FindObjectOfType<DunBuilder>().createdTurnCubes[0].itemSpawnPoint.transform.position;
-        }        
+        }
         agent.gameObject.SetActive(true);
 
         if (PlayerPrefs.GetInt("Agent" + 0 + "Active") == 1)
-        {            
+        {
+            int talk = Random.Range(0, 2);
+            if (talk == 1)
+            {
+                audioSource.clip = returnClips[Random.Range(0, returnClips.Count)];
+                audioSource.Play();
+            }
             move = true;
             active = true;
-        }        
+        }
     }
 
-
-
-    public void SelectTargetLocation()
+    public override void Update()
     {
-        
-    }
-
-    public virtual void Update()
-    {        
 
         if (move)
-        {            
+        {
             bodyAnim.SetBool("walk", true);
             agent.SetDestination(targetLocation);
         }
         if (!move)
         {
-            bodyAnim.SetBool("walk", false);            
+            bodyAnim.SetBool("walk", false);
         }
         if (Vector3.Distance(transform.position, targetLocation) < 1)
         {
-            if (targetLocation == nextLocation)
-            {
-                move = false;
-                finished = true;
-            }
-            if (targetLocation != nextLocation)
-            {
-                targetLocation = nextLocation;
-            }
-
+            move = false;
+            finished = true;
         }
         if (Vector3.Distance(transform.position, areaController.moveController.transform.position) >= 5)
         {
@@ -122,8 +76,10 @@ public class DunEnemyAgent : MonoBehaviour
             agentMessage = true;
             if (intro == false && active == false)
             {
-                bodyAnim.SetTrigger("idleBreak");             
-                intro = true;                
+                bodyAnim.SetTrigger("idleBreak");
+                audioSource.clip = introClips[Random.Range(0, introClips.Count)];
+                audioSource.Play();
+                intro = true;
             }
             if (active == false)
             {
@@ -150,7 +106,14 @@ public class DunEnemyAgent : MonoBehaviour
                             areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                             move = true;
                             active = true;
+                            audioSource.clip = activatedClips[0];
+                            audioSource.Play();
                             PlayerPrefs.SetInt("Agent" + 0 + "Active", 1); PlayerPrefs.Save();
+                        }
+                        if (StaticMenuItems.goldCount >= hireCost)
+                        {
+                            audioSource.clip = activatedClips[3];
+                            audioSource.Play();                            
                         }
                     }
                     if (!forHire)
@@ -158,25 +121,32 @@ public class DunEnemyAgent : MonoBehaviour
                         areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                         move = true;
                         active = true;
+                        audioSource.clip = activatedClips[0];
+                        audioSource.Play();
                         PlayerPrefs.SetInt("Agent" + 0 + "Active", 1); PlayerPrefs.Save();
                     }
                 }
-            }            
+            }
         }
         if (intro && Vector3.Distance(transform.position, areaController.moveController.transform.position) > 15 && move == false)
         {
             if (!negative)
             {
                 negative = true;
+                audioSource.clip = activatedClips[2];
+                audioSource.Play();
             }
         }
         if (Vector3.Distance(transform.position, areaController.moveController.transform.position) < 5 && finished == true)
         {
             if (goodBye == false)
-            {                
+            {
+                bodyAnim.SetTrigger("idleBreak");
+                audioSource.clip = activatedClips[1];
+                audioSource.Play();
                 goodBye = true;
             }
         }
-    }
 
+    }
 }

@@ -6,6 +6,8 @@ public class Archer : Player
 {
     public GameObject ammoModel;
     public List<Ammo> quiver;
+    public Ammo equipedArrow;
+    public int ammoIndex;
 
     public int healthMirror;
     public int manaMirror;
@@ -14,7 +16,8 @@ public class Archer : Player
 
     public override void Start()
     {        
-        base.Start();        
+        base.Start();
+        Weapon.power = quiver[ammoIndex].ammoPower;        
     }
 
     public override void LevelUp()
@@ -48,10 +51,8 @@ public class Archer : Player
         PlayerPrefs.SetInt("ArMana", 20);
         PlayerPrefs.SetInt("ArStr", 45);
         PlayerPrefs.SetInt("ArDef", 35);
-        PlayerPrefs.Save();
-        Weapon.gameObject.SetActive(false);
-        Weapon = equipedWeapons[0];
-        Weapon.gameObject.SetActive(true);
+        PlayerPrefs.Save();        
+        equipedArrow = quiver[0];       
 
         for (int i = 0; i < spells.Count; i++)
         {
@@ -60,7 +61,6 @@ public class Archer : Player
                 spells.Remove(spells[i]);
             }
         }
-
     }
 
     public override void SetBattleStats()
@@ -102,7 +102,7 @@ public class Archer : Player
             transform.position = idlePosition;
             Reload();
 
-            int damage = playerSTR - attackTarget.playerDEF;
+            int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
             {
@@ -121,6 +121,11 @@ public class Archer : Player
     public void TriggerBowDraw()
     {
         Weapon.GetComponent<Animator>().SetTrigger("setup2R");
+    }
+
+    public void TriggerBowRelease()
+    {
+        Weapon.GetComponent<Animator>().SetTrigger("finish"); 
     }
 
     public void TriggerBowShoot()

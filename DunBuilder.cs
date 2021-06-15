@@ -22,21 +22,26 @@ public class DunBuilder : MonoBehaviour
     public DunCube tJunct;
     public DunCube fourWay;
     public DunCube deadEnd;
+    public List<DunCube> turnBank;
+    public List<DunCube> rooms;
     public List<DunCube> secretCubes;
 
     public DunCube bossRoom;
     public List<DunCube> createdStartCubes;
-    public List<DunCube> createdTurnCubes;    
+    public List<DunCube> createdTurnCubes;
+    public List<DunCube> createdRooms;
+    public List<DunCube> createdSecretCubes;
     public List<DunCube> createdBossRooms;
     public List<DunCube> createdDeadEnds;
     public List<Chest> createdChests;
     public List<MimicChest> createdMimics;
     public List<Items> createdItems;
 
-    public List<DunCube> turnBank;
+    
     public List<GameObject> characterRotators;
 
     public int startCubeCount;
+    public int secretCubeCounter;
     public int turnCounter;
     public int cubeCounter;
     public int totalCubes;    
@@ -60,6 +65,7 @@ public class DunBuilder : MonoBehaviour
 
     public Animator loadScreenAnim;
 
+    int secretIndex;
 
     private void Awake()
     {
@@ -420,11 +426,7 @@ public class DunBuilder : MonoBehaviour
         }
         if (closedDun == false && bossRoomCreated == true)
         {            
-            int secretCubeCounter = 0;
-            int secretIndex = 0;
-
-            
-            List<DunCube> createdSecretCubes = new List<DunCube>();
+            secretCubeCounter = 0;
             bool cubeUsed = false;
             int x = 0;
 
@@ -439,7 +441,7 @@ public class DunBuilder : MonoBehaviour
                         createdDeadEnds.Add(deadEndCube);
                         secretIndex++;
                     }
-                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex > 1)
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= secretCubes.Count && secretIndex > 1)
                     {                        
                         for (int i = 0; i < 100; i++)
                         {
@@ -476,7 +478,7 @@ public class DunBuilder : MonoBehaviour
                             }
                         }                      
                     }
-                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= 4 && secretIndex <= 1)
+                    if (leftoverCube.SecretColliderCheck() == false && secretCubeCounter <= secretCubes.Count - 1 && secretIndex <= 1)
                     {
                         DunCube deadEndCube = Instantiate(deadEnd, leftoverCube.transform.position, leftoverCube.transform.rotation);
                         createdDeadEnds.Add(deadEndCube);
@@ -491,6 +493,8 @@ public class DunBuilder : MonoBehaviour
             }
             SpawnChests();
             areaController.chests = createdChests;
+
+
             closedDun = true;
             areaController.moveController.gameObject.SetActive(true);
             areaController.moveController.enabled = true;

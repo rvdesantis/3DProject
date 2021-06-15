@@ -7,7 +7,9 @@ public class Ammo : MonoBehaviour
 
     public Vector3 targetPosition;
     public float spellSpeed;
-
+    public int ammoPower;
+    public enum AmmoType { normal, fire, ice, lightning, dark }
+    public AmmoType ammoType;
 
 
     // Update is called once per frame

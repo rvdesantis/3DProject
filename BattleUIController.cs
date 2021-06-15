@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 public class BattleUIController : MonoBehaviour
 {
-    public BattleController battlecontroller;
+    public BattleController battleController;
     public List<FacePanel> facePanels;
     public List<Image> heroFaces;
     public List<Slider> healthbars;
@@ -20,8 +20,9 @@ public class BattleUIController : MonoBehaviour
 
     public GameObject battleMenuUI;
 
-    public List<Button> spellButtons;
-    public List<Text> spellBTtxt;
+    public Button spellButton;
+    public Text spellBTtxt;
+    public Text spellInfoTXT;
     public GameObject spellPanel;    
     public int spellIndex;
 
@@ -60,51 +61,51 @@ public class BattleUIController : MonoBehaviour
 
     public void SetMaxHealth()
     {
-        healthbars[0].maxValue = battlecontroller.heroes[0].playerMaxHealth;
-        healthbars[1].maxValue = battlecontroller.heroes[1].playerMaxHealth;
-        healthbars[2].maxValue = battlecontroller.heroes[2].playerMaxHealth;
-        heroHealth[0].text = battlecontroller.heroes[0].playerMaxHealth + "/" + battlecontroller.heroes[0].playerMaxHealth;
-        heroHealth[1].text = battlecontroller.heroes[1].playerMaxHealth + "/" + battlecontroller.heroes[1].playerMaxHealth;
-        heroHealth[2].text = battlecontroller.heroes[2].playerMaxHealth + "/" + battlecontroller.heroes[2].playerMaxHealth;
+        healthbars[0].maxValue = battleController.heroes[0].playerMaxHealth;
+        healthbars[1].maxValue = battleController.heroes[1].playerMaxHealth;
+        healthbars[2].maxValue = battleController.heroes[2].playerMaxHealth;
+        heroHealth[0].text = battleController.heroes[0].playerMaxHealth + "/" + battleController.heroes[0].playerMaxHealth;
+        heroHealth[1].text = battleController.heroes[1].playerMaxHealth + "/" + battleController.heroes[1].playerMaxHealth;
+        heroHealth[2].text = battleController.heroes[2].playerMaxHealth + "/" + battleController.heroes[2].playerMaxHealth;
     }
 
     public void SetMaxMana()
     {
-        manabars[0].maxValue = battlecontroller.heroes[0].playerMaxMana;
-        manabars[1].maxValue = battlecontroller.heroes[1].playerMaxMana;
-        manabars[2].maxValue = battlecontroller.heroes[2].playerMaxMana;
-        heroMana[0].text = battlecontroller.heroes[0].playerMaxMana + "/" + battlecontroller.heroes[0].playerMaxMana;
-        heroMana[1].text = battlecontroller.heroes[1].playerMaxMana + "/" + battlecontroller.heroes[1].playerMaxMana;
-        heroMana[2].text = battlecontroller.heroes[2].playerMaxMana + "/" + battlecontroller.heroes[2].playerMaxMana;
+        manabars[0].maxValue = battleController.heroes[0].playerMaxMana;
+        manabars[1].maxValue = battleController.heroes[1].playerMaxMana;
+        manabars[2].maxValue = battleController.heroes[2].playerMaxMana;
+        heroMana[0].text = battleController.heroes[0].playerMaxMana + "/" + battleController.heroes[0].playerMaxMana;
+        heroMana[1].text = battleController.heroes[1].playerMaxMana + "/" + battleController.heroes[1].playerMaxMana;
+        heroMana[2].text = battleController.heroes[2].playerMaxMana + "/" + battleController.heroes[2].playerMaxMana;
     }
 
     public void SetHealth()
     {
-        healthbars[0].value = battlecontroller.heroes[0].playerHealth;
-        healthbars[1].value = battlecontroller.heroes[1].playerHealth;
-        healthbars[2].value = battlecontroller.heroes[2].playerHealth;
-        heroHealth[0].text = battlecontroller.heroes[0].playerHealth + "/" + battlecontroller.heroes[0].playerMaxHealth;
-        heroHealth[1].text = battlecontroller.heroes[1].playerHealth + "/" + battlecontroller.heroes[1].playerMaxHealth;
-        heroHealth[2].text = battlecontroller.heroes[2].playerHealth + "/" + battlecontroller.heroes[2].playerMaxHealth;
+        healthbars[0].value = battleController.heroes[0].playerHealth;
+        healthbars[1].value = battleController.heroes[1].playerHealth;
+        healthbars[2].value = battleController.heroes[2].playerHealth;
+        heroHealth[0].text = battleController.heroes[0].playerHealth + "/" + battleController.heroes[0].playerMaxHealth;
+        heroHealth[1].text = battleController.heroes[1].playerHealth + "/" + battleController.heroes[1].playerMaxHealth;
+        heroHealth[2].text = battleController.heroes[2].playerHealth + "/" + battleController.heroes[2].playerMaxHealth;
     }
 
     public void SetMana()
     {
-        manabars[0].value = battlecontroller.heroes[0].playerMana;
-        heroMana[0].text = battlecontroller.heroes[0].playerMana + "/" + battlecontroller.heroes[0].playerMaxMana;
-        if (battlecontroller.heroes[0].playerMaxMana == 0)
+        manabars[0].value = battleController.heroes[0].playerMana;
+        heroMana[0].text = battleController.heroes[0].playerMana + "/" + battleController.heroes[0].playerMaxMana;
+        if (battleController.heroes[0].playerMaxMana == 0)
         {
             manabars[0].gameObject.SetActive(false);
         }
-        manabars[1].value = battlecontroller.heroes[1].playerMana;
-        heroMana[1].text = battlecontroller.heroes[1].playerMana + "/" + battlecontroller.heroes[1].playerMaxMana;
-        if (battlecontroller.heroes[1].playerMaxMana == 0)
+        manabars[1].value = battleController.heroes[1].playerMana;
+        heroMana[1].text = battleController.heroes[1].playerMana + "/" + battleController.heroes[1].playerMaxMana;
+        if (battleController.heroes[1].playerMaxMana == 0)
         {
             manabars[1].gameObject.SetActive(false);
         }
-        manabars[2].value = battlecontroller.heroes[2].playerMana;
-        heroMana[2].text = battlecontroller.heroes[2].playerMana + "/" + battlecontroller.heroes[2].playerMaxMana;
-        if (battlecontroller.heroes[2].playerMaxMana == 0)
+        manabars[2].value = battleController.heroes[2].playerMana;
+        heroMana[2].text = battleController.heroes[2].playerMana + "/" + battleController.heroes[2].playerMaxMana;
+        if (battleController.heroes[2].playerMaxMana == 0)
         {
             manabars[2].gameObject.SetActive(false);
         }
@@ -112,12 +113,12 @@ public class BattleUIController : MonoBehaviour
 
     public void SetFace()
     {
-        facePanels[0].targetHero = battlecontroller.heroes[0];        
-        heroFaces[0].sprite = battlecontroller.heroes[0].playerFace;
-        facePanels[1].targetHero = battlecontroller.heroes[1];
-        heroFaces[1].sprite = battlecontroller.heroes[1].playerFace;
-        facePanels[1].targetHero = battlecontroller.heroes[1];
-        heroFaces[2].sprite = battlecontroller.heroes[2].playerFace;
+        facePanels[0].targetHero = battleController.heroes[0];        
+        heroFaces[0].sprite = battleController.heroes[0].playerFace;
+        facePanels[1].targetHero = battleController.heroes[1];
+        heroFaces[1].sprite = battleController.heroes[1].playerFace;
+        facePanels[1].targetHero = battleController.heroes[1];
+        heroFaces[2].sprite = battleController.heroes[2].playerFace;
     }
 
     public void ToggleButtonIcons()
@@ -150,28 +151,16 @@ public class BattleUIController : MonoBehaviour
         {
             activeUI = true;
             currentUI = spellPanel;
-            if (battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count != 0)
+            if (battleController.heroes[battleController.characterTurnIndex].spells.Count != 0)
             {
                 spellIndex = 0;
                 spellPanel.gameObject.SetActive(true);
-                foreach (Button button in spellButtons)
-                {
-                    button.gameObject.SetActive(true);                    
-                    int spellCount = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells.Count;
-                    spellButtons[spellCount - 1].Select(); // to trick UI into reselecting 0 button after first use
-                    if (spellButtons.IndexOf(button) > spellCount - 1)
-                    {                        
-                        button.gameObject.SetActive(false);
-                    }
-                    if (spellButtons.IndexOf(button) <= spellCount - 1)
-                    {
-                        spellBTtxt[spellButtons.IndexOf(button)].text = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].spellName;
-                        button.gameObject.SetActive(true);
-                        button.image.sprite = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellButtons.IndexOf(button)].panelImage;
-                    }
-
-                }                
-                spellButtons[0].Select();
+                spellButton.gameObject.SetActive(true);                   
+                
+                spellBTtxt.text = battleController.heroes[battleController.characterTurnIndex].spells[0].spellName;
+                spellInfoTXT.text = battleController.heroes[battleController.characterTurnIndex].spells[0].spellInfo + "\nSpell Power = " + battleController.heroes[battleController.characterTurnIndex].spells[spellIndex].power;
+                spellButton.image.sprite = battleController.heroes[battleController.characterTurnIndex].spells[0].panelImage;
+                spellButton.Select();
             }
         }        
     }
@@ -219,17 +208,17 @@ public class BattleUIController : MonoBehaviour
     {
         uiAudio.clip = uiSounds[0];
         uiAudio.Play();
-        battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget = battlecontroller.enemies[battlecontroller.focusIndex];
-        battlecontroller.heroes[battlecontroller.characterTurnIndex].attackTarget.ToggleHighlighter();
-        battlecontroller.TargetChecker();
+        battleController.heroes[battleController.characterTurnIndex].attackTarget = battleController.enemies[battleController.focusIndex];
+        battleController.heroes[battleController.characterTurnIndex].attackTarget.ToggleHighlighter();
+        battleController.TargetChecker();
 
-        battlecontroller.heroes[battlecontroller.characterTurnIndex].selectedSpell = battlecontroller.heroes[battlecontroller.characterTurnIndex].spells[spellIndex];        
-        battlecontroller.heroes[battlecontroller.characterTurnIndex].actionType = Player.Action.casting;
+        battleController.heroes[battleController.characterTurnIndex].selectedSpell = battleController.heroes[battleController.characterTurnIndex].spells[spellIndex];        
+        battleController.heroes[battleController.characterTurnIndex].actionType = Player.Action.casting;
         spellPanel.gameObject.SetActive(false);
         ToggleButtonIcons();
-        if (battlecontroller.characterTurnIndex <= 2)
+        if (battleController.characterTurnIndex <= 2)
         {
-            battlecontroller.NextPlayerTurn();
+            battleController.NextPlayerTurn();
         }
     }
 

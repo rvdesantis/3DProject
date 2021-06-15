@@ -122,10 +122,18 @@ public class AreaUIController : MonoBehaviour
     {
         Player equipHero = areaController.staticBank.bank[activeItem.weaponHero];
 
-        equipHero.Weapon.gameObject.SetActive(false);
-        equipHero.Weapon = equipHero.equipedWeapons[activeItem.weaponNum];
-        equipHero.equipedWeapons[activeItem.weaponNum].gameObject.SetActive(true);
-
+        if (activeItem.weaponHero != 1)
+        {
+            equipHero.Weapon.gameObject.SetActive(false);
+            equipHero.Weapon = equipHero.equipedWeapons[activeItem.weaponNum];
+            equipHero.equipedWeapons[activeItem.weaponNum].gameObject.SetActive(true);
+        }
+        if (activeItem.weaponHero == 1)
+        {
+            equipHero.GetComponent<Archer>().equipedArrow.gameObject.SetActive(false);
+            equipHero.GetComponent<Archer>().equipedArrow = equipHero.GetComponent<Archer>().quiver[activeItem.weaponNum];
+            equipHero.GetComponent<Archer>().equipedArrow.gameObject.SetActive(true);
+        }
         weaponPanel.gameObject.SetActive(false);
         uiNavigation = false;
         areaController.moveController.enabled = true;

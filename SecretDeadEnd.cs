@@ -12,8 +12,8 @@ public class SecretDeadEnd : DunCube
     public GameObject portalParticles;
     public Chest portalChest;
 
-    public bool shop;
-
+    public enum SecretType { returnP, bossP, treasure, empty, enemy, shop }
+    public SecretType secretType;
 
 
     private void Start()

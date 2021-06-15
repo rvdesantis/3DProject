@@ -8,6 +8,7 @@ public class Spell : MonoBehaviour
 
     
     public string spellName;
+    public string spellInfo;
     public int power;
     public int manaCost;
 

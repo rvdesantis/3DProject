@@ -28,19 +28,16 @@ public class BattleLauncher : MonoBehaviour
 
     private void Update()
     {
-        distance = FPcontroller.distanceTraveled;
-        
+        distance = FPcontroller.distanceTraveled;        
         stepCount = FPcontroller.steps;
-
         if (stepCount > 33)
         {
             
             int battleChance = Random.Range(0, 100);
             Debug.Log("Battle Chance " + battleChance);
             if (battleChance > 66)
-            {                
-
-
+            {
+                FPcontroller.steps = 0;
                 launching = true;
                 respawnPoint = areaController.moveController.transform.position;
                 rotationPoint = areaController.moveController.transform.rotation;                
@@ -50,7 +47,6 @@ public class BattleLauncher : MonoBehaviour
                 {
                     agent.SavePosition();
                 }
-
                 AreaController.respawnPoint = respawnPoint;
                 AreaController.respawnRotation = rotationPoint;
                 IEnumerator LoadTimer()

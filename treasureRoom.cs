@@ -21,51 +21,60 @@ public class treasureRoom : MonoBehaviour
             int mimicCount = 0;
             int chestCount = 0;
 
-            foreach (GameObject spawnPlatform in chestSpawnPlatforms)
+            IEnumerator TreasureRoomTimer()
             {
-                int x = Random.Range(0, 5);  // 20% chance to spawn mimic, set to 0;
-
-                if (x == 0)
+                yield return new WaitForSeconds(1);
+                foreach (GameObject spawnPlatform in chestSpawnPlatforms)
                 {
-                    MimicChest mimic = Instantiate(mimicChests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
-                    mimic.battleLauncher = FindObjectOfType<BattleLauncher>();
-                    mimic.areaController = areaController;
-                    areaController.mimics.Add(mimic);
-                    mimicCount++;
-                    PlayerPrefs.SetInt("TreasureRoomChest" + chestSpawnPlatforms.IndexOf(spawnPlatform), 0);
+                    int x = Random.Range(0, 5);  // 20% chance to spawn mimic, set to 0;
+                    if (x == 0)
+                    {
+                        MimicChest mimic = Instantiate(mimicChests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
+                        mimic.battleLauncher = FindObjectOfType<BattleLauncher>();
+                        mimic.areaController = areaController;
+                        areaController.mimics.Add(mimic);
+                        mimicCount++;
+                        PlayerPrefs.SetInt("TreasureRoomChest" + chestSpawnPlatforms.IndexOf(spawnPlatform), 0);
+                    }
+                    if (x != 0)
+                    {
+                        Chest chest = Instantiate(chests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
+                        chest.areaController = areaController;
+                        chest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
+                        areaController.chests.Add(chest);
+                        chestCount++;
+                        PlayerPrefs.SetInt("TreasureRoomChest" + chestSpawnPlatforms.IndexOf(spawnPlatform), 1);
+                    }
                 }
-                if (x != 0)
-                {
-                    Chest chest = Instantiate(chests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
-                    chest.areaController = areaController;
-                    chest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
-                    areaController.chests.Add(chest);
-                    chestCount++;
-                    PlayerPrefs.SetInt("TreasureRoomChest" + chestSpawnPlatforms.IndexOf(spawnPlatform), 1);
-                }
-            }
-            PlayerPrefs.Save();
+                PlayerPrefs.Save();
+            } StartCoroutine(TreasureRoomTimer());
+           
         }
         if (AreaController.firstLoad == false)
         {
-            foreach (GameObject spawnPlatform in chestSpawnPlatforms)
+            IEnumerator TreasureRoomTimer()
             {
-                int x = PlayerPrefs.GetInt("TreasureRoomChest" + chestSpawnPlatforms.IndexOf(spawnPlatform));
-                if (x == 0)
+                yield return new WaitForSeconds(1);
+                foreach (GameObject spawnPlatform in chestSpawnPlatforms)
                 {
-                    MimicChest mimic = Instantiate(mimicChests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
-                    mimic.battleLauncher = FindObjectOfType<BattleLauncher>();
-                    mimic.areaController = areaController;
-                    areaController.mimics.Add(mimic);
+                    int x = PlayerPrefs.GetInt("TreasureRoomChest" + chestSpawnPlatforms.IndexOf(spawnPlatform));
+                    if (x == 0)
+                    {
+                        MimicChest mimic = Instantiate(mimicChests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
+                        mimic.battleLauncher = FindObjectOfType<BattleLauncher>();
+                        mimic.areaController = areaController;
+                        areaController.mimics.Add(mimic);
+                    }
+                    if (x != 0)
+                    {
+                        Chest chest = Instantiate(chests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
+                        chest.areaController = areaController;
+                        chest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
+                        areaController.chests.Add(chest);
+                    }
                 }
-                if (x != 0)
-                {
-                    Chest chest = Instantiate(chests[0], spawnPlatform.transform.position, spawnPlatform.transform.rotation);
-                    chest.areaController = areaController;
-                    chest.player = areaController.moveController.GetComponentInChildren<FirstPersonPlayer>();
-                    areaController.chests.Add(chest);
-                }
-            }            
+            }
+            StartCoroutine(TreasureRoomTimer());                
         }
 
 

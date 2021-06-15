@@ -667,6 +667,7 @@ public class BattleController : MonoBehaviour
             bool lvlUP = false;
             int gold = (Random.Range(5, 11) * enemyNumber);
             StaticMenuItems.goldCount = StaticMenuItems.goldCount + gold;
+            PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount);
             AreaController.battleGold = gold;
             foreach (Player character in heroes)
             {
@@ -905,15 +906,14 @@ public class BattleController : MonoBehaviour
                     
                     if (uiController.activeUI == true)
                     {
-                        if (uiController.activeUI = uiController.spellPanel)
+                        if (uiController.currentUI == uiController.spellPanel)
                         {
-                            if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
+                            if (uiController.spellIndex > 0)
                             {
-                                uiController.spellIndex = 0;
-                            }
-                            if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
-                            {
-                                uiController.spellIndex++;
+                                uiController.spellIndex--;
+                                uiController.spellBTtxt.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellName;
+                                uiController.spellInfoTXT.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellInfo + "\nSpell Power = " + heroes[characterTurnIndex].spells[uiController.spellIndex].power;
+                                uiController.spellButton.image.sprite = heroes[characterTurnIndex].spells[uiController.spellIndex].panelImage;                                
                             }
                         }
 
@@ -991,15 +991,12 @@ public class BattleController : MonoBehaviour
                         {
                             if (uiController.activeUI = uiController.spellPanel)
                             {
-                                if (uiController.spellIndex == 0)
+                                if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
                                 {
-                                    uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
-
-                                }
-                                if (uiController.spellIndex > 0)
-                                {
-                                    uiController.spellIndex--;
-
+                                    uiController.spellIndex++;
+                                    uiController.spellBTtxt.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellName;
+                                    uiController.spellInfoTXT.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellInfo + "\nSpell Power = " + heroes[characterTurnIndex].spells[uiController.spellIndex].power;
+                                    uiController.spellButton.image.sprite = heroes[characterTurnIndex].spells[uiController.spellIndex].panelImage;
                                 }
                             }
                         }
@@ -1171,13 +1168,12 @@ public class BattleController : MonoBehaviour
                 {
                     if (uiController.currentUI == uiController.spellPanel)
                     {
-                        if (uiController.spellIndex == 0)
+                        if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
                         {
-                            uiController.spellIndex = heroes[characterTurnIndex].spells.Count - 1;
-                        }
-                        if (uiController.spellIndex > 0)
-                        {
-                            uiController.spellIndex--;
+                            uiController.spellIndex++;
+                            uiController.spellBTtxt.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellName;
+                            uiController.spellInfoTXT.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellInfo + "\nSpell Power = " + heroes[characterTurnIndex].spells[uiController.spellIndex].power;
+                            uiController.spellButton.image.sprite = heroes[characterTurnIndex].spells[uiController.spellIndex].panelImage;
                         }
                     }
 
@@ -1250,13 +1246,12 @@ public class BattleController : MonoBehaviour
                 {
                     if (uiController.currentUI == uiController.spellPanel)
                     {
-                        if (uiController.spellIndex == heroes[characterTurnIndex].spells.Count - 1)
+                        if (uiController.spellIndex > 0)
                         {
-                            uiController.spellIndex = 0;
-                        }
-                        if (uiController.spellIndex < heroes[characterTurnIndex].spells.Count - 1)
-                        {
-                            uiController.spellIndex++;
+                            uiController.spellIndex--;
+                            uiController.spellBTtxt.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellName;
+                            uiController.spellInfoTXT.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellInfo + "\nSpell Power = " + heroes[characterTurnIndex].spells[uiController.spellIndex].power;
+                            uiController.spellButton.image.sprite = heroes[characterTurnIndex].spells[uiController.spellIndex].panelImage;
                         }
 
                     }

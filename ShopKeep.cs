@@ -70,7 +70,7 @@ public class ShopKeep : MonoBehaviour
         {
             weapDistance = Vector3.Distance(weapon.transform.position, areaController.moveController.transform.position);
         }            
-        if (weapDistance <= 5)
+        if (weapDistance <= 6)
         {            
             wInRange = true;
             if (opened == false)
@@ -105,7 +105,7 @@ public class ShopKeep : MonoBehaviour
             }
             
         }
-        if (weapDistance > 5 && wInRange)
+        if (weapDistance > 6 && wInRange)
         {
             wInRange = false;
             if (areaController.areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)

@@ -109,6 +109,19 @@ public class DunCube : MonoBehaviour
                 DunCube randomTurn = dunBuilder.turnBank[turnNumber];
                 dunBuilder.createdTurn = Instantiate(randomTurn, nextSpawnPosition, targetCube.transform.rotation);
                 dunBuilder.createdTurnCubes.Add(dunBuilder.createdTurn);
+                bool room = false;
+                foreach(DunCube roomPrefab in dunBuilder.rooms)
+                {
+                    if (randomTurn == roomPrefab)
+                    {
+                        room = true;
+                    }
+                }
+                if (room == true)
+                {
+                    dunBuilder.createdRooms.Add(randomTurn);
+                }
+
                 PlayerPrefs.SetInt("Turn" + dunBuilder.turnCounter, turnNumber);
                 PlayerPrefs.SetFloat("Turn" + dunBuilder.turnCounter + "X", nextSpawnPosition.x);
                 PlayerPrefs.SetFloat("Turn" + dunBuilder.turnCounter + "Y", nextSpawnPosition.y);
@@ -120,10 +133,19 @@ public class DunCube : MonoBehaviour
                 return;
             }
             if (ColliderCheck() == true)
-            {   
-                DunCube deadEndCube = Instantiate(dunBuilder.deadEnd, transform.position, transform.rotation);
-                dunBuilder.createdDeadEnds.Add(deadEndCube);
-                dunBuilder.totalCubes++;  
+            {
+                if (SecretColliderCheck() == true)
+                {
+                    DunCube deadEndCube = Instantiate(dunBuilder.deadEnd, transform.position, transform.rotation);
+                    dunBuilder.createdDeadEnds.Add(deadEndCube);
+                    dunBuilder.totalCubes++;
+                }
+                if (SecretColliderCheck() == false)
+                {
+                    DunCube deadEndCube = Instantiate(dunBuilder.deadEnd, transform.position, transform.rotation);
+                    dunBuilder.createdDeadEnds.Add(deadEndCube);
+                    dunBuilder.totalCubes++;
+                }
             }
         }
         if (cubeCheck >= StaticMenuItems.dungeonCubeTarget && dunBuilder.bossRoomCreated == true)
