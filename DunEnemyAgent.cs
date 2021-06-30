@@ -7,6 +7,7 @@ using UnityEngine.Experimental.AI;
 public class DunEnemyAgent : MonoBehaviour
 {
     public string agentName;
+    public int spawnChance;
     public bool forHire;
     public int hireCost;
 
@@ -45,39 +46,51 @@ public class DunEnemyAgent : MonoBehaviour
 
     public virtual void SavePosition()
     {
-        savedPosition = transform.position;
-        PlayerPrefs.SetFloat("Agent" + 0 + "X", savedPosition.x);
-        PlayerPrefs.SetFloat("Agent" + 0 + "Y", savedPosition.y);
-        PlayerPrefs.SetFloat("Agent" + 0 + "Z", savedPosition.z);
+        savedPosition = agentBodyTransform.transform.position;
+        PlayerPrefs.SetFloat(agentName + "X", savedPosition.x);
+        PlayerPrefs.SetFloat(agentName + "Y", savedPosition.y);
+        PlayerPrefs.SetFloat(agentName + "Z", savedPosition.z);
+
+        PlayerPrefs.SetFloat(agentName + "XR", transform.rotation.x);
+        PlayerPrefs.SetFloat(agentName + "YR", transform.rotation.y);
+        PlayerPrefs.SetFloat(agentName + "ZR", transform.rotation.z);
         PlayerPrefs.Save();
     }
     public virtual void LoadPosition()
     {
-        agent.gameObject.SetActive(false);
+        this.gameObject.SetActive(false);
         if (AreaController.battleReturn == true)
         {
-            float x = PlayerPrefs.GetFloat("Agent" + 0 + "X");
-            float y = PlayerPrefs.GetFloat("Agent" + 0 + "Y");
-            float z = PlayerPrefs.GetFloat("Agent" + 0 + "Z");
+            float x = PlayerPrefs.GetFloat(agentName + "X");
+            float y = PlayerPrefs.GetFloat(agentName + "Y");
+            float z = PlayerPrefs.GetFloat(agentName + "Z");
             savedPosition = new Vector3(x, y, z);
             transform.position = savedPosition;
         }
         if (AreaController.battleReturn == false)
         {
             transform.position = FindObjectOfType<DunBuilder>().createdTurnCubes[0].itemSpawnPoint.transform.position;
-        }        
-        agent.gameObject.SetActive(true);
+        }
+        this.gameObject.SetActive(true);
 
-        if (PlayerPrefs.GetInt("Agent" + 0 + "Active") == 1)
-        {            
+        if (PlayerPrefs.GetInt(agentName + "Active") == 1)
+        {
             move = true;
             active = true;
         }        
     }
 
+    public virtual void Spawn()
+    {
 
+    }
 
-    public void SelectTargetLocation()
+    public virtual void Respawn()
+    {
+
+    }
+
+    public virtual void SelectTargetLocation()
     {
         
     }
@@ -109,13 +122,10 @@ public class DunEnemyAgent : MonoBehaviour
         }
         if (Vector3.Distance(transform.position, areaController.moveController.transform.position) >= 5)
         {
-            if (agentMessage == true)
+            if (areaController.areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)
             {
-                if (areaController.areaUI.messageUI.GetComponent<Animator>().GetBool("solid") == true)
-                {
-                    areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
-                }
-            }
+                areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+            }           
         }
         if (Vector3.Distance(transform.position, areaController.moveController.transform.position) < 5)
         {

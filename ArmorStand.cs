@@ -8,6 +8,8 @@ public class ArmorStand : Chest
     public Vector3 weaponSpawnPoint;
     public GameObject weaponSpawnTransform;
 
+
+
     void Update()
     {
         if (Vector3.Distance(player.transform.position, transform.position) < 5.5f)
@@ -31,29 +33,34 @@ public class ArmorStand : Chest
             }
         }
 
-
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
+        if (inArea)
         {
-            if (treasure.gameObject.activeSelf == true)
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
             {
-                if (Vector3.Distance(player.transform.position, this.transform.position) < 5 && opened == 0)
+                if (treasure.gameObject.activeSelf == true)
                 {
-                    PlayerPrefs.SetInt("chest" + areaController.chests.IndexOf(this), 1);
-                    areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
-                    opened = 1;
-
-                    PlayerPrefs.Save();
-
-                    if (treasure.itemFunction == Items.itemType.weapon)
+                    if (Vector3.Distance(player.transform.position, this.transform.position) < 5 && opened == 0)
                     {
-                        areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
-                        areaController.areaUI.activeItem = treasure;
-                        areaController.areaUI.WeaponImage();
-                        treasure.gameObject.SetActive(false);
+                        PlayerPrefs.SetInt("chest" + areaController.chests.IndexOf(this), 1);
+                        areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
+                        opened = 1;
+
+                        PlayerPrefs.Save();
+
+                        if (treasure.itemFunction == Items.itemType.weapon)
+                        {
+                            areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
+                            areaController.areaUI.activeItem = treasure;
+                            areaController.areaUI.WeaponImage();
+                            treasure.gameObject.SetActive(false);
+                            audioSource.PlayOneShot(audioClips[0]);
+                        }
                     }
                 }
-            }
 
+            }
         }
+
+
     }
 }

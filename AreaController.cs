@@ -47,7 +47,8 @@ public class AreaController : MonoBehaviour
     public bool battleReturnmirror;
     public bool firstLoadMirror;
 
-
+    public AudioSource audioSource;
+    public List<AudioClip> audioClips;
 
 
     void Start()
@@ -83,6 +84,7 @@ public class AreaController : MonoBehaviour
                 areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                 areaUI.itemImage.sprite = availableItems[0].itemSprite;
                 areaUI.ItemImage();
+                audioSource.PlayOneShot(audioClips[0]);
             }
         } StartCoroutine(LoadTimer());
     }

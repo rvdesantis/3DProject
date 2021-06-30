@@ -31,6 +31,7 @@ public class BattleController : MonoBehaviour
     
     public EnemyBank staticEnemyBank;
     public EnemyBank SpecialEnemyBank;
+    public static int specialEnemyNum;
     public int enemyChoice;
     public int enemyNumber;
 
@@ -55,10 +56,28 @@ public class BattleController : MonoBehaviour
     public bool endTurn;
     public bool combo;
 
+    public bool testBoss;
+    public bool testMimic;
+    public bool testDunEnemy;
+    public int testDunEnemyNum;
 
+    private void Awake()
+    {
+        if (testBoss)
+        {
+            BattleLauncher.bossEnemy = true;
+        }
+        if (testMimic)
+        {
+            BattleLauncher.mimic = true;
 
-    
-
+        }
+        if (testDunEnemy)
+        {
+            specialEnemyNum = testDunEnemyNum;
+            BattleLauncher.dunEnemy = true;
+        }
+    }
     private void Start()
     {        
         characterTurnIndex = 0;
@@ -146,12 +165,19 @@ public class BattleController : MonoBehaviour
             enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
             BattleLauncher.mimic = false;
         }
-        if (BattleLauncher.dunEnemy == true || BattleLauncher.bossEnemy == true)
+        if (BattleLauncher.bossEnemy == true)
         {
             enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[1], enemySpawnPoint0, Quaternion.identity);
+            enemies[1] = Instantiate<Player>(staticEnemyBank.bank[1], enemySpawnPoint1, Quaternion.identity);
+            enemies[2] = Instantiate<Player>(staticEnemyBank.bank[1], enemySpawnPoint2, Quaternion.identity);
+            BattleLauncher.bossEnemy = false;
+        }
+        if (BattleLauncher.dunEnemy == true)
+        {
+            enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[specialEnemyNum], enemySpawnPoint0, Quaternion.identity);
             enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
             enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
-            BattleLauncher.dunEnemy = false;            
+            BattleLauncher.dunEnemy = false;
         }
 
         foreach (Player character in heroes)
@@ -769,7 +795,8 @@ public class BattleController : MonoBehaviour
     }
 
     private void Update()
-    {
+    {        
+
         CamTracker();
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.JoystickButton2)) // X on XBOX Controller
         {
@@ -913,7 +940,8 @@ public class BattleController : MonoBehaviour
                                 uiController.spellIndex--;
                                 uiController.spellBTtxt.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellName;
                                 uiController.spellInfoTXT.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellInfo + "\nSpell Power = " + heroes[characterTurnIndex].spells[uiController.spellIndex].power;
-                                uiController.spellButton.image.sprite = heroes[characterTurnIndex].spells[uiController.spellIndex].panelImage;                                
+                                uiController.spellButton.image.sprite = heroes[characterTurnIndex].spells[uiController.spellIndex].panelImage;
+                                uiController.uiAudio.PlayOneShot(uiController.uiSounds[6]);
                             }
                         }
 
@@ -997,6 +1025,7 @@ public class BattleController : MonoBehaviour
                                     uiController.spellBTtxt.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellName;
                                     uiController.spellInfoTXT.text = heroes[characterTurnIndex].spells[uiController.spellIndex].spellInfo + "\nSpell Power = " + heroes[characterTurnIndex].spells[uiController.spellIndex].power;
                                     uiController.spellButton.image.sprite = heroes[characterTurnIndex].spells[uiController.spellIndex].panelImage;
+                                    uiController.uiAudio.PlayOneShot(uiController.uiSounds[6]);
                                 }
                             }
                         }
@@ -1032,7 +1061,7 @@ public class BattleController : MonoBehaviour
                     enemies[focusIndex].ToggleHighlighter();
                     
 
-                    if (heroes[characterTurnIndex].playerClass == Player.PlayerClass.warrior || heroes[characterTurnIndex].playerClass == Player.PlayerClass.berzerker)
+                    if (heroes[characterTurnIndex].playerClass == Player.PlayerClass.warrior || heroes[characterTurnIndex].playerClass == Player.PlayerClass.berserker)
                     {
                         heroes[characterTurnIndex].actionType = Player.Action.melee;
                         if (characterTurnIndex <= 2)

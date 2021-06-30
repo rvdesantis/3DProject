@@ -9,7 +9,7 @@ public class WarriorM : Player
 
     public override void LevelUp()
     {
-        if (playerLevel == 1 && XP >= 500)
+        if (playerLevel == 1 && XP >= 400)
         {
             XP = 0;
             playerLevel = 2;
@@ -23,6 +23,20 @@ public class WarriorM : Player
             PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(15, 21));
             PlayerPrefs.Save();
             SetBattleStats();            
+        }
+
+        if (playerLevel == 2 && XP >= 800)
+        {
+            XP = 0;
+            playerLevel = 3;
+            PlayerPrefs.SetInt("WarLevel", 3);
+            PlayerPrefs.SetInt("WarXP", 0);
+            PlayerPrefs.SetInt("WarMaxHealth", playerMaxHealth + Random.Range(20, 26));
+            PlayerPrefs.SetInt("WarHealth", PlayerPrefs.GetInt("WarMaxHealth"));
+            PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(20, 26));
+            PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(20, 26));
+            PlayerPrefs.Save();
+            SetBattleStats();
         }
     }
 
@@ -43,6 +57,10 @@ public class WarriorM : Player
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
+
+        PlayerPrefs.SetInt("WarriorWeapon1", 0);
+        PlayerPrefs.SetInt("WarriorWeapon2", 0);
+        PlayerPrefs.SetInt("WarriorWeapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {

@@ -60,7 +60,7 @@ public class DunBuilder : MonoBehaviour
     public Chest chestPrefab;
     public MimicChest mimicChest;
 
-    public DunEnemyAgent[] agents;
+    public List<DunEnemyAgent> agents;
    
 
     public Animator loadScreenAnim;
@@ -175,7 +175,7 @@ public class DunBuilder : MonoBehaviour
         for (int i = 0; i < mimicCount; i++)
         {
 
-            int x = Random.Range(0, createdDeadEnds.Count - 1);
+            int x = Random.Range(0, createdDeadEnds.Count);
             bool chestChecker = false;
             foreach (Chest chest in createdChests)
             {
@@ -336,68 +336,16 @@ public class DunBuilder : MonoBehaviour
 
     public void SpawnAgents()
     {
-        int ag = Random.Range(0, agents.Length);
-        DunEnemyAgent spawnedAgent = Instantiate(agents[ag], createdTurnCubes[0].itemSpawnPoint.transform.position, createdTurnCubes[0].itemSpawnPoint.transform.rotation);
-        areaController.agents.Add(spawnedAgent);
-
-        NavMeshPath path = new NavMeshPath();
-        spawnedAgent.agent.CalculatePath(areaController.bossHallwaySpawnPoint, path);
-
-        if (path.status == NavMeshPathStatus.PathComplete)
+        foreach(DunEnemyAgent agent in agents)
         {
-            Debug.Log(spawnedAgent.agentName + " Path Complete");
-            spawnedAgent.targetLocation = areaController.bossHallwaySpawnPoint;
-        }
-
-
-        if (path.status == NavMeshPathStatus.PathPartial)
-        {   
-            Debug.Log(spawnedAgent.agentName + " Path Partial, Checking Turn Agents");
-            bool foundPath = false;
-            foreach (DunCube turn in createdTurnCubes)
+            int chance = Random.Range(0, 100);
+            if (chance <= agent.spawnChance)
             {
-                NavMeshPath path1 = new NavMeshPath();
-                NavMeshPath path2 = new NavMeshPath();
-                bool pathToAgent = false;
-                bool pathToTarget = false;
-
-                spawnedAgent.agent.CalculatePath(turn.itemSpawnPoint.transform.position, path1);
-                if (path1.status == NavMeshPathStatus.PathComplete)
-                {
-                    Debug.Log("Path to Turn " + createdTurnCubes.IndexOf(turn) + " from " + spawnedAgent.agentName + " clear");
-                    pathToAgent = true;
-                }
-                turn.navAgent.CalculatePath(areaController.bossHallwaySpawnPoint, path2);
-                if (path2.status == NavMeshPathStatus.PathComplete)
-                {
-                    Debug.Log("Path from Turn " + createdTurnCubes.IndexOf(turn) + " to boss hallway clear");
-                    pathToTarget = true;
-                }
-                if (pathToAgent && pathToTarget)
-                {
-                    Debug.Log(createdTurnCubes.IndexOf(turn) + " agent target set");
-                    foundPath = true;
-                    spawnedAgent.nextLocation = areaController.bossHallwaySpawnPoint;
-                    spawnedAgent.targetLocation = turn.itemSpawnPoint.transform.position;
-                    break;
-                }
-            }
-            
-            if (foundPath == false)
-            {
-                spawnedAgent.gameObject.SetActive(false);
-                Debug.Log(spawnedAgent.agentName + " path not found.  deactivating");
+                agent.Spawn(); 
             }
         }
-        if (path.status == NavMeshPathStatus.PathInvalid)
-        {
-            Debug.Log(spawnedAgent.agentName + " Path Invalid");
-        }
-
-
-
-        PlayerPrefs.SetInt("Agent" + 0, ag);
         PlayerPrefs.Save();
+
     }
 
     public void CloseDungeon()
@@ -510,6 +458,10 @@ public class DunBuilder : MonoBehaviour
             PlayerPrefs.SetInt("TotalTurnCubes", turnCounter);
             PlayerPrefs.SetInt("TotalBossCubes", createdBossRooms.Count);
 
+            foreach (DunEnemyAgent agent in agents)
+            {
+                PlayerPrefs.SetInt(agent.agentName + "Active", 0); 
+            }
             SpawnAgents();
 
            
@@ -600,12 +552,15 @@ public class DunBuilder : MonoBehaviour
                 floor.BuildNavMesh();
             }
 
-
-            int ag = PlayerPrefs.GetInt("Agent" + 0);
-            DunEnemyAgent spawnedAgent = Instantiate(agents[ag], originCube.spawnPlatform.transform.position, originCube.spawnPlatform.transform.rotation);
-            areaController.agents.Add(spawnedAgent);
-            spawnedAgent.LoadPosition();
-            spawnedAgent.targetLocation = areaController.bossHallwaySpawnPoint;
+            foreach (DunEnemyAgent agent in agents)
+            {
+                int respawn = PlayerPrefs.GetInt(agent.agentName + "Spawn");
+                if (respawn == 1)
+                {
+                    agent.Respawn();    
+                }
+            }
+                       
 
             areaController.moveController.gameObject.SetActive(true);
             areaController.areaUI.gameObject.SetActive(true);

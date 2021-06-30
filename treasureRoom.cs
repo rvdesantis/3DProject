@@ -9,7 +9,6 @@ public class treasureRoom : MonoBehaviour
     public List<Chest> chests;
     public List<MimicChest> mimicChests;
     public List<Items> chestTreasures;
-
     public List<GameObject> chestSpawnPlatforms;
 
     void Start()

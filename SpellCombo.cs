@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class SpellCombo : MonoBehaviour
 {
     public BattleController battleController;
@@ -97,9 +98,11 @@ public class SpellCombo : MonoBehaviour
 
                 int groupSTR = mWarrior.spells[0].power + fMage.spells[0].power + fMage.Weapon.magPower + 25;
                 int damage = groupSTR;
-                fMage.attackTarget.playerHealth = fMage.attackTarget.playerHealth - damage;
+                
                 fMage.attackTarget.combatTextPrefab.damageAmount = damage;
-                fMage.attackTarget.combatTextPrefab.ToggleCombatText();
+                fMage.attackTarget.combatTextPrefab.floatingText.color = Color.red;
+                fMage.attackTarget.TakeDamage(damage);
+                fMage.attackTarget.anim.SetTrigger("gotHit");
 
                 yield return new WaitForSeconds(2f);
                 foreach (Enemy enemy in battleController.enemies)
@@ -153,10 +156,12 @@ public class SpellCombo : MonoBehaviour
                 {
                     if (enemy.dead == false)
                     {
-                        enemy.anim.SetTrigger("gotHit");
-                        enemy.playerHealth = enemy.playerHealth - damage;
+                        enemy.anim.SetTrigger("gotHit");                        
                         enemy.combatTextPrefab.damageAmount = damage;
-                        enemy.combatTextPrefab.ToggleCombatText();
+                        enemy.combatTextPrefab.floatingText.color = Color.red;
+                        enemy.TakeDamage(damage);
+                        enemy.TimelineHitTrigger();
+
                     }
                 }
                 leftover.gameObject.SetActive(true);
@@ -227,9 +232,9 @@ public class SpellCombo : MonoBehaviour
                     if (enemy.dead == false)
                     {
                         enemy.anim.SetTrigger("gotHit");
-                        enemy.playerHealth = enemy.playerHealth - damage;
                         enemy.combatTextPrefab.damageAmount = damage;
-                        enemy.combatTextPrefab.ToggleCombatText();
+                        enemy.combatTextPrefab.floatingText.color = Color.red;
+                        enemy.TakeDamage(damage);    
                     }
                 }
                 leftover.gameObject.SetActive(true);

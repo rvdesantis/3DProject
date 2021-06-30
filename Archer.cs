@@ -30,6 +30,21 @@ public class Archer : Player
             PlayerPrefs.SetInt("ArXP", 0);
             PlayerPrefs.SetInt("ArMaxHealth", playerMaxHealth + Random.Range(10, 16));
             PlayerPrefs.SetInt("ArHealth", PlayerPrefs.GetInt("ArMaxHealth"));
+            PlayerPrefs.SetInt("ArMaxMana", playerMaxMana + Random.Range(10, 16));
+            PlayerPrefs.SetInt("ArMana", PlayerPrefs.GetInt("ArMaxMana"));
+            PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
+            PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));
+            PlayerPrefs.Save();
+            SetBattleStats();
+        }
+        if (playerLevel == 2 && XP >= 1000)
+        {
+            XP = 0;
+            playerLevel = 3;
+            PlayerPrefs.SetInt("ArLevel", 3);
+            PlayerPrefs.SetInt("ArXP", 0);
+            PlayerPrefs.SetInt("ArMaxHealth", playerMaxHealth + Random.Range(15, 21));
+            PlayerPrefs.SetInt("ArHealth", PlayerPrefs.GetInt("ArMaxHealth"));
             PlayerPrefs.SetInt("ArMaxMana", playerMaxMana + Random.Range(15, 21));
             PlayerPrefs.SetInt("ArMana", PlayerPrefs.GetInt("ArMaxMana"));
             PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
@@ -52,7 +67,11 @@ public class Archer : Player
         PlayerPrefs.SetInt("ArStr", 45);
         PlayerPrefs.SetInt("ArDef", 35);
         PlayerPrefs.Save();        
-        equipedArrow = quiver[0];       
+        equipedArrow = quiver[0];
+
+        PlayerPrefs.SetInt("ArcherWeapon1", 0);
+        PlayerPrefs.SetInt("ArcherWeapon2", 0);
+        PlayerPrefs.SetInt("ArcherWeapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {
@@ -104,15 +123,7 @@ public class Archer : Player
 
             int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
-            if (damage > 0)
-            {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;
-            }
-
-            if (damage <= 0)
-            {
-                Debug.Log("damage 0 or less");
-            }
+            attackTarget.TakeDamage(damage);
 
         }
         StartCoroutine(HitTimer());

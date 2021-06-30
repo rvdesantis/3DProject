@@ -98,7 +98,11 @@ public class HeroSelect : MonoBehaviour
         {
             newGameBT.Select();
         }        
-        directionUIanim = directionUI.GetComponent<Animator>();        
+        directionUIanim = directionUI.GetComponent<Animator>();
+
+        hero0 = 100;
+        hero1 = 100;
+        hero2 = 100;
     }
 
     public void NewRun()
@@ -148,6 +152,31 @@ public class HeroSelect : MonoBehaviour
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("DunGenerator");
     }
+
+    public void DoorBackBT()
+    {
+        focused = false;
+        cam1.m_Priority = 1;
+        focusCams[heroIndex].m_Priority = 0;
+        heroUI[heroIndex].gameObject.SetActive(false);
+        staticHeroList.bank[heroIndex].GetComponent<Animator>().SetTrigger("sit");
+        iconPanel.gameObject.SetActive(true);
+        if (!joystick)
+        {
+            spaceBar.gameObject.SetActive(true);
+            xButton.gameObject.SetActive(false);
+        }
+
+        door = false;
+        cam2.m_Priority = 0;        
+        doorButtonsUI.gameObject.SetActive(false);
+        dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", false);
+        trinketPanel.gameObject.SetActive(false);
+        directionUIanim.SetBool("left", false);
+        directionUIanim.SetBool("right", false);
+    }
+
+
 
     public void ResumeRun()
     {        
@@ -397,9 +426,9 @@ public class HeroSelect : MonoBehaviour
 
         }
 
-        if (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton1))
+        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton1))
         {
-            if (focused && start == false)
+            if (focused && start == false && door == false)
             {
                 focused = false;
                 cam1.m_Priority = 1;
@@ -414,16 +443,9 @@ public class HeroSelect : MonoBehaviour
                 }
                 
             }
-            if (door)
-            {
-                door = false;
-                cam2.m_Priority = 0;
-                dungeonInfoUI.GetComponent<Animator>().SetBool("fadein", false);
-                trinketPanel.gameObject.SetActive(false);
-            }
         }
 
-        if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.JoystickButton2))
+        if (Input.GetKeyDown(KeyCode.JoystickButton2) || Input.GetKeyDown(KeyCode.Backspace))
         {
             if (focused && start == false)
             {
@@ -444,8 +466,25 @@ public class HeroSelect : MonoBehaviour
                         }
 
                     }
+
+                    if (partyIndex == 2)
+                    {
+                        hero2 = 100;
+                    }
+                    if (partyIndex == 1)
+                    {
+                        hero1 = 100;
+                    }
+                    if (partyIndex == 0)
+                    {
+                        hero0 = 100;
+                    }
+
                     partyIndex--;
-                }               
+                }
+                
+                
+
 
                 focused = false;
                 cam1.m_Priority = 1;

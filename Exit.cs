@@ -22,7 +22,9 @@ public class Exit : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.JoystickButton0))
             {
-                AreaController.respawnPoint = transform.position;                
+                AreaController.respawnPoint = transform.position;
+                AreaController.battleReturn = false;
+                DunBuilder.createDungeon = true;
                 HeroSelect.dunReturn = true;
                 PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount); PlayerPrefs.Save();
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Character Select");

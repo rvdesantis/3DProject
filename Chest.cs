@@ -16,6 +16,7 @@ public class Chest : MonoBehaviour
 
 
     public AudioSource audioSource;
+    public List<AudioClip> audioClips;
 
 
 
@@ -57,8 +58,9 @@ public class Chest : MonoBehaviour
                     anim.SetBool("portalChest", true);
                 }
                 anim.SetTrigger("openLid");
-                audioSource.Play();
-             
+                audioSource.clip = audioClips[0];
+                audioSource.Play();    
+
                 if (treasure.itemFunction == Items.itemType.portal)
                 {
                     secretDeadEnd.PortalChest();
@@ -68,6 +70,7 @@ public class Chest : MonoBehaviour
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
                     areaController.areaUI.activeItem = treasure;
                     areaController.areaUI.WeaponImage();
+                    audioSource.PlayOneShot(audioClips[2]);
                 }
                 if (treasure.itemFunction == Items.itemType.gold)
                 {
@@ -79,6 +82,7 @@ public class Chest : MonoBehaviour
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                     areaController.areaUI.itemImage.sprite = treasure.itemSprite;
                     areaController.areaUI.ItemImage();
+                    audioSource.PlayOneShot(audioClips[1]);
 
                 }
                 if (treasure.itemFunction == Items.itemType.trinket)

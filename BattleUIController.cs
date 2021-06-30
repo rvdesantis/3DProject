@@ -49,6 +49,7 @@ public class BattleUIController : MonoBehaviour
     public AudioSource uiAudio;
     public List<AudioClip> uiSounds;
     // 0 - select enemy, 1 - open menu, 2 - close menu, 3- victory
+    // 4 - spellbook open, 5 - spellbook close, 6 - spellbook page
 
     private void Start()
     {
@@ -136,13 +137,12 @@ public class BattleUIController : MonoBehaviour
 
     public void ToggleSpellPanel()
     {
-        uiAudio.clip = uiSounds[1];
-        uiAudio.Play();
         if (spellPanel.gameObject.activeSelf)
         {
             spellPanel.gameObject.SetActive(false);
             spellIndex = 0;
             ToggleButtonIcons();
+            uiAudio.PlayOneShot(uiSounds[5]);
             activeUI = false;
 
             return;
@@ -151,6 +151,7 @@ public class BattleUIController : MonoBehaviour
         {
             activeUI = true;
             currentUI = spellPanel;
+            uiAudio.PlayOneShot(uiSounds[4]);
             if (battleController.heroes[battleController.characterTurnIndex].spells.Count != 0)
             {
                 spellIndex = 0;
@@ -158,7 +159,8 @@ public class BattleUIController : MonoBehaviour
                 spellButton.gameObject.SetActive(true);                   
                 
                 spellBTtxt.text = battleController.heroes[battleController.characterTurnIndex].spells[0].spellName;
-                spellInfoTXT.text = battleController.heroes[battleController.characterTurnIndex].spells[0].spellInfo + "\nSpell Power = " + battleController.heroes[battleController.characterTurnIndex].spells[spellIndex].power;
+                spellInfoTXT.text = battleController.heroes[battleController.characterTurnIndex].spells[0].spellInfo + "\nSpell Power = " + battleController.heroes[battleController.characterTurnIndex].spells[spellIndex].power
+                    + "\nMana Cost = " + battleController.heroes[battleController.characterTurnIndex].spells[spellIndex].manaCost;
                 spellButton.image.sprite = battleController.heroes[battleController.characterTurnIndex].spells[0].panelImage;
                 spellButton.Select();
             }

@@ -41,7 +41,7 @@ public class Items : MonoBehaviour
             Debug.Log(potionTarget.playerName + " is at Max health");
         }
 
-        if (potionTarget.playerClass == Player.PlayerClass.berzerker)
+        if (potionTarget.playerClass == Player.PlayerClass.berserker)
         {
             PlayerPrefs.SetInt("BerHealth", potionTarget.playerHealth);
         }

@@ -48,9 +48,12 @@ public class SecretDeadEnd : DunCube
                 w = PlayerPrefs.GetInt("SecretArmorStand");
             }
 
-            Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, Quaternion.identity);
-            chest.treasure = spawnedWeapon;
-            Debug.Log("Armor Stand Spawned");
+            if (PlayerPrefs.GetInt("chest" + areaController.chests.IndexOf(chest)) == 0)
+            {
+                Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, Quaternion.identity);
+                chest.treasure = spawnedWeapon;
+                Debug.Log("Armor Stand Spawned");
+            }            
         }
 
     }

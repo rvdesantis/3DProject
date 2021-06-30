@@ -216,31 +216,8 @@ public class Enemy : Player
             anim.SetTrigger("attack1");
 
             yield return new WaitForSeconds(1.75f);
-            transform.position = idlePosition;          
-
-            
-
-            if (damage > 0)
-            {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;
-            }
-
-            if (damage <= 0)
-            {
-                Debug.Log("damage 0 or less");
-            }
-
-            if (attackTarget.playerHealth <= 0)
-            {
-                if (attackTarget.danger == true)
-                {
-                    attackTarget.Die();
-                }
-                if (attackTarget.danger == false)
-                {
-                    attackTarget.Danger();                    
-                }
-            }
+            transform.position = idlePosition;
+            attackTarget.TakeDamage(damage);            
         }
         StartCoroutine(HitTimer());
     }
@@ -269,23 +246,7 @@ public class Enemy : Player
             yield return new WaitForSeconds(.25f);
             anim.SetTrigger("AttackR");
             yield return new WaitForSeconds(1.75f);
-            if (damage > 0)
-            {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;
-            }
-
-            if (attackTarget.playerHealth <= 0)
-            {
-                if (attackTarget.danger == true)
-                {
-                    attackTarget.Die();
-                }
-                if (attackTarget.danger == false)
-                {
-                    attackTarget.Danger();
-                }
-            }
-
+            attackTarget.TakeDamage(damage);            
             transform.position = idlePosition;
         }
         StartCoroutine(HitTimer());
@@ -295,7 +256,7 @@ public class Enemy : Player
     {
         BattleController bController = FindObjectOfType<BattleController>();
 
-        if (bController.heroes[bController.characterTurnIndex].playerClass == Player.PlayerClass.berzerker)
+        if (bController.heroes[bController.characterTurnIndex].playerClass == Player.PlayerClass.berserker)
         {
             hitBox.Impacts[0].gameObject.SetActive(true);
             hitBox.Impacts[0].Play();
@@ -390,7 +351,10 @@ public class Enemy : Player
             }
         }
     }
-
+    public override void Danger()
+    {
+        Die();
+    }
     public override void Die()
     {
         dead = true;

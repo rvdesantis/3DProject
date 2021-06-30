@@ -22,6 +22,20 @@ public class Berserker : Player
             PlayerPrefs.Save();
             SetBattleStats();            
         }
+
+        if (playerLevel == 2 && XP >= 1000)
+        {
+            XP = 0;
+            playerLevel = 3;
+            PlayerPrefs.SetInt("BerLevel", 3);
+            PlayerPrefs.SetInt("BerXP", 0);
+            PlayerPrefs.SetInt("BerMaxHealth", playerMaxHealth + Random.Range(20, 26));
+            PlayerPrefs.SetInt("BerHealth", PlayerPrefs.GetInt("BerMaxHealth"));
+            PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
+            PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
+            PlayerPrefs.Save();
+            SetBattleStats();
+        }
     }
 
     public override void LevelReset()
@@ -36,11 +50,18 @@ public class Berserker : Player
         PlayerPrefs.SetInt("BerMana", 0);
         PlayerPrefs.SetInt("BerStr", 50);
         PlayerPrefs.SetInt("BerDef", 35);
+
+
+
         PlayerPrefs.Save();
 
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
+
+        PlayerPrefs.SetInt("BerserkerWeapon1", 0);
+        PlayerPrefs.SetInt("BerserkerWeapon2", 0);
+        PlayerPrefs.SetInt("BerserkerWeapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {

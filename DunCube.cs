@@ -119,7 +119,7 @@ public class DunCube : MonoBehaviour
                 }
                 if (room == true)
                 {
-                    dunBuilder.createdRooms.Add(randomTurn);
+                    dunBuilder.createdRooms.Add(dunBuilder.createdTurn);
                 }
 
                 PlayerPrefs.SetInt("Turn" + dunBuilder.turnCounter, turnNumber);

@@ -22,6 +22,7 @@ public class ShopKeep : MonoBehaviour
 
     public AudioSource audioSource;
     public List<AudioClip> shopKeepAudio;
+    public List<AudioClip> shopFXClips;
     public GameObject secretDoor;
     public bool opened;
 
@@ -40,15 +41,20 @@ public class ShopKeep : MonoBehaviour
         int x = 0;
         if (AreaController.firstLoad)
         {
-            x = Random.Range(0, availWeapons.Count);
+            x = Random.Range(0, areaController.activeBank.bank.Count);
+
+
+
             Debug.Log(availWeapons[x].itemName + " available in Shop");
             PlayerPrefs.SetInt("SecretStoreWeapon", x);
             PlayerPrefs.SetInt("StoreWeaponSold", 0);
+            PlayerPrefs.SetInt("StoreOpen", 0);
             PlayerPrefs.Save();
 
             storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
             weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
         }        
+
         if (AreaController.firstLoad == false)
         {
             if (PlayerPrefs.GetInt("StoreWeaponSold") == 0)
@@ -57,10 +63,12 @@ public class ShopKeep : MonoBehaviour
                 storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
                 weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
             }
-            
-        }
-        
+            if (PlayerPrefs.GetInt("StoreWeaponSold") == 1)
+            {
+                opened = true;
+            }
 
+        }       
     }
 
 
@@ -69,16 +77,17 @@ public class ShopKeep : MonoBehaviour
         if (PlayerPrefs.GetInt("StoreWeaponSold") == 0)
         {
             weapDistance = Vector3.Distance(weapon.transform.position, areaController.moveController.transform.position);
-        }            
-        if (weapDistance <= 6)
-        {            
-            wInRange = true;
-            if (opened == false)
+
+            if (weapDistance <= 6)
             {
-                opened = true;
-                audioSource.PlayOneShot(shopKeepAudio[Random.Range(0, shopKeepAudio.Count)], 1);
+                wInRange = true;
+                if (opened == false)
+                {
+                    opened = true;
+                    audioSource.PlayOneShot(shopKeepAudio[Random.Range(0, shopKeepAudio.Count)], 1);
+                }
             }
-        }
+        }  
         if (wInRange && weapon.gameObject.activeSelf)
         {
             if (StaticMenuItems.goldCount >= weapon.goldCost)
@@ -96,6 +105,7 @@ public class ShopKeep : MonoBehaviour
                         areaController.areaUI.weaponImage.sprite = weapon.itemSprite;
                         areaController.areaUI.activeItem = weapon;
                         areaController.areaUI.WeaponImage();
+                        audioSource.PlayOneShot(shopFXClips[0]);
                         weapon.gameObject.SetActive(false);
                         areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                         if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)

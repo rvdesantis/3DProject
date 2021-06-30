@@ -34,7 +34,7 @@ public class Player : MonoBehaviour
     // 0 = attack, 1 = spell, 2 = damage 3 = die
 
     // Player Info
-    public enum PlayerClass { warrior, fireMage, archer, berzerker, darkMage}
+    public enum PlayerClass { warrior, fireMage, archer, berserker, darkMage}
     public PlayerClass playerClass;
 
 
@@ -92,7 +92,7 @@ public class Player : MonoBehaviour
             {
                 attackTarget.combatTextPrefab.floatingText.color = Color.red;
                 attackTarget.combatTextPrefab.damageAmount = 0;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
                 Debug.Log("damage 0 or less");
             }
 
@@ -107,7 +107,7 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(1.75f);
             if (damage > 0)
             {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                attackTarget.TakeDamage(damage);                
             }
             transform.position = idlePosition;
 
@@ -127,13 +127,15 @@ public class Player : MonoBehaviour
                 attackTarget.combatTextPrefab.floatingText.color = Color.red;
                 attackTarget.combatTextPrefab.damageAmount = damage;
                 attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                
             }
 
             if (damage <= 0)
             {
                 attackTarget.combatTextPrefab.floatingText.color = Color.red;
-                attackTarget.combatTextPrefab.damageAmount = damage;
-                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;                
+                attackTarget.combatTextPrefab.damageAmount = 0;
+                attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                
                 Debug.Log("damage 0 or less");
             }
 
@@ -143,11 +145,37 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(1.75f);
             if (damage > 0)
             {
-                attackTarget.playerHealth = attackTarget.playerHealth - damage;
+                attackTarget.TakeDamage(damage);                
             }
             transform.position = idlePosition;
         }
         StartCoroutine(HitTimer());
+    }
+
+    public virtual void TakeDamage(int damage)
+    {
+        combatTextPrefab.ToggleCombatText();
+        if (damage > 0)
+        {
+            playerHealth = playerHealth - damage;
+        }
+
+        if (damage <= 0)
+        {
+            Debug.Log("damage 0 or less");
+        }
+
+        if (playerHealth <= 0)
+        {
+            if (danger == true)
+            {
+                Die();
+            }
+            if (danger == false)
+            {
+                Danger();
+            }
+        }
     }
 
 
@@ -155,9 +183,7 @@ public class Player : MonoBehaviour
     public virtual void CastSpell()
     {
         int damage = selectedSpell.power + Weapon.magPower;
-        attackTarget.combatTextPrefab.floatingText.color = Color.red;
-        attackTarget.combatTextPrefab.damageAmount = damage;
-        attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+       
         if (selectedSpell.manaCost <= playerMana)
         {
             playerMana = playerMana - selectedSpell.manaCost;
@@ -201,9 +227,9 @@ public class Player : MonoBehaviour
                 {
                     attackTarget.anim.SetTrigger("gotHit");
                     attackTarget.combatTextPrefab.floatingText.color = Color.red;
-                    attackTarget.combatTextPrefab.ToggleCombatText();
-                    attackTarget.playerHealth = attackTarget.playerHealth - damage;
-
+                    attackTarget.combatTextPrefab.damageAmount = damage;
+                    attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
+                    attackTarget.TakeDamage(damage);
                 }
                 if (selectedSpell.targetALL)
                 {
@@ -212,18 +238,13 @@ public class Player : MonoBehaviour
                         if (enemy.dead == false)
                         {
                             enemy.anim.SetTrigger("gotHit");
-                            attackTarget.combatTextPrefab.floatingText.color = Color.red;
+                            enemy.combatTextPrefab.floatingText.color = Color.red;
+                            enemy.combatTextPrefab.damageAmount = damage;
                             enemy.combatTextPrefab.startingPosition = enemy.transform.position;
-                            enemy.combatTextPrefab.ToggleCombatText();
-                            enemy.playerHealth = attackTarget.playerHealth - damage;
+                            enemy.TakeDamage(damage);
                         }
                     }
-                }
-
-                Debug.Log(playerName + " has cast " + selectedSpell.spellName + " at " + attackTarget.playerName);
-
-                
-                    
+                }     
             }
             StartCoroutine(SpellTimer());
         }
@@ -246,8 +267,11 @@ public class Player : MonoBehaviour
 
     public virtual void Die()
     {
-        dead = true;
-        anim.SetTrigger("Dead");
+        if (danger)
+        {
+            dead = true;
+            anim.SetTrigger("Dead");
+        }
     }
 
     public void EnemyHitTrigger()  // for use in anims to trigger hit to trigger weapon noise and popup text
@@ -259,12 +283,10 @@ public class Player : MonoBehaviour
         if (attackTarget.playerHealth > 0)
         {
             attackTarget.anim.SetTrigger("gotHit");
-            attackTarget.combatTextPrefab.ToggleCombatText();            
         }
         if (attackTarget.playerHealth <= 0)
         {
-            attackTarget.anim.SetTrigger("gotHit");            
-            attackTarget.combatTextPrefab.ToggleCombatText();
+            attackTarget.anim.SetTrigger("gotHit");   
             if (attackTarget.dead == false)
             {
                 attackTarget.dead = true;                

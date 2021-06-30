@@ -1,46 +1,121 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GoblinGuide : DunEnemyAgent
 {
 
+    public DunBuilder dunBuilder;    
 
+
+
+    private void Start()
+    {
+        
+    }
     public override void SavePosition()
     {
-        savedPosition = transform.position;
-        PlayerPrefs.SetFloat("Agent" + 0 + "X", savedPosition.x);
-        PlayerPrefs.SetFloat("Agent" + 0 + "Y", savedPosition.y);
-        PlayerPrefs.SetFloat("Agent" + 0 + "Z", savedPosition.z);
-        PlayerPrefs.Save();
-    }
-    public override void LoadPosition()
-    {
-        agent.gameObject.SetActive(false);
-        if (AreaController.battleReturn == true)
-        {
-            float x = PlayerPrefs.GetFloat("Agent" + 0 + "X");
-            float y = PlayerPrefs.GetFloat("Agent" + 0 + "Y");
-            float z = PlayerPrefs.GetFloat("Agent" + 0 + "Z");
-            savedPosition = new Vector3(x, y, z);
-            transform.position = savedPosition;
-        }
-        if (AreaController.battleReturn == false)
-        {
-            transform.position = FindObjectOfType<DunBuilder>().createdTurnCubes[0].itemSpawnPoint.transform.position;
-        }
-        agent.gameObject.SetActive(true);
+        savedPosition = agentBodyTransform.transform.position;
+        PlayerPrefs.SetFloat(agentName + "X", savedPosition.x);
+        PlayerPrefs.SetFloat(agentName + "Y", savedPosition.y);
+        PlayerPrefs.SetFloat(agentName + "Z", savedPosition.z);
 
-        if (PlayerPrefs.GetInt("Agent" + 0 + "Active") == 1)
+        PlayerPrefs.SetFloat(agentName + "XR", transform.rotation.x);
+        PlayerPrefs.SetFloat(agentName + "YR", transform.rotation.y);
+        PlayerPrefs.SetFloat(agentName + "ZR", transform.rotation.z);
+
+        Debug.Log(agentName + " position " + savedPosition.ToString());
+
+        PlayerPrefs.Save();
+    }   
+
+    public override void Spawn()
+    {
+        dunBuilder = FindObjectOfType<DunBuilder>();
+        areaController = FindObjectOfType<AreaController>();
+        GoblinGuide goblin = Instantiate(this, dunBuilder.createdTurnCubes[0].itemSpawnPoint.transform.position, dunBuilder.createdTurnCubes[0].itemSpawnPoint.transform.rotation);
+        goblin.dunBuilder = dunBuilder;
+        goblin.areaController = areaController;
+        areaController.agents.Add(goblin);
+    }
+
+    public override void Respawn()
+    {
+        float x = PlayerPrefs.GetFloat(agentName + "X");
+        float y = PlayerPrefs.GetFloat(agentName + "Y");
+        float z = PlayerPrefs.GetFloat(agentName + "Z");
+        Debug.Log("Goblin Saved Position at " + x + " " + y + " " + z);
+        savedPosition = new Vector3(x, y, z);
+
+        GoblinGuide respawn = Instantiate(this, savedPosition, Quaternion.identity);
+        respawn.savedPosition = savedPosition;
+        respawn.dunBuilder = FindObjectOfType<DunBuilder>();
+        respawn.areaController = FindObjectOfType<AreaController>();
+        respawn.areaController.agents.Add(respawn);
+        respawn.LoadPosition();
+        respawn.SelectTargetLocation();
+        if (PlayerPrefs.GetFloat(agentName + "Active") == 1)
         {
-            int talk = Random.Range(0, 2);
-            if (talk == 1)
-            {
-                audioSource.clip = returnClips[Random.Range(0, returnClips.Count)];
-                audioSource.Play();
-            }
             move = true;
             active = true;
+        }
+    }
+
+    public override void SelectTargetLocation()
+    {        
+        NavMeshPath path = new NavMeshPath();
+        agent.CalculatePath(areaController.bossHallwaySpawnPoint, path);
+
+        if (path.status == NavMeshPathStatus.PathComplete)
+        {
+            Debug.Log(agentName + " Path Complete");
+            targetLocation = areaController.bossHallwaySpawnPoint;
+        }
+
+
+        if (path.status == NavMeshPathStatus.PathPartial)
+        {
+            Debug.Log(agentName + " Path Partial, Checking Turn Agents");
+            bool foundPath = false;
+            foreach (DunCube turn in dunBuilder.createdTurnCubes)
+            {
+                NavMeshPath path1 = new NavMeshPath();
+                NavMeshPath path2 = new NavMeshPath();
+                bool pathToAgent = false;
+                bool pathToTarget = false;
+
+                agent.CalculatePath(turn.itemSpawnPoint.transform.position, path1);
+                if (path1.status == NavMeshPathStatus.PathComplete)
+                {
+                    Debug.Log("Path to Turn " + dunBuilder.createdTurnCubes.IndexOf(turn) + " from " + agentName + " clear");
+                    pathToAgent = true;
+                }
+                turn.navAgent.CalculatePath(areaController.bossHallwaySpawnPoint, path2);
+                if (path2.status == NavMeshPathStatus.PathComplete)
+                {
+                    Debug.Log("Path from Turn " + dunBuilder.createdTurnCubes.IndexOf(turn) + " to boss hallway clear");
+                    pathToTarget = true;
+                }
+                if (pathToAgent && pathToTarget)
+                {
+                    Debug.Log(dunBuilder.createdTurnCubes.IndexOf(turn) + " agent target set");
+                    foundPath = true;
+                    nextLocation = areaController.bossHallwaySpawnPoint;
+                    targetLocation = turn.itemSpawnPoint.transform.position;
+                    break;
+                }
+            }
+
+            if (foundPath == false)
+            {
+                gameObject.SetActive(false);
+                Debug.Log(agentName + " path not found.  deactivating");
+            }
+        }
+        if (path.status == NavMeshPathStatus.PathInvalid)
+        {
+            Debug.Log(agentName + " Path Invalid");
         }
     }
 
@@ -122,7 +197,8 @@ public class GoblinGuide : DunEnemyAgent
                             active = true;
                             audioSource.clip = activatedClips[0];
                             audioSource.Play();
-                            PlayerPrefs.SetInt("Agent" + 0 + "Active", 1); PlayerPrefs.Save();
+                            PlayerPrefs.SetInt(agentName + "Active", 1); PlayerPrefs.Save();
+                            return;
                         }
                         if (StaticMenuItems.goldCount < hireCost)
                         {

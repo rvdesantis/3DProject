@@ -68,45 +68,55 @@ public class Combo : MonoBehaviour
                 }
             }
         }
-        if (fMageCount == 1 && fArcherCount == 1)
+        if (fMageCount == 1 && fArcherCount == 1 && spellCombos.fireArrowsfinish == false)
         {
             if (fArcher.actionType == Player.Action.casting && fMage.actionType == Player.Action.casting)
             {
-                if (fArcher.selectedSpell == fArcher.spells[0] && fMage.selectedSpell == fMage.spells[0] && spellCombos.fireArrowsfinish == false)
-                {
-                    battleController.combo = true;
-                    spellCombos.fireArrows = true;
-                    spellCombos.SpellComboTrigger();
-                    Debug.Log("Fire Arrows Combo Trigger");
-                    return;
+                if (fArcher.selectedSpell == fArcher.spells[0] && fMage.selectedSpell == fMage.spells[0])
+                {                    
+                    if (fArcher.playerMana >= fArcher.selectedSpell.manaCost && fMage.playerMana >= fMage.selectedSpell.manaCost)
+                    {
+                        battleController.combo = true;
+                        spellCombos.fireArrows = true;
+                        spellCombos.SpellComboTrigger();
+                        Debug.Log("Fire Arrows Combo Trigger");
+                        return;
+                    }     
                 }
             }
         }
-        if (fMageCount == 1 && mWarriorCount == 1)
+        if (fMageCount == 1 && mWarriorCount == 1 && spellCombos.firestrikefinish == false)
         {
             if (fMage.attackTarget == mWarrior.attackTarget)
             {
-                if (fMage.selectedSpell == fMage.spells[0] && mWarrior.selectedSpell == mWarrior.spells[0] && spellCombos.firestrikefinish == false)
+                if (fMage.selectedSpell == fMage.spells[0] && mWarrior.selectedSpell == mWarrior.spells[0])
                 {
-                    battleController.combo = true;
-                    spellCombos.fireStrike = true;
-                    spellCombos.SpellComboTrigger();
-                    Debug.Log("FireStrike Combo Trigger");
-                    return;
+                    if (mWarrior.playerMana >= mWarrior.selectedSpell.manaCost && fMage.playerMana >= fMage.selectedSpell.manaCost)
+                    {
+                        battleController.combo = true;
+                        spellCombos.fireStrike = true;
+                        spellCombos.SpellComboTrigger();
+                        Debug.Log("FireStrike Combo Trigger");
+                        return;
+                    }
+                    
                 } 
             }
         }
-        if (fMageCount == 1 && fBerzerkerCount == 1)
+        if (fMageCount == 1 && fBerzerkerCount == 1 && spellCombos.lavaStrikeFinish == false)
         {
             if (fMage.playerLevel > 1 && fBerzerker.playerLevel > 1)
             {
-                if (fMage.selectedSpell == fMage.spells[1] && fBerzerker.selectedSpell == fBerzerker.spells[1] && spellCombos.lavaStrikeFinish == false)
+                if (fMage.selectedSpell == fMage.spells[1] && fBerzerker.selectedSpell == fBerzerker.spells[1])
                 {
-                    battleController.combo = true;
-                    spellCombos.lavaStrike = true;
-                    spellCombos.SpellComboTrigger();
-                    Debug.Log("LavaStrike Combo Trigger");
-                    return;
+                    if (fBerzerker.playerMana >= fBerzerker.selectedSpell.manaCost && fMage.playerMana >= fMage.selectedSpell.manaCost)
+                    {
+                        battleController.combo = true;
+                        spellCombos.lavaStrike = true;
+                        spellCombos.SpellComboTrigger();
+                        Debug.Log("LavaStrike Combo Trigger");
+                        return;
+                    }
                 }
             }
         }
@@ -140,7 +150,7 @@ public class Combo : MonoBehaviour
                 fMage = character;
                 fMageCount++;
             }
-            if (character.playerClass == Player.PlayerClass.berzerker)
+            if (character.playerClass == Player.PlayerClass.berserker)
             {
                 fBerzerker = character;
                 fBerzerkerCount++;

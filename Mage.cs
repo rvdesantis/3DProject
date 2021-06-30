@@ -24,6 +24,21 @@ public class Mage : Player
             PlayerPrefs.Save();
             SetBattleStats();            
         }
+        if (playerLevel == 2 && XP >= 1000)
+        {
+            XP = 0;
+            playerLevel = 3;
+            PlayerPrefs.SetInt("MagLevel", 3);
+            PlayerPrefs.SetInt("MagXP", 0);
+            PlayerPrefs.SetInt("MagMaxHealth", playerMaxHealth + Random.Range(20, 26));
+            PlayerPrefs.SetInt("MagHealth", PlayerPrefs.GetInt("MagMaxHealth"));
+            PlayerPrefs.SetInt("MagMaxMana", playerMaxMana + Random.Range(20, 31));
+            PlayerPrefs.SetInt("MagMana", PlayerPrefs.GetInt("MagMaxMana"));
+            PlayerPrefs.SetInt("MagStr", playerSTR + Random.Range(15, 21));
+            PlayerPrefs.SetInt("MagDef", playerDEF + Random.Range(10, 16));
+            PlayerPrefs.Save();
+            SetBattleStats();
+        }
     }
 
     public override void LevelReset()
@@ -43,6 +58,10 @@ public class Mage : Player
         Weapon.gameObject.SetActive(false);
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
+
+        PlayerPrefs.SetInt("MageWeapon1", 0);
+        PlayerPrefs.SetInt("MageWeapon2", 0);
+        PlayerPrefs.SetInt("MageWeapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {

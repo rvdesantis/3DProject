@@ -87,8 +87,7 @@ public class MeleeCombos : MonoBehaviour
                 battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
                 battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
 
-                battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
-                battleController.heroes[0].EnemyHitTrigger();
+                battleController.heroes[0].attackTarget.TakeDamage(damage);
 
                 yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
@@ -155,8 +154,7 @@ public class MeleeCombos : MonoBehaviour
                 battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
                 battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
 
-                battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
-                battleController.heroes[0].EnemyHitTrigger();
+                battleController.heroes[0].attackTarget.TakeDamage(damage);
 
                 yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
@@ -225,8 +223,7 @@ public class MeleeCombos : MonoBehaviour
                 battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
                 battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
 
-                battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
-                battleController.heroes[0].EnemyHitTrigger();
+                battleController.heroes[0].attackTarget.TakeDamage(damage);
 
                 yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
@@ -293,8 +290,7 @@ public class MeleeCombos : MonoBehaviour
                 battleController.heroes[0].attackTarget.combatTextPrefab.damageAmount = damage;
                 battleController.heroes[0].attackTarget.combatTextPrefab.startingPosition = battleController.heroes[0].attackTarget.transform.position;
 
-                battleController.heroes[0].attackTarget.playerHealth = battleController.heroes[0].attackTarget.playerHealth - damage;
-                battleController.heroes[0].EnemyHitTrigger();
+                battleController.heroes[0].attackTarget.TakeDamage(damage);
                 battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
                 yield return new WaitForSeconds(2f);
                 if (battleController.heroes[0].attackTarget.playerHealth <= 0)
