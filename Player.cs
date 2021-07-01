@@ -26,6 +26,10 @@ public class Player : MonoBehaviour
 
     public enum Action {melee, ranged, casting, item, flee }
     public Action actionType;
+
+    public enum StatusEffect { paralyze, frozen, burn,}
+    public StatusEffect statusEffect;
+
     public bool danger;
 
     public List<PlayableDirector> playables;
@@ -61,7 +65,7 @@ public class Player : MonoBehaviour
 
     public Weapons Weapon;
     public List<Weapons> equipedWeapons;
-
+    public List<Items> weaponItemBank;
     public virtual void Start()
     {        
         anim = GetComponent<Animator>();
@@ -110,7 +114,6 @@ public class Player : MonoBehaviour
                 attackTarget.TakeDamage(damage);                
             }
             transform.position = idlePosition;
-
         }
         StartCoroutine(HitTimer());
     }
@@ -224,8 +227,7 @@ public class Player : MonoBehaviour
                 
 
                 if (selectedSpell.targetALL == false)
-                {
-                    attackTarget.anim.SetTrigger("gotHit");
+                {                   
                     attackTarget.combatTextPrefab.floatingText.color = Color.red;
                     attackTarget.combatTextPrefab.damageAmount = damage;
                     attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
@@ -236,8 +238,7 @@ public class Player : MonoBehaviour
                     foreach (Enemy enemy in FindObjectOfType<BattleController>().enemies)
                     {
                         if (enemy.dead == false)
-                        {
-                            enemy.anim.SetTrigger("gotHit");
+                        {                            
                             enemy.combatTextPrefab.floatingText.color = Color.red;
                             enemy.combatTextPrefab.damageAmount = damage;
                             enemy.combatTextPrefab.startingPosition = enemy.transform.position;

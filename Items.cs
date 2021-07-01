@@ -32,6 +32,8 @@ public class Items : MonoBehaviour
     public static bool pickedUp;
     public bool pickedUpMirror;
 
+
+
     public void HealthPotion()
     {
         potionTarget.playerHealth = potionTarget.playerHealth + 25;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Mage : Player
-{        
+{    
     public ParticleSystem meleeStrike;
     public ParticleSystem fireAuara;
 
@@ -36,6 +36,9 @@ public class Mage : Player
             PlayerPrefs.SetInt("MagMana", PlayerPrefs.GetInt("MagMaxMana"));
             PlayerPrefs.SetInt("MagStr", playerSTR + Random.Range(15, 21));
             PlayerPrefs.SetInt("MagDef", playerDEF + Random.Range(10, 16));
+
+            PlayerPrefs.SetInt(playerName + "Weapon1", 1);
+
             PlayerPrefs.Save();
             SetBattleStats();
         }
@@ -59,9 +62,9 @@ public class Mage : Player
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
 
-        PlayerPrefs.SetInt("MageWeapon1", 0);
-        PlayerPrefs.SetInt("MageWeapon2", 0);
-        PlayerPrefs.SetInt("MageWeapon3", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon1", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon2", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {

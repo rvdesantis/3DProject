@@ -43,8 +43,6 @@ public class MeleeCombos : MonoBehaviour
 
         if (comboController.mWarriorCount == 0)
         {
-
-
             fWarrior.gameObject.SetActive(false);
             comboController.fWarriorTimelineAsset.attackTarget = fWarrior.attackTarget;
 
@@ -54,10 +52,7 @@ public class MeleeCombos : MonoBehaviour
             fMage.gameObject.SetActive(false);
             comboController.fMageTimelineAsset.attackTarget = fMage.attackTarget;
 
-
-
             battleController.comboPlayables[0].Play();
-
 
             IEnumerator CamTimer()
             {
@@ -76,8 +71,7 @@ public class MeleeCombos : MonoBehaviour
                 foreach (Player character in battleController.heroes)
                 {
                     character.transform.position = character.idlePosition;
-                }
-                
+                }                
 
                 int groupSTR = battleController.heroes[0].playerSTR + battleController.heroes[0].Weapon.power +
                 battleController.heroes[1].playerSTR + battleController.heroes[1].Weapon.power +
@@ -90,10 +84,7 @@ public class MeleeCombos : MonoBehaviour
                 battleController.heroes[0].attackTarget.TakeDamage(damage);
 
                 yield return new WaitForSeconds(2f);
-                if (battleController.heroes[0].attackTarget.playerHealth <= 0)
-                {
-                    battleController.heroes[0].attackTarget.Die();
-                }
+              
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)
@@ -156,11 +147,7 @@ public class MeleeCombos : MonoBehaviour
 
                 battleController.heroes[0].attackTarget.TakeDamage(damage);
 
-                yield return new WaitForSeconds(2f);
-                if (battleController.heroes[0].attackTarget.playerHealth <= 0)
-                {
-                    battleController.heroes[0].attackTarget.Die();
-                }
+                yield return new WaitForSeconds(2f);               
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)
@@ -225,11 +212,7 @@ public class MeleeCombos : MonoBehaviour
 
                 battleController.heroes[0].attackTarget.TakeDamage(damage);
 
-                yield return new WaitForSeconds(2f);
-                if (battleController.heroes[0].attackTarget.playerHealth <= 0)
-                {
-                    battleController.heroes[0].attackTarget.Die();
-                }
+                yield return new WaitForSeconds(2f);                
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)
@@ -293,10 +276,6 @@ public class MeleeCombos : MonoBehaviour
                 battleController.heroes[0].attackTarget.TakeDamage(damage);
                 battleController.heroes[0].attackTarget.transform.position = battleController.heroes[0].attackTarget.idlePosition;
                 yield return new WaitForSeconds(2f);
-                if (battleController.heroes[0].attackTarget.playerHealth <= 0)
-                {
-                    battleController.heroes[0].attackTarget.Die();
-                }
                 foreach (Enemy enemy in battleController.enemies)
                 {
                     if (enemy != battleController.heroes[0].attackTarget)

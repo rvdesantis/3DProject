@@ -38,21 +38,25 @@ public class SecretDeadEnd : DunCube
             areaController.chests.Add(chest);
 
             ArmorStand armorStand = chest.GetComponent<ArmorStand>();
-            int w = Random.Range(0, armorStand.weaponBank.Count);
-            if (AreaController.firstLoad)
+            armorStand.AvailableWeapons();
+            if (armorStand.weaponBank.Count > 0)
             {
-                PlayerPrefs.SetInt("SecretArmorStand", w);
-            }
-            if (AreaController.firstLoad == false)
-            {
-                w = PlayerPrefs.GetInt("SecretArmorStand");
-            }
+                int w = Random.Range(0, armorStand.weaponBank.Count);
+                if (AreaController.firstLoad)
+                {
+                    PlayerPrefs.SetInt("SecretArmorStand", w);
+                }
+                if (AreaController.firstLoad == false)
+                {
+                    w = PlayerPrefs.GetInt("SecretArmorStand");
+                }
 
-            if (PlayerPrefs.GetInt("chest" + areaController.chests.IndexOf(chest)) == 0)
-            {
-                Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, Quaternion.identity);
-                chest.treasure = spawnedWeapon;
-                Debug.Log("Armor Stand Spawned");
+                if (PlayerPrefs.GetInt("chest" + areaController.chests.IndexOf(chest)) == 0)
+                {
+                    Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, armorStand.weaponSpawnTransform.transform.localRotation);
+                    chest.treasure = spawnedWeapon;
+                    Debug.Log("Armor Stand Spawned");
+                }
             }            
         }
 

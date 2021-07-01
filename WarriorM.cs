@@ -6,7 +6,7 @@ using UnityEngine.Playables;
 
 public class WarriorM : Player
 {
-
+    
     public override void LevelUp()
     {
         if (playerLevel == 1 && XP >= 400)
@@ -21,6 +21,9 @@ public class WarriorM : Player
             PlayerPrefs.SetInt("WarMaxMana", 20);
             PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(15, 21));
             PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(15, 21));
+
+            PlayerPrefs.SetInt(playerName + "Weapon1", 1);
+
             PlayerPrefs.Save();
             SetBattleStats();            
         }
@@ -35,6 +38,9 @@ public class WarriorM : Player
             PlayerPrefs.SetInt("WarHealth", PlayerPrefs.GetInt("WarMaxHealth"));
             PlayerPrefs.SetInt("WarStr", playerSTR + Random.Range(20, 26));
             PlayerPrefs.SetInt("WarDef", playerDEF + Random.Range(20, 26));
+
+            PlayerPrefs.SetInt(playerName + "Weapon2", 1);
+
             PlayerPrefs.Save();
             SetBattleStats();
         }
@@ -58,9 +64,9 @@ public class WarriorM : Player
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
 
-        PlayerPrefs.SetInt("WarriorWeapon1", 0);
-        PlayerPrefs.SetInt("WarriorWeapon2", 0);
-        PlayerPrefs.SetInt("WarriorWeapon3", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon1", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon2", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {

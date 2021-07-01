@@ -8,7 +8,24 @@ public class ArmorStand : Chest
     public Vector3 weaponSpawnPoint;
     public GameObject weaponSpawnTransform;
 
-
+    public void AvailableWeapons()
+    {
+        foreach (Player hero in areaController.staticBank.bank)
+        {
+            if (PlayerPrefs.GetInt(hero.playerName + "Weapon2") == 1 && PlayerPrefs.GetInt(hero.playerName + "Weapon3") == 0)
+            {
+                weaponBank.Add(hero.weaponItemBank[2]);
+            }
+            if (PlayerPrefs.GetInt(hero.playerName + "Weapon1") == 1 && PlayerPrefs.GetInt(hero.playerName + "Weapon2") == 0)
+            {
+                weaponBank.Add(hero.weaponItemBank[1]);
+            }
+            if (PlayerPrefs.GetInt(hero.playerName + "Weapon1") == 0)
+            {
+                weaponBank.Add(hero.weaponItemBank[0]);
+            }
+        }
+    }
 
     void Update()
     {

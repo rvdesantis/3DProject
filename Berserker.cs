@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Berserker : Player
-{
-
+{    
     public override void LevelUp()
     {
         if (playerLevel == 1 && XP >= 500)
@@ -19,6 +18,9 @@ public class Berserker : Player
             PlayerPrefs.SetInt("BerMana", 20);
             PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
             PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
+
+            PlayerPrefs.SetInt(playerName + "Weapon1", 1);
+
             PlayerPrefs.Save();
             SetBattleStats();            
         }
@@ -33,6 +35,9 @@ public class Berserker : Player
             PlayerPrefs.SetInt("BerHealth", PlayerPrefs.GetInt("BerMaxHealth"));
             PlayerPrefs.SetInt("BerStr", playerSTR + Random.Range(20, 26));
             PlayerPrefs.SetInt("BerDef", playerDEF + Random.Range(10, 16));
+
+            PlayerPrefs.SetInt(playerName + "Weapon2", 1);
+
             PlayerPrefs.Save();
             SetBattleStats();
         }
@@ -59,9 +64,9 @@ public class Berserker : Player
         Weapon = equipedWeapons[0];
         Weapon.gameObject.SetActive(true);
 
-        PlayerPrefs.SetInt("BerserkerWeapon1", 0);
-        PlayerPrefs.SetInt("BerserkerWeapon2", 0);
-        PlayerPrefs.SetInt("BerserkerWeapon3", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon1", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon2", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {

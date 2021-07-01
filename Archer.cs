@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Archer : Player
-{
+{    
     public GameObject ammoModel;
     public List<Ammo> quiver;
     public Ammo equipedArrow;
@@ -33,7 +33,8 @@ public class Archer : Player
             PlayerPrefs.SetInt("ArMaxMana", playerMaxMana + Random.Range(10, 16));
             PlayerPrefs.SetInt("ArMana", PlayerPrefs.GetInt("ArMaxMana"));
             PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
-            PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));
+            PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));            
+
             PlayerPrefs.Save();
             SetBattleStats();
         }
@@ -49,6 +50,9 @@ public class Archer : Player
             PlayerPrefs.SetInt("ArMana", PlayerPrefs.GetInt("ArMaxMana"));
             PlayerPrefs.SetInt("ArStr", playerSTR + Random.Range(15, 21));
             PlayerPrefs.SetInt("ArDef", playerDEF + Random.Range(10, 16));
+
+            PlayerPrefs.SetInt(playerName + "Weapon1", 1);
+
             PlayerPrefs.Save();
             SetBattleStats();
         }
@@ -69,9 +73,9 @@ public class Archer : Player
         PlayerPrefs.Save();        
         equipedArrow = quiver[0];
 
-        PlayerPrefs.SetInt("ArcherWeapon1", 0);
-        PlayerPrefs.SetInt("ArcherWeapon2", 0);
-        PlayerPrefs.SetInt("ArcherWeapon3", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon1", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon2", 0);
+        PlayerPrefs.SetInt(playerName + "Weapon3", 0);
 
         for (int i = 0; i < spells.Count; i++)
         {

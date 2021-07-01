@@ -223,8 +223,9 @@ public class DunBuilder : MonoBehaviour
                 mimicCount--;
             }
         }
+        // set items here.
 
-        foreach (Chest createdChest in createdChests)
+        foreach (Chest createdChest in createdChests) // chest fill
         {            
             createdChest.treasure = areaController.availableItems[Random.Range(0, areaController.availableItems.Count - 1)];
             bool treasureInUse = false;

@@ -48,13 +48,16 @@ public class treasureRoom : MonoBehaviour
                             PlayerPrefs.SetInt("TreasureRoomChest" + chestSpawnPlatforms.IndexOf(spawnPlatform), 2);
 
                             ArmorStand armorStand = chest.GetComponent<ArmorStand>();
-                            int w = Random.Range(0, armorStand.weaponBank.Count);
-                            PlayerPrefs.SetInt("TreasureRoomArmorStand", w);
-                            Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, armorStand.weaponSpawnTransform.transform.rotation);
-                            chest.treasure = spawnedWeapon;
-                            Debug.Log("Armor Stand Spawned");
+                            armorStand.AvailableWeapons();
+                            if (armorStand.weaponBank.Count > 0)
+                            {
+                                int w = Random.Range(0, armorStand.weaponBank.Count);
+                                PlayerPrefs.SetInt("TreasureRoomArmorStand", w);
+                                Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, armorStand.weaponSpawnTransform.transform.localRotation);
+                                chest.treasure = spawnedWeapon;
+                                Debug.Log("Armor Stand Spawned");
+                            }
                         }
-
                     }
                     if (chestSpawnPlatforms.IndexOf(spawnPlatform) != 0)
                     {

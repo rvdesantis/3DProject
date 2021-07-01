@@ -40,7 +40,6 @@ public class Spell : MonoBehaviour
             audioSource.clip = castSound;
             audioSource.Play();
         }
-        
     }
 
     // Update is called once per frame
@@ -49,7 +48,7 @@ public class Spell : MonoBehaviour
         if (projectile)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, spellSpeed);
-            if (Vector3.Distance(transform.position, targetPosition) < .25f)
+            if (Vector3.Distance(transform.position, targetPosition) < 1)
             {
                 if (impactRange == false)
                 {

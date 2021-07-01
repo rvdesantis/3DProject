@@ -5,8 +5,6 @@ using UnityEngine;
 public class ShopKeep : MonoBehaviour
 {
     public AreaController areaController;
-
-
     public GameObject table;
 
     public GameObject weapnSpawnPlatform;
@@ -32,42 +30,65 @@ public class ShopKeep : MonoBehaviour
     private void Start()
     {
         areaController = FindObjectOfType<AreaController>();
+        AvailableWeapons();
         SpawnWeapon();
         weapDistance = 6;
+    }
+
+    public void AvailableWeapons()
+    {
+        foreach (Player hero in areaController.staticBank.bank)
+        {
+            if (PlayerPrefs.GetInt(hero.playerName + "Weapon2") == 1 && PlayerPrefs.GetInt(hero.playerName + "Weapon3") == 0)
+            {
+                availWeapons.Add(hero.weaponItemBank[2]);
+            }
+            if (PlayerPrefs.GetInt(hero.playerName + "Weapon1") == 1 && PlayerPrefs.GetInt(hero.playerName + "Weapon2") == 0)
+            {
+                availWeapons.Add(hero.weaponItemBank[1]);
+            }
+            if (PlayerPrefs.GetInt(hero.playerName + "Weapon1") == 0)
+            {
+                availWeapons.Add(hero.weaponItemBank[0]);
+            }
+        }
     }
 
     public void SpawnWeapon()
     {
         int x = 0;
+
         if (AreaController.firstLoad)
         {
-            x = Random.Range(0, areaController.activeBank.bank.Count);
+            if (availWeapons.Count > 0)
+            {
+                x = Random.Range(0, availWeapons.Count);
+                Debug.Log(availWeapons[x].itemName + " available in Shop");
+                PlayerPrefs.SetInt("SecretStoreWeapon", x);
+                PlayerPrefs.SetInt("StoreWeaponSold", 0);
+                PlayerPrefs.SetInt("StoreOpen", 0);
+                PlayerPrefs.Save();
 
-
-
-            Debug.Log(availWeapons[x].itemName + " available in Shop");
-            PlayerPrefs.SetInt("SecretStoreWeapon", x);
-            PlayerPrefs.SetInt("StoreWeaponSold", 0);
-            PlayerPrefs.SetInt("StoreOpen", 0);
-            PlayerPrefs.Save();
-
-            storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
-            weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
+                storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
+                weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
+            }            
         }        
 
         if (AreaController.firstLoad == false)
         {
             if (PlayerPrefs.GetInt("StoreWeaponSold") == 0)
             {
-                x = PlayerPrefs.GetInt("SecretStoreWeapon");
-                storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
-                weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
+                if (availWeapons.Count > 0)
+                {
+                    x = PlayerPrefs.GetInt("SecretStoreWeapon");
+                    storeWeaponSpawnPoint = weapnSpawnPlatform.transform.position;
+                    weapon = Instantiate(availWeapons[x], storeWeaponSpawnPoint, weapnSpawnPlatform.transform.rotation);
+                }
             }
             if (PlayerPrefs.GetInt("StoreWeaponSold") == 1)
             {
                 opened = true;
             }
-
         }       
     }
 
@@ -112,7 +133,8 @@ public class ShopKeep : MonoBehaviour
                         {
                             FindObjectOfType<AreaController>().areaUI.ToggleGold();
                         }
-                        PlayerPrefs.SetInt("StoreWeaponSold", 1); PlayerPrefs.Save();
+                        PlayerPrefs.SetInt("StoreWeaponSold", 1); 
+                        PlayerPrefs.Save();
                     }
                 }
             }

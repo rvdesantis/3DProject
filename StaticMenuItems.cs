@@ -7,10 +7,10 @@ public class StaticMenuItems : MonoBehaviour
 
     public static int musicVol;
     public static int soundFXVol;
-
     public static int goldCount;
-
     public static int dungeonCubeTarget;
+
+    public static bool dElfUnlocked;
     
 
     public static void ResetSavedValues()
