@@ -27,6 +27,11 @@ public class Exit : MonoBehaviour
                 DunBuilder.createDungeon = true;
                 HeroSelect.dunReturn = true;
                 PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount); PlayerPrefs.Save();
+                StaticMenuItems.goldFound = 0;
+                StaticMenuItems.XPgained = 0;
+                TimerController.savedTime = 0f;
+                areaController.areaUI.dunClearedUI.foundTreasure.Clear();
+                areaController.areaUI.dunClearedUI.missedTreasure.Clear();
                 UnityEngine.SceneManagement.SceneManager.LoadScene("Character Select");
             }
         }

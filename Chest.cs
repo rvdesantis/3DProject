@@ -71,13 +71,16 @@ public class Chest : MonoBehaviour
                     areaController.areaUI.activeItem = treasure;
                     areaController.areaUI.WeaponImage();
                     audioSource.PlayOneShot(audioClips[2]);
+                    areaController.areaUI.dunClearedUI.foundTreasure.Add(treasure);
                 }
                 if (treasure.itemFunction == Items.itemType.gold)
                 {
                     int goldAmount = Random.Range(25, 50);  
                     StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
                     PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount); PlayerPrefs.Save();
+                    StaticMenuItems.goldFound = StaticMenuItems.goldFound + goldAmount;
                     areaController.areaUI.messageText.text = "Gold +" + goldAmount;
+                    areaController.areaUI.dunClearedUI.foundTreasure.Add(treasure);
 
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                     areaController.areaUI.itemImage.sprite = treasure.itemSprite;
@@ -127,6 +130,8 @@ public class Chest : MonoBehaviour
                             }                            
                         }
                     }
+
+                    areaController.areaUI.dunClearedUI.foundTreasure.Add(treasure);
                     areaController.areaUI.SetTrinketImages();
                     areaController.areaUI.messageText.text = trinketName + " added to Trinkets";
                     PlayerPrefs.SetInt(trinketName, 1);

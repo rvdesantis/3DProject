@@ -226,11 +226,12 @@ public class Mage : Player
         }
     }
 
-    public override void Melee()
+    public override void Ranged()
     {
         IEnumerator HitTimer()
         {
             anim.SetTrigger("AttackR");
+            attackTarget.FaceAttacker(this);
             yield return new WaitForSeconds(.5f);            
             meleeStrike.transform.position = attackTarget.transform.position + new Vector3(0, .5f, 0); // .8 per specific prefab used
             meleeStrike.gameObject.SetActive(true); meleeStrike.Play(withChildren:true);            

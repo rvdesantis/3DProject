@@ -63,7 +63,7 @@ public class DunBuilder : MonoBehaviour
     public List<DunEnemyAgent> agents;
    
 
-    public Animator loadScreenAnim;
+    
 
     int secretIndex;
 
@@ -167,14 +167,12 @@ public class DunBuilder : MonoBehaviour
                     chestCount--;
                 }
             }
-
         }
 
         int mimicCount = (int)Mathf.Round(targetChestCount / 2);
         PlayerPrefs.SetInt("MimicCount", mimicCount);
         for (int i = 0; i < mimicCount; i++)
         {
-
             int x = Random.Range(0, createdDeadEnds.Count);
             bool chestChecker = false;
             foreach (Chest chest in createdChests)
@@ -201,7 +199,6 @@ public class DunBuilder : MonoBehaviour
                         chestChecker = true;
                     }
                 }
-
             }
             if (createdDeadEnds[x].cubeFilled)
             {
@@ -297,18 +294,13 @@ public class DunBuilder : MonoBehaviour
         {
             int targetCube = PlayerPrefs.GetInt("Mimic" + i + "position");
             MimicChest newMimic = Instantiate(mimicChest, createdDeadEnds[targetCube].itemSpawnPoint.transform.position, createdDeadEnds[targetCube].itemSpawnPoint.transform.rotation);
+            Debug.Log("Mimic set to cube " + targetCube);
             createdDeadEnds[targetCube].cubeFilled = true;
             newMimic.areaController = areaController;
             newMimic.battleLauncher = FindObjectOfType<BattleLauncher>();
             areaController.mimics.Add(newMimic);
             createdMimics.Add(newMimic);
-
-            foreach (Chest respawnedChest in createdChests)
-            {
-                respawnedChest.treasure = areaController.availableItems[PlayerPrefs.GetInt("Chest" + createdChests.IndexOf(respawnedChest) + "Item")];
-            }
         }
-
     }
     public void AttachRoom()
     {
@@ -339,14 +331,13 @@ public class DunBuilder : MonoBehaviour
     {
         foreach(DunEnemyAgent agent in agents)
         {
+            agent.SpawnChance();
             int chance = Random.Range(0, 100);
             if (chance <= agent.spawnChance)
             {
                 agent.Spawn(); 
             }
-        }
-        PlayerPrefs.Save();
-
+        }   
     }
 
     public void CloseDungeon()
@@ -464,14 +455,11 @@ public class DunBuilder : MonoBehaviour
                 PlayerPrefs.SetInt(agent.agentName + "Active", 0); 
             }
             SpawnAgents();
-
+            PlayerPrefs.Save();
            
-
-                
-
             createDungeon = false;
             createDungeonMirror = false;
-            loadScreenAnim.SetTrigger("fadeOut");
+            
             this.gameObject.SetActive(false);
         }
         
@@ -571,7 +559,7 @@ public class DunBuilder : MonoBehaviour
             createDungeon = false;
             createDungeonMirror = false;
             areaController.Respawn();
-            loadScreenAnim.SetTrigger("fadeOut");
+           
             this.gameObject.SetActive(false);            
         }
     }

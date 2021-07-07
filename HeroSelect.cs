@@ -126,6 +126,7 @@ public class HeroSelect : MonoBehaviour
             DunBuilder.createDungeon = true;
             StaticMenuItems.dungeonCubeTarget = 250; // sets default dungeon size to "small"
             StaticMenuItems.ResetSavedValues();
+            TimerController.savedTime = 0f;
             cam1.m_LookAt = camAimers[0].transform;
             lights[0].gameObject.SetActive(true);
         }

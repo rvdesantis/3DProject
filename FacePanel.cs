@@ -13,6 +13,7 @@ public class FacePanel : MonoBehaviour
     public Color faded;
     public Image health;
     public Image mana;
+    public Image skull;
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +22,13 @@ public class FacePanel : MonoBehaviour
         targetHero = battleController.heroes[faceIndex];
     }
 
-    
+    public void TurnOffSkull()
+    {
+        if (skull.gameObject.activeSelf)
+        {
+            skull.gameObject.SetActive(false);
+        }
+    }
 
 
     // Update is called once per frame

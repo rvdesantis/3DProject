@@ -103,6 +103,12 @@ public class Berserker : Player
         PlayerPrefs.Save();
     }
 
+    public void FixPosition()
+    {
+        transform.position = idlePosition;
+        transform.Rotate(transform.rotation.x - transform.rotation.x, 0, 0);
+    }
+
     public override void CastSpell()
     {
         if (selectedSpell.manaCost <= playerMana)
@@ -117,7 +123,8 @@ public class Berserker : Player
             {
                 GetComponent<Animator>().SetTrigger("castStart1");
             }
-            LookAtTarget();
+            LookAtTarget();    
+            
             if (selectedSpell == spells[0])
             {
                 foreach (Player player in FindObjectOfType<BattleController>().heroes)
@@ -145,6 +152,7 @@ public class Berserker : Player
                     int damage = selectedSpell.power + Weapon.magPower;
                     attackTarget.combatTextPrefab.damageAmount = damage;
                     attackTarget.combatTextPrefab.damageAmount = damage;
+                    attackTarget.FaceAttacker(this);
                     yield return new WaitForSeconds(1.5f);
                     Spell spellToCast = Instantiate<Spell>(selectedSpell, transform.position, Quaternion.identity);
                     spellToCast.transform.LookAt(attackTarget.transform);

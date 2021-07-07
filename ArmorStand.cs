@@ -61,7 +61,7 @@ public class ArmorStand : Chest
                         PlayerPrefs.SetInt("chest" + areaController.chests.IndexOf(this), 1);
                         areaController.areaUI.messageUI.GetComponent<Animator>().SetBool("solid", false);
                         opened = 1;
-
+                        areaController.areaUI.dunClearedUI.foundTreasure.Add(treasure);
                         PlayerPrefs.Save();
 
                         if (treasure.itemFunction == Items.itemType.weapon)

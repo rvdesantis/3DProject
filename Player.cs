@@ -100,9 +100,10 @@ public class Player : MonoBehaviour
                 Debug.Log("damage 0 or less");
             }
 
-
+            attackTarget.FaceAttacker(this);
             transform.position = attackTarget.strikePoint.transform.position;
             transform.LookAt(attackTarget.transform);
+            
 
             yield return new WaitForSeconds(.25f);
             attackTarget.transform.LookAt(this.transform);
@@ -123,6 +124,7 @@ public class Player : MonoBehaviour
         IEnumerator HitTimer()
         {
             LookAtTarget();
+            attackTarget.FaceAttacker(this);
             int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
 
             if (damage > 0)
@@ -196,6 +198,7 @@ public class Player : MonoBehaviour
             {
                 IEnumerator CastTimer()
                 {
+                    attackTarget.FaceAttacker(this);
                     yield return new WaitForSeconds(1.5f);
                     Spell spellToCast = Instantiate<Spell>(selectedSpell, spellSpawnPoint.transform.position, Quaternion.identity);
                     spellToCast.targetPosition = attackTarget.aimTargetGameObject.transform.position;                    
@@ -210,6 +213,7 @@ public class Player : MonoBehaviour
                     {
                         IEnumerator CastTimer()
                         {
+                            enemy.FaceAttacker(this);
                             yield return new WaitForSeconds(1.5f);
                             Spell spellToCast = Instantiate<Spell>(selectedSpell, spellSpawnPoint.transform.position, Quaternion.identity);
                             spellToCast.targetPosition = enemy.aimTargetGameObject.transform.position;
@@ -232,6 +236,7 @@ public class Player : MonoBehaviour
                     attackTarget.combatTextPrefab.damageAmount = damage;
                     attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
                     attackTarget.TakeDamage(damage);
+                    attackTarget.anim.SetTrigger("gotHit"); 
                 }
                 if (selectedSpell.targetALL)
                 {
@@ -243,6 +248,7 @@ public class Player : MonoBehaviour
                             enemy.combatTextPrefab.damageAmount = damage;
                             enemy.combatTextPrefab.startingPosition = enemy.transform.position;
                             enemy.TakeDamage(damage);
+                            enemy.anim.SetTrigger("gotHit");
                         }
                     }
                 }     
@@ -304,6 +310,10 @@ public class Player : MonoBehaviour
         attackTarget.anim.SetTrigger("gotHit");
     }
 
+    public void FaceAttacker(Player attacker)
+    {
+        transform.LookAt(attacker.transform);
+    }
     public void LookAtTarget()
     {
         if (attackTarget != null)

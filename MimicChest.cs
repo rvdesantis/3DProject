@@ -22,126 +22,12 @@ public class MimicChest : MonoBehaviour
     private void Start()
     {
         GetComponent<Animator>().SetTrigger("shut");
-
-    }
-
-    public void ChestChecker()
-    {        
-        if (PlayerPrefs.GetInt("mimic" + areaController.mimics.IndexOf(this)) == 0)
-        {
-            Debug.Log("Mimic " + areaController.mimics.IndexOf(this) + " lid shut");
-        }
-        if (PlayerPrefs.GetInt("mimic" + areaController.mimics.IndexOf(this)) == 1)
-        {
-            Debug.Log("Mimic " + areaController.mimics.IndexOf(this) + " defeated");
-            OpenedUI();
-        }
-        if (PlayerPrefs.GetInt("mimic" + areaController.mimics.IndexOf(this)) == 100)
-        {
-            Debug.Log("Mimic " + areaController.mimics.IndexOf(this) + " inactive");
-            gameObject.SetActive(false);
-        }
     }
 
     public void ActivateGhost()
     {
         ghost.gameObject.SetActive(true);
-    }
-
-    
-
-    public void OpenedUI()
-    {
-        if (this.gameObject.activeSelf)
-        {
-            gameObject.SetActive(false);
-            if (treasure.itemFunction == Items.itemType.placeholder)
-            {                
-                PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 100);
-                PlayerPrefs.Save();
-            }
-            if (treasure.itemFunction == Items.itemType.weapon)
-            {
-                areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
-                areaController.areaUI.activeItem = treasure;
-                areaController.areaUI.WeaponImage();
-                PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 100);
-                PlayerPrefs.Save();
-            }
-            if (treasure.itemFunction == Items.itemType.gold)
-            {
-                int goldAmount = Random.Range(25, 76);     
-                string trinketName = treasure.itemName;
-                StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
-                areaController.areaUI.messageText.text = "Gold +" + goldAmount;
-
-                areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
-                areaController.areaUI.itemImage.sprite = treasure.itemSprite;
-                areaController.areaUI.ItemImage();
-            }
-            if (treasure.itemFunction == Items.itemType.trinket)
-            {
-                if (areaController.areaUI.topBarUI.activeSelf == false)
-                {
-                    areaController.areaUI.topBarUI.gameObject.SetActive(true);
-                }
-                areaController.areaUI.activeItem = treasure;
-                string trinketName = treasure.itemName;
-                bool owned = false;
-
-
-                foreach (Trinket trinket in areaController.activeTrinkets)
-                {
-                    if (trinketName == trinket.trinketName)
-                    {
-                        Debug.Log("Already holding tricket " + trinketName);
-                        owned = true;
-                    }
-
-                }
-                if (!owned)
-                {
-                    foreach (Trinket masterTrinket in areaController.dunTrinketMasterList)
-                    {
-                        if (trinketName == masterTrinket.trinketName)
-                        {
-                            areaController.activeTrinkets.Add(masterTrinket);
-                            PlayerPrefs.SetInt(trinketName, 1);
-                            PlayerPrefs.Save();
-                        }
-                    }
-                }
-                foreach (Trinket trinket in areaController.activeTrinkets)
-                {
-                    if (trinketName == trinket.trinketName)
-                    {
-                        trinket.active = true;
-                        Instantiate(trinket, areaController.playerBody.transform.position, Quaternion.identity);
-                    }
-                }
-                areaController.areaUI.SetTrinketImages();
-                areaController.areaUI.messageText.text = trinketName + " added to Trinkets";
-
-                areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
-                areaController.areaUI.itemImage.sprite = treasure.itemSprite;
-                areaController.areaUI.ItemImage();
-                PlayerPrefs.SetInt(trinketName, 1);     
-                PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 100);
-                PlayerPrefs.Save();
-            }
-            else
-            {
-                FindObjectOfType<AreaUIController>().itemImage.sprite = treasure.itemSprite;
-                FindObjectOfType<AreaUIController>().ItemImage();
-                areaController.areaInventory.Add(treasure);
-                PlayerPrefs.SetInt("mimic" + areaController.mimics.IndexOf(this), 100);
-                PlayerPrefs.Save();
-            }
-        }
-    }
-
-
-
+    }  
 
     void Update()
     {

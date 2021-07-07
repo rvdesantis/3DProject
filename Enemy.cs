@@ -205,8 +205,7 @@ public class Enemy : Player
     {
         IEnumerator HitTimer()
         {
-            transform.position = attackTarget.strikePoint.transform.position;
-            attackTarget.transform.LookAt(this.transform);
+            transform.position = attackTarget.strikePoint.transform.position;            
             yield return new WaitForSeconds(1);
             int damage = playerSTR - attackTarget.playerDEF;
             attackTarget.combatTextPrefab.floatingText.color = Color.red;

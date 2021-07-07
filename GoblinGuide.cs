@@ -12,7 +12,19 @@ public class GoblinGuide : DunEnemyAgent
 
     private void Start()
     {
-        
+
+    }
+
+    public override void SpawnChance()
+    {
+        if (PlayerPrefs.GetInt("GuideUnlock") == 0)
+        {
+            spawnChance = 0;
+        }
+        if (PlayerPrefs.GetInt("GuideUnlock") == 1)
+        {
+            spawnChance = 66;
+        }
     }
     public override void SavePosition()
     {
@@ -197,7 +209,8 @@ public class GoblinGuide : DunEnemyAgent
                             active = true;
                             audioSource.clip = activatedClips[0];
                             audioSource.Play();
-                            PlayerPrefs.SetInt(agentName + "Active", 1); PlayerPrefs.Save();
+                            PlayerPrefs.SetInt(agentName + "Active", 1); PlayerPrefs.SetInt("GoblinHired", PlayerPrefs.GetInt("GoblinHired") + 1);
+                            PlayerPrefs.Save();
                             return;
                         }
                         if (StaticMenuItems.goldCount < hireCost)
@@ -224,8 +237,12 @@ public class GoblinGuide : DunEnemyAgent
             if (!negative)
             {
                 negative = true;
-                audioSource.clip = activatedClips[2];
-                audioSource.Play();
+                int diceRoll = Random.Range(0, 6);
+                if (diceRoll == 5)
+                {
+                    audioSource.clip = activatedClips[2];
+                    audioSource.Play();
+                }
                 if (FindObjectOfType<AreaController>().areaUI.goldUI.gameObject.activeSelf)
                 {
                     FindObjectOfType<AreaController>().areaUI.ToggleGold();

@@ -117,6 +117,7 @@ public class treasureRoom : MonoBehaviour
                         areaController.chests.Add(stand);
 
                         ArmorStand armorStand = stand.GetComponent<ArmorStand>();
+                        armorStand.AvailableWeapons();
                         int w = PlayerPrefs.GetInt("TreasureRoomArmorStand");
                         
                         Items spawnedWeapon = Instantiate(armorStand.weaponBank[w], armorStand.weaponSpawnTransform.transform.position, armorStand.weaponSpawnTransform.transform.rotation);

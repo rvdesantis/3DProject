@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,6 +52,7 @@ public class AreaUIController : MonoBehaviour
     public GameObject goldUI;
 
     public GameObject fadeOutPanel;
+    public Animator loadScreenAnim;
 
     public GameObject messageUI;
     public Text messageText;
@@ -61,7 +63,10 @@ public class AreaUIController : MonoBehaviour
     public List<DunMenuBT> homeButtons;
     public int homeBTIndex;
 
-    public AudioSource audioSource;
+    public DunClearedUI dunClearedUI;
+    public UnlockedUI unlockedUI;
+
+    public AudioSource audioSource;   
 
 
     private void Start()
@@ -78,7 +83,16 @@ public class AreaUIController : MonoBehaviour
     public void ExitDungeon()
     {
         AreaController.battleReturn = false;        
-        DunBuilder.createDungeon = true;        
+        DunBuilder.createDungeon = true;
+        StaticMenuItems.goldCount = StaticMenuItems.goldCount - StaticMenuItems.goldFound;
+        if (StaticMenuItems.goldCount < 0)
+        {
+            StaticMenuItems.goldCount = 0;
+        }
+        StaticMenuItems.XPgained = 0;
+        StaticMenuItems.goldFound = 0;
+        dunClearedUI.foundTreasure.Clear();
+        dunClearedUI.missedTreasure.Clear();
         UnityEngine.SceneManagement.SceneManager.LoadScene("Character Select");
     }
 

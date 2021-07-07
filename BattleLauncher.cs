@@ -43,6 +43,7 @@ public class BattleLauncher : MonoBehaviour
                 rotationPoint = areaController.moveController.transform.rotation;                
                 areaController.areaUI.fadeOutPanel.gameObject.SetActive(true);
                 areaController.moveController.enabled = false;
+                TimerController.instance.StopTimer();
                 foreach(DunEnemyAgent agent in areaController.agents)
                 {
                     agent.SavePosition();

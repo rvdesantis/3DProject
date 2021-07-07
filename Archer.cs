@@ -113,19 +113,19 @@ public class Archer : Player
         PlayerPrefs.Save();
     }
 
-    public override void Melee()
-    {       
-        
+    public override void Ranged()
+    {
         IEnumerator HitTimer()
         {
+            attackTarget.FaceAttacker(this);
             yield return new WaitForSeconds(1);
-            anim.SetTrigger("AttackR");                      
-            
+            anim.SetTrigger("AttackR");
+
             yield return new WaitForSeconds(1.75f);
             transform.position = idlePosition;
             Reload();
 
-            int damage = (playerSTR + Weapon.power) - attackTarget.playerDEF;
+            int damage = (playerSTR + equipedArrow.ammoPower) - attackTarget.playerDEF;
 
             attackTarget.TakeDamage(damage);
 

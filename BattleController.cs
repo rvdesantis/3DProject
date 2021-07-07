@@ -170,14 +170,14 @@ public class BattleController : MonoBehaviour
             enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[1], enemySpawnPoint0, Quaternion.identity);
             enemies[1] = Instantiate<Player>(staticEnemyBank.bank[1], enemySpawnPoint1, Quaternion.identity);
             enemies[2] = Instantiate<Player>(staticEnemyBank.bank[1], enemySpawnPoint2, Quaternion.identity);
-            BattleLauncher.bossEnemy = false;
+            PlayerPrefs.SetInt("BossBattles", PlayerPrefs.GetInt("BossBattles") + 1); PlayerPrefs.Save();
+            // Boss Enemy set to false after batgtle in AreaController
         }
         if (BattleLauncher.dunEnemy == true)
         {
             enemies[0] = Instantiate<Player>(SpecialEnemyBank.bank[specialEnemyNum], enemySpawnPoint0, Quaternion.identity);
             enemies[1] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint1, Quaternion.identity);
-            enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);
-            BattleLauncher.dunEnemy = false;
+            enemies[2] = Instantiate<Player>(staticEnemyBank.bank[0], enemySpawnPoint2, Quaternion.identity);            
         }
 
         foreach (Player character in heroes)
@@ -693,6 +693,7 @@ public class BattleController : MonoBehaviour
             bool lvlUP = false;
             int gold = Random.Range(5, 11) * enemyNumber;
             StaticMenuItems.goldCount = StaticMenuItems.goldCount + gold;
+            StaticMenuItems.XPgained = StaticMenuItems.XPgained + totalXP;
             PlayerPrefs.SetInt("Gold", StaticMenuItems.goldCount); PlayerPrefs.Save();
             AreaController.battleGold = gold;
             foreach (Player character in heroes)

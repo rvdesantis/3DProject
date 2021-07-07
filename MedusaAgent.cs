@@ -25,6 +25,17 @@ public class MedusaAgent : DunEnemyAgent
         SelectTargetLocation();
     }
 
+    public override void SpawnChance()
+    {
+        if (PlayerPrefs.GetInt("MedusaUnlock") == 0)
+        {
+            spawnChance = 0;
+        }
+        if (PlayerPrefs.GetInt("MedusaUnlock") == 1)
+        {
+            spawnChance = 50;
+        }
+    }
     public override void Spawn()
     {
         dunBuilder = FindObjectOfType<DunBuilder>();

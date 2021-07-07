@@ -44,6 +44,10 @@ public class DunEnemyAgent : MonoBehaviour
         areaController = FindObjectOfType<AreaController>(); 
     }
 
+    public virtual void SpawnChance()
+    {
+
+    }
     public virtual void SavePosition()
     {
         savedPosition = agentBodyTransform.transform.position;

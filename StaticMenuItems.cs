@@ -3,15 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class StaticMenuItems : MonoBehaviour
-{    
+{
 
     public static int musicVol;
     public static int soundFXVol;
     public static int goldCount;
     public static int dungeonCubeTarget;
 
-    public static bool dElfUnlocked;
-    
+    // tracked values per run
+    public static int XPgained;
+    public static int goldFound;
+
+    // unlocks
+    // players
+   
+
+    public void ResetUnlocks()
+    {
+        PlayerPrefs.SetInt("DarkElfUnlock", 0);
+        PlayerPrefs.SetInt("GuideUnlock", 0);
+        PlayerPrefs.SetInt("MedusaUnlock", 0);
+        PlayerPrefs.SetInt("BossWins", 0);
+        PlayerPrefs.SetInt("BossBattles", 0);
+
+        PlayerPrefs.Save();
+    }
 
     public static void ResetSavedValues()
     {
@@ -26,7 +42,9 @@ public class StaticMenuItems : MonoBehaviour
             PlayerPrefs.SetInt("Chest" + x + "position", 0);
             PlayerPrefs.SetInt("Mimic" + x + "position", 0);            
             PlayerPrefs.SetInt("Chest" + x + "Item", 0);
-            PlayerPrefs.SetInt("Agent" + x + "Active", 0); 
+            PlayerPrefs.SetInt("Agent" + x + "Active", 0);
+            PlayerPrefs.SetInt("ChestCount", 0);
+            PlayerPrefs.SetInt("MimicCount", 0);
         }
 
         // reset dun shops
@@ -50,6 +68,8 @@ public class StaticMenuItems : MonoBehaviour
             PlayerPrefs.SetInt("Mimic" + x + "position", 0);
             PlayerPrefs.SetInt("Chest" + x + "Item", 0);
             PlayerPrefs.SetInt("Agent" + x + "Active", 0);
+            PlayerPrefs.SetInt("ChestCount", 0);
+            PlayerPrefs.SetInt("MimicCount", 0);
         }
 
         // reset dun shops

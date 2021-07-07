@@ -35,12 +35,15 @@ public class DunEnemy : MonoBehaviour
                     areaController.areaUI.weaponImage.sprite = treasure.itemSprite;
                     areaController.areaUI.activeItem = treasure;
                     areaController.areaUI.WeaponImage();
+                    areaController.areaUI.dunClearedUI.foundTreasure.Add(treasure);
                 }
                 if (treasure.itemFunction == Items.itemType.gold)
                 {
                     int goldAmount = Random.Range(25, 76);
                     string trinketName = treasure.itemName;
                     StaticMenuItems.goldCount = StaticMenuItems.goldCount + goldAmount;
+                    StaticMenuItems.goldFound = StaticMenuItems.goldFound + goldAmount;
+                    areaController.areaUI.dunClearedUI.foundTreasure.Add(treasure);
                     areaController.areaUI.messageText.text = "Gold +" + goldAmount;
 
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
@@ -93,7 +96,7 @@ public class DunEnemy : MonoBehaviour
                     PlayerPrefs.SetInt(trinketName, 1);
                     PlayerPrefs.SetInt("DunEnemy", 1);
                     PlayerPrefs.Save();
-
+                    areaController.areaUI.dunClearedUI.foundTreasure.Add(treasure);
                     areaController.areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                     areaController.areaUI.itemImage.sprite = treasure.itemSprite;
                     areaController.areaUI.ItemImage();

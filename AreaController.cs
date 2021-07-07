@@ -37,7 +37,6 @@ public class AreaController : MonoBehaviour
     public Vector3 bossHallwaySpawnPoint;
     public Quaternion bossHallwaySPRotation;
 
-
     public static bool firstLoad;
     
     public static bool battleReturn;
@@ -54,8 +53,9 @@ public class AreaController : MonoBehaviour
     void Start()
     {
         if (firstLoad == false && battleReturn == false)
-        {
+        {            
             respawnPoint = FindObjectOfType<OriginCube>().spawnPlatform.transform.position;
+            StaticMenuItems.goldFound = 0;
         }
         if (firstLoad)
         {
@@ -73,20 +73,92 @@ public class AreaController : MonoBehaviour
             yield return new WaitForSeconds(2);
             SetStartingTrinkets();
             SetChestsMimics();
+            
             WallChecker(); // sets firstload to false when finished
 
             SetPlayerBank();
             SetStartingItems();
-            yield return new WaitForSeconds(2);
+            Unlockables();
+            
+            yield return new WaitForSeconds(1);
             if (battleReturn)
-            {                
+            {
+                TimerController.instance.BeginTimer();
                 areaUI.messageText.text = "+ " + battleGold + " Gold";
                 areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                 areaUI.itemImage.sprite = availableItems[0].itemSprite;
                 areaUI.ItemImage();
-                audioSource.PlayOneShot(audioClips[0]);
+                audioSource.PlayOneShot(audioClips[0]);                
+
+                if (BattleLauncher.bossEnemy == true)
+                {   
+                    BattleLauncher.bossEnemy = false;
+                    areaUI.dunClearedUI.SetValues();
+                    TimerController.instance.StopTimer();
+                }
+                if (BattleLauncher.dunEnemy == true)
+                {
+                    BattleLauncher.dunEnemy = false;
+                }
             }
+
+            areaUI.loadScreenAnim.SetTrigger("fadeOut");
         } StartCoroutine(LoadTimer());
+
+
+    }
+
+    public void Unlockables()
+    {
+        UnlockedUI unlockedUI = areaUI.unlockedUI;
+        bool newUnlock = false;
+
+    
+
+        // Counters
+        if (BattleLauncher.bossEnemy == true)
+        {
+            PlayerPrefs.SetInt("BossWins", PlayerPrefs.GetInt("BossWins") + 1);
+            Debug.Log(PlayerPrefs.GetInt("BossWins") + " Boss Wins");
+        }
+        PlayerPrefs.Save();
+
+
+        // Agent Unlocks
+        Debug.Log(PlayerPrefs.GetInt("GuideUnlock") + " Guide Unlock");
+        if (PlayerPrefs.GetInt("BossBattles") > 0 && PlayerPrefs.GetInt("GuideUnlock") == 0)
+        {
+            PlayerPrefs.SetInt("GuideUnlock", 1);
+            unlockedUI.guideUnlocked = true;
+            unlockedUI.cycle = true;
+                      
+        }
+        Debug.Log(PlayerPrefs.GetInt("MedusaUnlock") + " Medusa Unlock");
+        if (PlayerPrefs.GetInt("BossWins") > 2 && PlayerPrefs.GetInt("MedusaUnlock") == 0)
+        {
+            PlayerPrefs.SetInt("MedusaUnlock", 1);
+            unlockedUI.medusaUnlocked = true;
+            unlockedUI.cycle = true;
+        }
+
+        // Player Unlocks
+        Debug.Log(PlayerPrefs.GetInt("DarkElfUnlock") + " Dark Elf Unlock");
+        if (PlayerPrefs.GetInt("BossBattles") > 2 && PlayerPrefs.GetInt("DarkElfUnlock") == 0)
+        {
+            PlayerPrefs.SetInt("DarkElfUnlock", 1);
+            unlockedUI.darkElfUnlock = true;
+            unlockedUI.cycle = true;
+        }
+        if (newUnlock)
+        {
+            areaUI.ToggleUINav();
+            unlockedUI.gameObject.SetActive(true);
+            unlockedUI.confirmBT.Select();
+            unlockedUI.UnlockBT();
+        }
+
+        PlayerPrefs.Save();
+        
     }
 
     public void Respawn()
@@ -157,14 +229,23 @@ public class AreaController : MonoBehaviour
                 if (chest.opened == 1)
                 {
                     chest.anim.SetTrigger("openLid");
+                    areaUI.dunClearedUI.foundTreasure.Add(chest.treasure);
                 }
             }
 
             foreach (MimicChest mimic in mimics)
              {
-                 Debug.Log("Chest Checker");
-                 mimic.ChestChecker();
-             } 
+                 Debug.Log("Mimic Checker");
+                if (PlayerPrefs.GetInt("mimic" + mimics.IndexOf(mimic)) == 0)
+                {
+                    Debug.Log("Mimic " + mimics.IndexOf(mimic) + " lid shut");
+                }
+                if (PlayerPrefs.GetInt("mimic" + mimics.IndexOf(mimic)) == 1)
+                {
+                    Debug.Log("Mimic " + mimics.IndexOf(mimic) + " inactive");
+                    mimic.gameObject.SetActive(false);
+                }
+            } 
         }
 
     }
@@ -264,7 +345,7 @@ public class AreaController : MonoBehaviour
             {
                 foreach (SecretWall wall in secretWalls)
                 {
-                    if (wall.isActiveAndEnabled)
+                    if (wall.gameObject.activeSelf)
                     {
                         if (Vector3.Distance(moveController.transform.position, wall.transform.position) < 5f && wall.open == false)
                         {

@@ -6,7 +6,8 @@ using UnityEngine.Playables;
 
 public class WarriorM : Player
 {
-    
+    public Shield shield;
+    public List<Shield> equipedShield;
     public override void LevelUp()
     {
         if (playerLevel == 1 && XP >= 400)
@@ -134,6 +135,7 @@ public class WarriorM : Player
 
                 IEnumerator SpellTimer()
                 {
+                    attackTarget.FaceAttacker(this);
                     yield return new WaitForSeconds(selectedSpell.damageTimer);
                     attackTarget.anim.SetTrigger("gotHit");
                     attackTarget.combatTextPrefab.startingPosition = attackTarget.transform.position;
@@ -188,6 +190,23 @@ public class WarriorM : Player
                 LookAtTarget();
             }            
         }
+    }
+
+    public override void TakeDamage(int damage)
+    {
+        int diceRoll = Random.Range(1, 101);
+        if (diceRoll <= shield.blockChance)
+        {
+            anim.SetTrigger("block");
+            combatTextPrefab.floatingText.color = Color.blue;
+            combatTextPrefab.floatingText.text = "Block";
+            combatTextPrefab.startingPosition = attackTarget.transform.position;
+            combatTextPrefab.ToggleCombatText();
+        }
+        if (diceRoll > shield.blockChance)
+        {
+            base.TakeDamage(damage - shield.addedDef);
+        }        
     }
 
 }
