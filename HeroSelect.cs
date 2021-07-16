@@ -75,6 +75,7 @@ public class HeroSelect : MonoBehaviour
     public GameObject trinketPanel;    
     public List<Image> trinketImages;
     public List<Trinket> masterTrinketList;
+    public List<DunEnemyAgent> masterAgentList;
 
     public AudioSource audioSource;
     public List<AudioClip> enterDunAudio;
@@ -183,7 +184,8 @@ public class HeroSelect : MonoBehaviour
     {        
         IEnumerator StartTimer()
         {
-            AreaController.firstLoad = false;            
+            AreaController.firstLoad = true;
+            DunBuilder.createDungeon = true;
             foreach (Player hero in heroBank.bank)
             {
                 hero.SetBattleStats();

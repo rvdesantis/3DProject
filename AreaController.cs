@@ -77,32 +77,31 @@ public class AreaController : MonoBehaviour
             WallChecker(); // sets firstload to false when finished
 
             SetPlayerBank();
-            SetStartingItems();
-            Unlockables();
+            SetStartingItems();          
             
             yield return new WaitForSeconds(1);
-            if (battleReturn)
+            if (battleReturn && BattleLauncher.bossEnemy == false)
             {
                 TimerController.instance.BeginTimer();
                 areaUI.messageText.text = "+ " + battleGold + " Gold";
                 areaUI.messageUI.GetComponent<Animator>().SetTrigger("message");
                 areaUI.itemImage.sprite = availableItems[0].itemSprite;
                 areaUI.ItemImage();
-                audioSource.PlayOneShot(audioClips[0]);                
-
-                if (BattleLauncher.bossEnemy == true)
-                {   
-                    BattleLauncher.bossEnemy = false;
-                    areaUI.dunClearedUI.SetValues();
-                    TimerController.instance.StopTimer();
-                }
-                if (BattleLauncher.dunEnemy == true)
-                {
-                    BattleLauncher.dunEnemy = false;
-                }
+                audioSource.PlayOneShot(audioClips[0]);
             }
-
+            if (BattleLauncher.bossEnemy == true)
+            {  
+                areaUI.dunClearedUI.SetValues();
+                TimerController.instance.StopTimer();
+                areaUI.uiNavigation = true;
+                moveController.enabled = false;
+            }
+            if (BattleLauncher.dunEnemy == true)
+            {
+                BattleLauncher.dunEnemy = false;
+            }            
             areaUI.loadScreenAnim.SetTrigger("fadeOut");
+            Unlockables();
         } StartCoroutine(LoadTimer());
 
 
@@ -120,6 +119,7 @@ public class AreaController : MonoBehaviour
         {
             PlayerPrefs.SetInt("BossWins", PlayerPrefs.GetInt("BossWins") + 1);
             Debug.Log(PlayerPrefs.GetInt("BossWins") + " Boss Wins");
+            BattleLauncher.bossEnemy = false;
         }
         PlayerPrefs.Save();
 
@@ -128,14 +128,18 @@ public class AreaController : MonoBehaviour
         Debug.Log(PlayerPrefs.GetInt("GuideUnlock") + " Guide Unlock");
         if (PlayerPrefs.GetInt("BossBattles") > 0 && PlayerPrefs.GetInt("GuideUnlock") == 0)
         {
+            unlockedUI.gameObject.SetActive(true);
+            Debug.Log("Unlocking Goblin Guide");
             PlayerPrefs.SetInt("GuideUnlock", 1);
             unlockedUI.guideUnlocked = true;
-            unlockedUI.cycle = true;
+            unlockedUI.cycle = true;            
                       
         }
         Debug.Log(PlayerPrefs.GetInt("MedusaUnlock") + " Medusa Unlock");
         if (PlayerPrefs.GetInt("BossWins") > 2 && PlayerPrefs.GetInt("MedusaUnlock") == 0)
         {
+            unlockedUI.gameObject.SetActive(true);
+            Debug.Log("Unlocking Medusa");
             PlayerPrefs.SetInt("MedusaUnlock", 1);
             unlockedUI.medusaUnlocked = true;
             unlockedUI.cycle = true;
@@ -145,15 +149,18 @@ public class AreaController : MonoBehaviour
         Debug.Log(PlayerPrefs.GetInt("DarkElfUnlock") + " Dark Elf Unlock");
         if (PlayerPrefs.GetInt("BossBattles") > 2 && PlayerPrefs.GetInt("DarkElfUnlock") == 0)
         {
+            unlockedUI.gameObject.SetActive(true);
+            Debug.Log("Unlocking Dark Elf");
             PlayerPrefs.SetInt("DarkElfUnlock", 1);
             unlockedUI.darkElfUnlock = true;
             unlockedUI.cycle = true;
         }
         if (newUnlock)
         {
-            areaUI.ToggleUINav();
             unlockedUI.gameObject.SetActive(true);
-            unlockedUI.confirmBT.Select();
+            areaUI.uiNavigation = true;
+            moveController.enabled = false;            
+            unlockedUI.nextBT.Select();
             unlockedUI.UnlockBT();
         }
 
@@ -366,7 +373,7 @@ public class AreaController : MonoBehaviour
                     }
                     
                 }
-                if (Vector3.Distance(moveController.transform.position, bossDoor.transform.position) < 5f)
+                if (Vector3.Distance(moveController.transform.position, bossDoor.transform.position) < 5f && areaUI.uiNavigation == false)
                 {
                     areaPlayables[0].Play();
                     IEnumerator LaunchTimer()

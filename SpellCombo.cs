@@ -317,7 +317,7 @@ public class SpellCombo : MonoBehaviour
                     leftover.attackTarget = battleController.GetHighestEnemy();
                 }
                 battleController.activeCam = battleController.virtualCams[0];
-                leftover.Melee();
+                leftover.Ranged();
                 IEnumerator MeleeTimer()
                 {
                     yield return new WaitForSeconds(2);

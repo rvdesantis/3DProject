@@ -330,12 +330,13 @@ public class DunBuilder : MonoBehaviour
     public void SpawnAgents()
     {
         foreach(DunEnemyAgent agent in agents)
-        {
+        {            
             agent.SpawnChance();
             int chance = Random.Range(0, 100);
             if (chance <= agent.spawnChance)
             {
-                agent.Spawn(); 
+                agent.Spawn();
+                PlayerPrefs.SetInt(agent.agentName + "Active", 1); PlayerPrefs.Save();
             }
         }   
     }

@@ -8,7 +8,7 @@ public class UnlockedUI : MonoBehaviour
 {
     public Text unlockType;
     public Text unlockInfo;
-    public Button confirmBT;
+    public Button nextBT;
     public RawImage rawImage;
     public VideoPlayer videoPlayer;
     public List<VideoClip> vidClips;
@@ -23,26 +23,25 @@ public class UnlockedUI : MonoBehaviour
 
     public void UnlockBT()
     {
+        nextBT.Select();
+        Cursor.lockState = CursorLockMode.None;
         if (cycle == true)
         {
             if (darkElfUnlock)
             {
                 darkElfUnlock = false;
-                cycle = true;
-                // set video clip
-                // play video clip
-                // set text string
-
+                cycle = true;                         
+                unlockType.text = unlockType + " Character";
                 return;
             }
 
             if (guideUnlocked)
             {
+                unlockType.text = unlockType + " Agent";
                 guideUnlocked = false;
                 cycle = true;
-                // set video clip
-                // play video clip
-                // set text string
+                videoPlayer.clip = vidClips[0];
+                videoPlayer.Play();                
                 return;
             }
 
@@ -50,22 +49,36 @@ public class UnlockedUI : MonoBehaviour
             {
                 darkElfUnlock = false;
                 cycle = true;
-                // set video clip
-                // play video clip
-                // set text string
+                // set video clip                
+                unlockType.text = unlockType + " Agent";
                 return;
             }
             else
-            cycle = false;
+            {
+                cycle = false;
+                Debug.Log("Unlock Cycle Finished");
+            }
+            
 
         }
         if (cycle == false)
         {
-            FindObjectOfType<AreaUIController>().ToggleUINav();
+            if (FindObjectOfType<AreaUIController>().dunClearedUI.gameObject.activeSelf == false)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+            }            
             this.gameObject.SetActive(false);
-        }
-        
+        }        
     }
+
+    private void Update()
+    {
+        if (this.gameObject.activeSelf)
+        {
+            FindObjectOfType<AreaUIController>().uiNavigation = true;
+        }
+    }
+
 
 
 }

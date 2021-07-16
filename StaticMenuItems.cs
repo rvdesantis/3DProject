@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class StaticMenuItems : MonoBehaviour
-{
+{    
 
     public static int musicVol;
     public static int soundFXVol;
     public static int goldCount;
     public static int dungeonCubeTarget;
+
+    
 
     // tracked values per run
     public static int XPgained;
@@ -47,6 +49,12 @@ public class StaticMenuItems : MonoBehaviour
             PlayerPrefs.SetInt("MimicCount", 0);
         }
 
+        // reset agents spawn status
+        foreach (DunEnemyAgent agent in FindObjectOfType<HeroSelect>().masterAgentList)
+        {
+            PlayerPrefs.SetInt(agent.agentName + "Spawn", 0);
+        }
+
         // reset dun shops
         PlayerPrefs.SetInt("SecretStoreWeapon", 0);
         PlayerPrefs.SetInt("StoreWeaponSold", 0);
@@ -72,6 +80,11 @@ public class StaticMenuItems : MonoBehaviour
             PlayerPrefs.SetInt("MimicCount", 0);
         }
 
+        // reset agents spawn status
+        foreach (DunEnemyAgent agent in FindObjectOfType<HeroSelect>().masterAgentList)
+        {
+            PlayerPrefs.SetInt(agent.agentName + "Spawn", 0);
+        }
         // reset dun shops
         PlayerPrefs.SetInt("SecretStoreWeapon", 0);
         PlayerPrefs.SetInt("StoreWeaponSold", 0);

@@ -45,17 +45,21 @@ public class FirstPerson : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        rotationMirror = playerBody.rotation;
-        // must use Time.deltaTime since this is in Update()
-        // mouse settings
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        if (areaController.areaUI.uiNavigation == false)
+        {
+            rotationMirror = playerBody.rotation;
+            // must use Time.deltaTime since this is in Update()
+            // mouse settings
+            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        xRotation -= mouseY; //using -= because rotation is flipped)
-        xRotation = Mathf.Clamp(xRotation, 0, 0); // so player can't look down or up;
+            xRotation -= mouseY; //using -= because rotation is flipped)
+            xRotation = Mathf.Clamp(xRotation, 0, 0); // so player can't look down or up;
 
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        playerBody.Rotate(Vector3.up * mouseX);
+            transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+            playerBody.Rotate(Vector3.up * mouseX);
+        }
+        
 
 
 

@@ -11,6 +11,7 @@ public class Potion : MonoBehaviour
     public Sprite itemImage;
     public ParticleSystem castingEffect;
 
+    public AudioSource audioSource;
     public List<AudioClip> audioClips;
 
 
@@ -40,6 +41,8 @@ public class Potion : MonoBehaviour
             target.danger = false;
             target.anim.SetBool("danger", false);
         }
+        audioSource.clip = audioClips[0];
+        audioSource.Play();
 
 
         IEnumerator PotionTimer()

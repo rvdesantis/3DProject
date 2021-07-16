@@ -21,6 +21,8 @@ public class DunClearedUI : MonoBehaviour
     public Button ExitBT;
     public Button ContinueBT;
 
+    public UnlockedUI unlockedUI;
+
     private void Start()
     {
         
@@ -110,7 +112,10 @@ public class DunClearedUI : MonoBehaviour
 
     private void Update()
     {
-        
+        if (dunUIObject.activeSelf)
+        {
+             areaController.areaUI.uiNavigation = true;
+        }
     }
 
 }
